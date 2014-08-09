@@ -3,329 +3,331 @@
 
 <style type="text/css">
 
-	h1, h2, h3, h4, h5, p, ul {
-		padding: 0px;
-		margin: 0px;
-	}
-	
-	h3 {
-		text-transform: uppercase;
-	}
-	
-	p {
-		font-size: 12px;
-	}
-	
-	ul {
-		list-style: none;
-		font-size: 12px;
-	}
-	
-	li {
-		cursor: pointer;
-		
-	}
-	
-	li:hover {
-		background-color: #4a4a4a;
-	}
-	
-	li a {
-		padding: 4px;
-	}
-	
-	#modal li a:hover {
-		border-radius: 0;
-	}
-	
-	#modal a {
-		cursor: pointer;
-		display: block;
-		margin: 4px;
-		text-decoration: none;
-		color: #fff;
-	}
+    * {
+        font-family: "Helvetica", "Courier New", "sans-serif";
+    }
+    
+    h1, h2, h3, h4, h5, p, ul {
+        padding: 0px;
+        margin: 0px;
+    }
 
-	#modal a:hover {
-		background-color: #cecece;
-		border-radius: 5px;
-		color: #000;
-	}
-	
-	#modal #fleetListing a:hover {
-		background-color: inherit;
-	}
-	
-	#modal #fleetListing li:hover {
-		background-color: #3a3a3a;
-	}
-	
-	button {
-		text-transform: uppercase;
-		font-size: 10px;
-		color: #cecece;
-		background-color: #3a3a3a;
-	}
-	
-	span {
-		text-transform: uppercase;
-		font-size: 10px;
-	}
-	
-	ul li span {
-		display: inline-block;
-		width: 50px;
-	}
-	
-	#fleetInfo span {
-		cursor: pointer;
-		width: 40px;
-		padding: 5px;
-		text-align: center;
-		float: left;
-		clear: both;
-	}
-	
-	#fleetInfo span.active,
-	#fleetInfo span:hover,
-	#fleetInfo span:focus {
-		border-radius: 5px;
-		background-color: #aeaeae;
-		color: #6a6a6a;
-	}
-	
-	#fleetInfo span:active {
-		color: #000;
-		background-color: #dedede;
-	}
-	
-	#fleetInfo span::focus {
-		color: #000;
-		
-	}
-	
-	#modal a.selectedFleet  {
-		background-color: #8a8e8a;
-	}
-	
-	.dynamicInput {
-		border: none;
-		font-size: 12px;
-		background-color: transparent;
-		
-	}
-	
-	input, textarea, #logwindow {
-		color: #cecece;
-		background-color: #2a2a2a;
-		font-size: 12px;
-	}
-	
-	#logwindow  {
-		padding: 5px 5px; 
-		width: 254px;
-		width: auto;
-		height: 75px;
-		font-family:sans-serif;
-		overflow: auto;
-		height: 610px;
-	}
-	
-	#logwindow span {
-		text-transform: none;
-		font-size: 12px;
-		display: inline-block;
-		width: 100%;
-	}
-	
-	#logwindow span:hover {
-		cursor: default;
-		background-color: #3a3a3a;
-	}
-	
-	.infoLink {
-		color: #fff;
-		font-weight: bold;
-		padding: 0px 5px;
-		text-decoration: none;
-	}
-	
-	.infoLink:hover {
-		text-decoration: underline;
-	}
-	
-	#modal a.tabregister {
-		padding: 5px 10px;
-		font-size: 14px;
-		color: #000;
-		display: inline;
-		border-radius: 5px 5px 0px 0px;
-		margin: 0px;
-		background-color: #7a7a7a;
-		border: 1px solid #0A0A0A;
-		border-bottom: 0px;
-		margin-right: 2px;
-	}
-	
-	#gameScreen {
-		margin: 0px auto;
-		width: 1060px; 
-		border: 1px solid #5a5a5a;
-	}
+    h3 {
+        text-transform: uppercase;
+    }
 
-	#gameScreenArea {
-		background-color:#151540;
-		display: inline; 
-		position:relative; 
-		z-index:0; 
-		float: left;
-	}
-	
-	#modal {
-		position:absolute;
-		display: none; 
-		z-index:1; 
-		min-width: 375px;
-	}
-	
-	#modal a.tabregister:hover {
-		background-color: #5e5e5e;
-		color: #fff;
-	}
-	
-	#modal a.tabregister.activetab {
-		background-color: #0A0A0A;
-		color: #dedede;
-	}
-	
-	.planetstats {
-		background-color: #0A0A0A;
-		display: block;
-		padding: 10px;
-	}
-	
-	.tabcontent {
-		background-color: #555555;
-		border: 1px solid #0A0A0A;
-		border-radius: 0 0 5px 5px;
-		color: #dedede;
-		display: block;
-		height: 120px;
-		padding: 10px;
-	}
-	
-	hr {
-		border: none;
-		border-bottom: 1px solid #222;
-		clear: both;
-	}
-	
-	#productionQueue li {
-		padding: 3px 6px;
-	}
-	
-	#stats {
-		height: 23px;
-		background-color: #4a4a4a;
-		padding: 0px 5px;
-		border-bottom: 1px solid #1a1a1a; 
-		
-	}
-	
-	#stats .statsItem {
-		float: left;
-		background-color: #1a1a1a;
-		padding: 0px 15px;
-		margin-right: 5px;
-		margin-top: 5px;
-		border-radius: 3px 3px 0px 0px;
-		cursor: pointer;
-		min-width: 90px;
-		overflow: hidden;
-		font-size: 15px;
-		color: #acacac;
-		text-decoration: none;
-		display: block;
-	}
-	
-	#statusBar {
-		clear: both;
-		display: block; 
-		background-color: #4a4a4a; 
-		color:#acacac; 
-		font-size: 15px; 
-		height: 15px; 
-		padding: 0px 10px;
-	}
-	
-	
+    p {
+        font-size: 12px;
+    }
+
+    ul {
+        list-style: none;
+        font-size: 12px;
+    }
+
+    li {
+        cursor: pointer;
+
+    }
+
+    li:hover {
+        background-color: #4a4a4a;
+    }
+
+    li a {
+        padding: 4px;
+    }
+
+    #modal li a:hover {
+        border-radius: 0;
+    }
+
+    #modal a {
+        cursor: pointer;
+        display: block;
+        margin: 4px;
+        text-decoration: none;
+        color: #fff;
+    }
+
+    #modal a:hover {
+        background-color: #cecece;
+        border-radius: 5px;
+        color: #000;
+    }
+
+    #modal #fleetListing a:hover {
+        background-color: inherit;
+    }
+
+    #modal #fleetListing li:hover {
+        background-color: #3a3a3a;
+    }
+
+    button {
+        text-transform: uppercase;
+        font-size: 10px;
+        color: #cecece;
+        background-color: #3a3a3a;
+    }
+
+    span {
+        text-transform: uppercase;
+        font-size: 10px;
+    }
+
+    ul li span {
+        display: inline-block;
+        width: 50px;
+    }
+
+    #fleetInfo span {
+        cursor: pointer;
+        width: 40px;
+        padding: 5px;
+        text-align: center;
+        float: left;
+        clear: both;
+    }
+
+    #fleetInfo span.active,
+    #fleetInfo span:hover,
+    #fleetInfo span:focus {
+        border-radius: 5px;
+        background-color: #aeaeae;
+        color: #6a6a6a;
+    }
+
+    #fleetInfo span:active {
+        color: #000;
+        background-color: #dedede;
+    }
+
+    #fleetInfo span::focus {
+        color: #000;
+
+    }
+
+    #modal a.selectedFleet  {
+        background-color: #8a8e8a;
+    }
+
+    .dynamicInput {
+        border: none;
+        font-size: 12px;
+        background-color: transparent;
+
+    }
+
+    input, textarea, #logwindow {
+        color: #cecece;
+        background-color: #2a2a2a;
+        font-size: 12px;
+    }
+
+    #logwindow  {
+        padding: 5px 5px; 
+        width: 254px;
+        width: auto;
+        height: 75px;
+        font-family:sans-serif;
+        overflow: auto;
+        height: 610px;
+    }
+
+    #logwindow span {
+        text-transform: none;
+        font-size: 10px;
+        display: inline-block;
+        width: 100%;
+    }
+
+    #logwindow span:hover {
+        cursor: default;
+        background-color: #3a3a3a;
+    }
+
+    .infoLink {
+        color: #fff;
+        font-weight: bold;
+        padding: 0px 5px;
+        text-decoration: none;
+    }
+
+    .infoLink:hover {
+        text-decoration: underline;
+    }
+
+    #modal a.tabregister {
+        padding: 5px 10px;
+        font-size: 14px;
+        color: #000;
+        display: inline;
+        border-radius: 5px 5px 0px 0px;
+        margin: 0px;
+        background-color: #7a7a7a;
+        border: 1px solid #0A0A0A;
+        border-bottom: 0px;
+        margin-right: 2px;
+    }
+
+    #gameScreen {
+        margin: 0px auto;
+        width: 1060px; 
+        border: 1px solid #5a5a5a;
+    }
+
+    #gameScreenArea {
+        background-color:#151540;
+        display: inline; 
+        position:relative; 
+        z-index:0; 
+        float: left;
+    }
+
+    #modal {
+        position:absolute;
+        display: none; 
+        z-index:1; 
+        min-width: 375px;
+    }
+
+    #modal a.tabregister:hover {
+        background-color: #5e5e5e;
+        color: #fff;
+    }
+
+    #modal a.tabregister.activetab {
+        background-color: #0A0A0A;
+        color: #dedede;
+    }
+
+    .planetstats {
+        background-color: #0A0A0A;
+        display: block;
+        padding: 10px;
+    }
+
+    .tabcontent {
+        background-color: #555555;
+        border: 1px solid #0A0A0A;
+        border-radius: 0 0 5px 5px;
+        color: #dedede;
+        display: block;
+        height: 120px;
+        padding: 10px;
+    }
+
+    hr {
+        border: none;
+        border-bottom: 1px solid #222;
+        clear: both;
+    }
+
+    #productionQueue li {
+        padding: 3px 6px;
+    }
+
+    #stats {
+        height: 23px;
+        background-color: #4a4a4a;
+        padding: 0px 5px;
+        border-bottom: 1px solid #1a1a1a; 
+
+    }
+
+    #stats .statsItem {
+        float: left;
+        background-color: #1a1a1a;
+        padding: 0px 15px;
+        margin-right: 5px;
+        margin-top: 5px;
+        border-radius: 3px 3px 0px 0px;
+        cursor: pointer;
+        min-width: 90px;
+        overflow: hidden;
+        font-size: 15px;
+        color: #acacac;
+        text-decoration: none;
+        display: block;
+    }
+
+    #statusBar {
+        clear: both;
+        display: block; 
+        background-color: #4a4a4a; 
+        color:#acacac; 
+        font-size: 15px; 
+        height: 15px; 
+        padding: 0px 10px;
+    }
+
+
 
 </style>
 
 </head>
 <body style="background-color: #000">
-	<div id="gameScreen">
-		<div id="stats">
-			<a href="#" class="statsItem" id="turnDisplay">Turn</a>
-			<a href="#" class="statsItem">Balance</a>
-			<a href="#" class="statsItem">Research</a>
-			<a href="#" class="statsItem">Planets</a>
-			<a href="#" class="statsItem" id="fleetDisplay">Fleets</a>
-		</div>
-		<canvas id="gameScreenArea" height="620" width="790"></canvas>
-		<div id="resizeRight" style="background-color: #5a5a5a; cursor: pointer; border: 1px solid #000; border-top: 0px; border-bottom: 0px; width: 4px; height: 620px; float: left;"></div>
-		<div id="logwindow" autocomplete="off"><h5>Log...</h5></div>
-		<div id="statusBar"></div>
-		<div id="modal" style="top:50px; left: 12%;"></div>
-	</div>
-	
-	<div id ="overlayContainer" style="display: none;">
-		<div id="combatOverlay" style="position: fixed; top: 0px; opacity: 0.7; left: 0px; width: 100%; height: 100%; opacity: 0.7; background-color:#000"></div>
-		<div id="combatScreen">
-			<div id="combatDisplay"style="position:fixed; width:70%; height: 70%; left: 15%; top:15%; background-color: #000; border: 1px solid #7a7a7a; border-radius: 10px;">
-				<canvas id="combatArea" width="0px" height="0px" style="background-color:#000; border-radius:10px 10px 0px 0px; margin: 2% 2% 0px 2%; border: 1px solid #3a3a3a; border-bottom-width: 0px;"></canvas>
-				<div id="combatReport" style="width:96%; border: 1px solid #3a3a3a; border-radius: 0px 0px 10px 10px; margin: 0px 2% 2% 2%"></div>
-			</div>
-		</div>
-	</div>
-	
-	<script type="text/javascript" src="connect.js"></script>
-	
-	<script type="text/javascript">
-		
-		function checkMouseResize(evt) {
-			if (evt.clientX <= 250 || evt.clientX >= (document.getElementById('gameScreen').clientWidth-80) ) {
-				return;
-			}
-			document.getElementById('gameScreenArea').width = evt.clientX-document.getElementById('gameScreenArea').offsetLeft;
-		}
-		
-		function scaleCombatScreen()  {
-			document.getElementById('combatArea').width = document.getElementById('combatDisplay').clientWidth * 0.96;
-			document.getElementById('combatArea').height = document.getElementById('combatDisplay').clientHeight * 0.75;
-			document.getElementById('combatReport').style.height = document.getElementById('combatDisplay').clientHeight * 0.18;
-			//console.log(document.getElementById('combatDisplay').clientHeight);
-		}
-		
-		
-		document.getElementById('resizeRight').addEventListener('mousedown', function(evt) {
-			window.addEventListener('mousemove', checkMouseResize);
-		});
-		
-		window.addEventListener('mouseup', function() {
-			window.removeEventListener('mousemove', checkMouseResize);
-		});
+    <div id="gameScreen">
+        <div id="stats">
+            <a href="#" class="statsItem" id="turnDisplay">Turn</a>
+            <a href="#" class="statsItem">Balance</a>
+            <a href="#" class="statsItem">Research</a>
+            <a href="#" class="statsItem">Planets</a>
+            <a href="#" class="statsItem" id="fleetDisplay">Fleets</a>
+        </div>
+        <canvas id="gameScreenArea" height="620" width="790"></canvas>
+        <div id="resizeRight" style="background-color: #5a5a5a; cursor: pointer; border: 1px solid #000; border-top: 0px; border-bottom: 0px; width: 4px; height: 620px; float: left;"></div>
+        <div id="logwindow" autocomplete="off"><h5>Log...</h5></div>
+        <div id="statusBar"></div>
+        <div id="modal" style="top:50px; left: 12%;"></div>
+    </div>
+
+    <div id ="overlayContainer" style="display: none;">
+        <div id="combatOverlay" style="position: fixed; top: 0px; opacity: 0.7; left: 0px; width: 100%; height: 100%; opacity: 0.7; background-color:#000"></div>
+        <div id="combatScreen">
+            <div id="combatDisplay"style="position:fixed; width:70%; height: 70%; left: 15%; top:15%; background-color: #000; border: 1px solid #7a7a7a; border-radius: 10px;">
+                <canvas id="combatArea" width="0px" height="0px" style="background-color:#000; border-radius:10px 10px 0px 0px; margin: 2% 2% 0px 2%; border: 1px solid #3a3a3a; border-bottom-width: 0px;"></canvas>
+                <div id="combatReport" style="width:96%; border: 1px solid #3a3a3a; border-radius: 0px 0px 10px 10px; margin: 0px 2% 2% 2%"></div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="connect.js"></script>
+
+    <script type="text/javascript">
+        function checkMouseResize(evt) {
+            if (evt.clientX <= 250 || evt.clientX >= (document.getElementById('gameScreen').clientWidth - 80)) {
+                return;
+            }
+            document.getElementById('gameScreenArea').width = evt.clientX - document.getElementById('gameScreenArea').offsetLeft;
+        }
+
+        function scaleCombatScreen() {
+            document.getElementById('combatArea').width = document.getElementById('combatDisplay').clientWidth * 0.96;
+            document.getElementById('combatArea').height = document.getElementById('combatDisplay').clientHeight * 0.75;
+            document.getElementById('combatReport').style.height = document.getElementById('combatDisplay').clientHeight * 0.18;
+            //console.log(document.getElementById('combatDisplay').clientHeight);
+        }
+        
+        document.getElementById('resizeRight').addEventListener('mousedown', function(evt) {
+            window.addEventListener('mousemove', checkMouseResize);
+        });
+
+        window.addEventListener('mouseup', function() {
+            window.removeEventListener('mousemove', checkMouseResize);
+        });
 
 
-		window.addEventListener('resize', function() {
-			scaleCombatScreen();
-		});
-		
-		
-		window.addEventListener('load', function() {
-			scaleCombatScreen();
-		});
-		
-	</script>
+        window.addEventListener('resize', function() {
+            scaleCombatScreen();
+        });
+
+
+        window.addEventListener('load', function() {
+            scaleCombatScreen();
+        });
+
+    </script>
 </body>
 </html>

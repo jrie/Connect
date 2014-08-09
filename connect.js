@@ -58,6 +58,7 @@ function app() {
 
             if (gameScreen.isPointInPath(evt.layerX, evt.layerY)) {
                 if (env.knownPlanets.indexOf(logic.planets[item].id) !== -1 || env.unknownPlanets.indexOf(logic.planets[item].id) !== -1) {
+                    lg(logic.planets[item]);
                     return logic.planets[item];
                 }
             }
@@ -71,19 +72,21 @@ function app() {
 
         for (var item in env.fleets) {
             gameScreen.beginPath();
-            gameScreen.rect(env.fleets[item].x - 10 + env.offsetX, env.fleets[item].y - 8 + env.offsetY, 18, 14);
+            //gameScreen.rect(env.fleets[item].x - 10 + env.offsetX, env.fleets[item].y - 8 + env.offsetY, 18, 14);
+            gameScreen.arc(env.fleets[item].x + env.offsetX, env.fleets[item].y + env.offsetY, 18, 0,  10);
             gameScreen.closePath();
 
             if (gameScreen.isPointInPath(evt.layerX, evt.layerY)) {
                 if (env.fleets[item].location !== 'space') {
-                    if (env.fleets[item].origin.owner === logic.currentPlayer || env.fleets[item].origin.owner === -1) {
-                        return env.fleets[item].origin.stationedFleets;
+                    
+                    if (env.fleets[item].origin.owner === env.player || env.fleets[item].origin.foreignFleets.length === 0) {
+                        return env.fleets[item].origin.stationedFleets[0];
                     } else {
-                        return env.fleets[item].origin.foreignFleets;
+                        return env.fleets[item].origin.foreignFleets[0];
                     }
-                } else {
-                    return [env.fleets[item]];
                 }
+                
+                return env.fleets[item];
             }
         }
 
@@ -131,13 +134,18 @@ function app() {
                 return;
             }
         }
-
-        if (fleet) {
-            if (fleet[0].location !== 'space') {
-                createSelection(fleet[0]);
-                showFleetDialog(fleet[0].origin, env.strg);
+        
+        if (fleet) {          
+            // Retrieve fleet info from env.fleet for selection
+            if (!fleet.hasOwnProperty('name')) {
+                fleet = getFleetById(fleet);
+            }            
+            
+            if (fleet.location !== 'space') {
+                createSelection(fleet);
+                showFleetDialog(fleet.origin, env.strg);
             } else {
-                createSelection(fleet[0]);
+                createSelection(fleet);
             }
 
         } else if (planet) {
@@ -178,6 +186,15 @@ function app() {
             statusBar.innerHTML = '';
         }
 
+    }
+    
+    function getFleetById(fleetObj) {
+        var fleetEnv = logic.environments[ parseInt(fleetObj.id.split('_')) ].fleets;
+        for (fleetItem in fleetEnv ) {
+            if (fleetObj.id === fleetEnv[fleetItem].id) {
+                return fleetEnv[fleetItem];
+            }
+        }
     }
 
 
@@ -697,7 +714,7 @@ function app() {
 
             }
         } else {
-            if (planet.foreignFleets.length > 0 || forceDisplay) {
+            if (forceDisplay) {
                 shipListing = '<div id="fleetInfo" style="width:50px; float:left; display: inline-block; padding: 4px; border-radius:5px; background-color:#5a5a5a">';
                 shipListing += '<span id="joinFleets">Join</span>';
                 shipListing += '<span id="nameFleet">Rename</span>';
@@ -709,8 +726,9 @@ function app() {
                 for (item in planet.foreignFleets) {
                     var fleetItem = planet.foreignFleets[item];
                     var targetLocation = '';
-                    if (fleetItem.owner === logic.currentPlayer) {
-                        fleetItem = env.fleets[fleetItem.index];
+                    if ( fleetItem.owner === logic.currentPlayer) {     // TODO: MAke a check for the fleetId
+                        fleetItem = getFleetById(fleetItem);
+
                         if (fleetItem.destination) {
                             if (env.unknownPlanets.indexOf(fleetItem.destination.id) !== -1 && env.ownedPlanets.indexOf(fleetItem.destination.id) === -1) {
                                 targetLocation = ' - travelling to planet at ' + Math.ceil(fleetItem.destination.x) + '-' + Math.ceil(fleetItem.destination.y) + ' (' + Math.floor(fleetItem.turns) + ' turns)';
@@ -808,7 +826,7 @@ function app() {
 
                     if (planet.owner === logic.currentPlayer) {
                         for (item in planet.stationedFleets) {
-                            if (evt.target.name === planet.stationedFleets[item].name) {
+                            if (evt.target.id === planet.stationedFleets[item].id) {
                                 targetFleet = planet.stationedFleets[item];
                                 createSelection(planet.stationedFleets[item]);
                                 break;
@@ -816,7 +834,7 @@ function app() {
                         }
                     } else {
                         for (item in planet.stationedFleets) {
-                            if (evt.target.name === planet.stationedFleets[item].name && planet.stationedFleets[item].owner === logic.currentPlayer) {
+                            if (evt.target.id === planet.stationedFleets[item].id) {
                                 targetFleet = planet.stationedFleets[item];
                                 createSelection(planet.stationedFleets[item]);
                                 break;
@@ -824,8 +842,8 @@ function app() {
                         }
                         if (!targetFleet) {
                             for (item in planet.foreignFleets) {
-                                if (evt.target.name === planet.foreignFleets[item].name && planet.foreignFleets[item].owner === logic.currentPlayer) {
-                                    targetFleet = env.fleets[ planet.foreignFleets[item].index ];
+                                if (evt.target.id === planet.foreignFleets[item].id) { // && parseInt(evt.target.id.split('_')[0]) === logic.currentPlayer --- Add a player check using fleetId
+                                    targetFleet = getFleetById(evt.target); //env.fleets[ planet.foreignFleets[item].index ];
                                     createSelection(planet.foreignFleets[item]);
                                     break;
                                 }
@@ -1234,7 +1252,6 @@ function app() {
                             modal.style.display = 'none';
                             discoverPlanets(planet.x, planet.y, 400, planet);
 
-                            // TODO: Add a check for foreignFleets and update player view
                             logic.scanAreas[logic.currentPlayer].push([150, planet.x, planet.y]);
                             env.scanAreas.push([150, planet.x, planet.y]);
 
@@ -1769,7 +1786,7 @@ function app() {
             if (targetFleet.needsMove) {
 
                 if (targetFleet.location === 'planet') {
-                    if (targetFleet.origin.owner === logic.currentPlayer || targetFleet.origin.owner === -1) {
+                    if (targetFleet.origin.owner === logic.currentPlayer)  {
                         targetFleet.origin.stationedFleets.splice(targetFleet.origin.stationedFleets.indexOf(targetFleet), 1);
 
                         if (targetFleet.origin.stationedFleets.length !== 0) {
@@ -1777,25 +1794,33 @@ function app() {
                         }
 
                     } else {
-
-                        var playerFleet = false;
-
-                        for (fleetItem in targetFleet.origin.foreignFleets) {
-                            if (targetFleet.name === targetFleet.origin.foreignFleets[fleetItem].name && targetFleet.owner === targetFleet.origin.foreignFleets[fleetItem].owner) {
-                                targetFleet.origin.foreignFleets.splice(fleetItem, 1);
-                            } else if (targetFleet.owner === targetFleet.origin.foreignFleets[fleetItem].owner) {
-                                playerFleet = logic.environments[targetFleet.owner].fleets[ targetFleet.origin.foreignFleets[fleetItem].index ];
-                            }
+                        
+                        var wasStationedFleet = false;
+                        
+                        if (targetFleet.origin.foreignFleets.length === 0) {
+                            targetFleet.origin.stationedFleets.splice(targetFleet.origin.stationedFleets.indexOf(targetFleet), 1);
+                            wasStationedFleet = true;
+                            
+                            if (targetFleet.origin.stationedFleets.length !== 0) {
+                                targetFleet.origin.stationedFleets[0].hideDrawing = false;
+                            }                            
                         }
-
-                        if (playerFleet) {
-                            playerFleet.hideDrawing = false;
+                        
+                        if (!wasStationedFleet) {
+                            for (fleetItem in targetFleet.origin.foreignFleets) {
+                                if (targetFleet.id === targetFleet.origin.foreignFleets[fleetItem].id ) { // use unqiue fleetId to
+                                    targetFleet.origin.foreignFleets.splice(fleetItem, 1);
+                                    break;
+                                }
+                            }    
                         }
                     }
 
                     targetFleet.hideDrawing = false;
                     targetFleet.location = 'space';
                 }
+                
+                lg(targetFleet);
 
 
                 targetFleet.x += targetFleet.stepX;
@@ -1806,9 +1831,6 @@ function app() {
                 logic.scanAreas[targetFleet.owner][targetFleet.scanArea][2] = targetFleet.y;
                 logic.environments[targetFleet.owner].scanAreas[targetFleet.scanArea][1] = targetFleet.x;
                 logic.environments[targetFleet.owner].scanAreas[targetFleet.scanArea][2] = targetFleet.y;
-
-                // Detection for fleet during movement in scanAreas
-                updateScanAreas(targetFleet);
 
                 if (targetFleet.turns <= 0) {
                     env = logic.environments[targetFleet.owner];
@@ -1829,24 +1851,24 @@ function app() {
 
 
                     // TODO: Check planet for foreign fleets upon arrival and offering options for space combat..
+                    lg(targetFleet);
                     if (targetFleet.origin.stationedFleets.length !== 0) {
                         if (targetFleet.owner === targetFleet.origin.stationedFleets[0].owner) {
                             targetFleet.hideDrawing = true;
-                            targetFleet.origin.stationedFleets.push(fleet);
+                            targetFleet.origin.stationedFleets.push(targetFleet);
                         } else {
                             targetFleet.x += 20;
                             targetFleet.y -= 10;
-                            foreignFleet = new Object();
+                            var foreignFleet = new Object();
                             foreignFleet.x = targetFleet.x;
                             foreignFleet.y = targetFleet.y;
+                            foreignFleet.id = targetFleet.id;
                             foreignFleet.owner = targetFleet.owner;
-                            foreignFleet.name = targetFleet.name;
-                            foreignFleet.origin = targetFleet.origin;
-                            foreignFleet.index = env.fleets.indexOf(targetFleet);
                             targetFleet.origin.foreignFleets.push(foreignFleet);
                         }
                     } else {
                         targetFleet.origin.stationedFleets.push(targetFleet);
+                        targetFleet.hideDrawing = false;
                     }
 
                     // Remove route item
@@ -1869,6 +1891,9 @@ function app() {
 
                     env = previousEnv;
                 }
+                
+                // Detection for fleet during movement in scanAreas
+                updateScanAreas(targetFleet);
             }
         }
 
@@ -1896,7 +1921,7 @@ function app() {
 
                 if (gameScreen.isPointInPath(targetFleet.x, targetFleet.y)) {
                     for (fleetItem in logic.environments[player].foreignFleets) {
-                        if (targetFleet.name === logic.environments[player].foreignFleets[fleetItem].name && targetFleet.owner === logic.environments[player].foreignFleets[fleetItem].owner) {
+                        if (targetFleet.id === logic.environments[player].foreignFleets[fleetItem].id) {
                             logic.environments[player].foreignFleets.splice(fleetItem, 1);
                             break;
                         }
@@ -1929,7 +1954,7 @@ function app() {
                 if (gameScreen.isPointInPath(targetFleet.x, targetFleet.y)) {
 
                     for (fleetItem in logic.environments[player].foreignFleets) {
-                        if (targetFleet.name === logic.environments[player].foreignFleets[fleetItem].name && targetFleet.owner === logic.environments[player].foreignFleets[fleetItem].owner) {
+                        if (targetFleet.id === logic.environments[player].foreignFleets[fleetItem].id) {
                             isFleetIncluded = true;
                             removeFromPlayer = false;
                             logic.environments[player].foreignFleets[fleetItem].x = targetFleet.x;
@@ -1945,8 +1970,8 @@ function app() {
                     var foreignFleet = new Object();
                     foreignFleet.x = targetFleet.x;
                     foreignFleet.y = targetFleet.y;
+                    foreignFleet.id = targetFleet.id;
                     foreignFleet.owner = targetFleet.owner;
-                    foreignFleet.name = targetFleet.name;
                     logic.environments[player].foreignFleets.push(foreignFleet);
                     removeFromPlayer = false;
                     break;
@@ -1956,7 +1981,7 @@ function app() {
             // if removeFromPlayer, we can safely remove the ship from the foreignfleets list
             if (removeFromPlayer) {
                 for (fleetItem in logic.environments[player].foreignFleets) {
-                    if (targetFleet.name === logic.environments[player].foreignFleets[fleetItem].name && targetFleet.owner === logic.environments[player].foreignFleets[fleetItem].owner) {
+                    if (targetFleet.id === logic.environments[player].foreignFleets[fleetItem].id) {
                         logic.environments[player].foreignFleets.splice(fleetItem, 1);
                         break;
                     }
@@ -1968,7 +1993,7 @@ function app() {
 
     function discoverPlanets(x, y, scanRange, obj) {
         gameScreen.beginPath();
-        gameScreen.arc(x, y, scanRange, 0, 10);
+        gameScreen.arc(x, y, scanRange, 0, 10); // gameScreen.arc(x, y, scanRange/2, 0, 10);
         gameScreen.closePath();
 
         previousEnv = env;
@@ -2002,9 +2027,8 @@ function app() {
                             foreignFleet = new Object();
                             foreignFleet.x = fleet.x;
                             foreignFleet.y = fleet.y;
+                            foreignFleet.id = fleet.id;
                             foreignFleet.owner = fleet.owner;
-                            foreignFleet.name = fleet.name;
-                            foreignFleet.origin = fleet.destination;
                             env.foreignFleets.push(foreignFleet);
                         }
                     }
@@ -2019,7 +2043,6 @@ function app() {
     function createShip(planet, design, joinExisting) {
         previousEnv = env;
         env = logic.environments[planet.owner];
-        lg(planet);
 
         var shipDesign = false;
         for (fleetDesign in env.designs) {
@@ -2053,6 +2076,9 @@ function app() {
                 fleet.destination = false;
                 fleet.needsMove = false;
                 fleet.hideDrawing = false;
+                
+                // Create unique fleet id              
+                fleet.id = createFleetId(fleet, planet.owner);
 
                 fleet.ships.push(ship);
                 fleet.count++;
@@ -2081,6 +2107,12 @@ function app() {
         env = previousEnv;
 
     }
+    
+    function createFleetId(fleet, owner) {
+        var date = new Date();
+        var fleetId = owner+"_"+date.getTime()+date.getMilliseconds();
+        return fleetId;
+    }
 
 
     function createFleet(player, planet, shipList, fleetName) {
@@ -2101,6 +2133,9 @@ function app() {
         fleet.needsMove = false;
         fleet.hideDrawing = false;
         fleet.scanArea = -1;
+        
+        // Create hopefully unique id for fleets
+        fleet.id = createFleetId(fleet, player);
 
         // TODO: Create fleets base names only on fleets owned by a user
         //			separating logic.fleets to logic.fleets player/owner
@@ -2126,10 +2161,8 @@ function app() {
             var foreignFleet = new Object();
             foreignFleet.x = fleet.x + 20;
             foreignFleet.y = fleet.y - 10;
+            foreignFleet.id = fleet.id;
             foreignFleet.owner = fleet.owner;
-            foreignFleet.name = fleet.name;
-            foreignFleet.origin = planet;
-            foreignFleet.index = env.fleets.length;
             planet.foreignFleets.push(foreignFleet);
 
             fleet.hideDrawing = true;
@@ -2150,8 +2183,8 @@ function app() {
     function genGalaxie(count) {
 
         for (var step = 0; step < count; step++) {
-            var x = Math.random() * (gameArea.width * 0.5) + 20;
-            var y = Math.random() * (gameArea.height * 0.5) + 20;
+            var x = Math.random() * (gameArea.width * 0.75) + 20;
+            var y = Math.random() * (gameArea.height * 0.75) + 20;
             var size = Math.ceil((Math.random() * 8) + 7);
 
             var planet = new Object;
@@ -3497,7 +3530,7 @@ function app() {
      */
 
     env = logic.environments[0];
-    genGalaxie(20);
+    genGalaxie(40);
     bindHandlers();
     gameInterval = setInterval(mainloop, 20);
 
