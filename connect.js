@@ -39,7 +39,7 @@ function app() {
                  }
                  */
                 textsize = gameScreen.measureText(planet.name);
-                gameScreen.strokeText(planet.name, planet.x + env.offsetX - (textsize.width / 2), planet.y + planet.size + 15 + env.offsetY);
+                gameScreen.strokeText(planet.name, planet.x + env.offsetX - (textsize.width / 2), planet.y + planet.size + 16 + env.offsetY);
 
             } else if (env.unknownPlanets.indexOf(planet.id) !== -1) {
                 gameScreen.arc(planet.x + env.offsetX, planet.y + env.offsetY, planet.size, 0, 10);
@@ -53,7 +53,7 @@ function app() {
     function checkPlanets(evt) {
         for (var item in logic.planets) {
             gameScreen.beginPath();
-            gameScreen.arc(logic.planets[item].x + env.offsetX, logic.planets[item].y + env.offsetY, logic.planets[item].size + 2, 0, 10);
+            gameScreen.arc(logic.planets[item].x + env.offsetX, logic.planets[item].y + env.offsetY, logic.planets[item].size + 4, 0, 10);
             gameScreen.closePath();
 
             if (gameScreen.isPointInPath(evt.layerX, evt.layerY)) {
@@ -73,7 +73,7 @@ function app() {
         for (var item in env.fleets) {
             gameScreen.beginPath();
             //gameScreen.rect(env.fleets[item].x - 10 + env.offsetX, env.fleets[item].y - 8 + env.offsetY, 18, 14);
-            gameScreen.arc(env.fleets[item].x + env.offsetX, env.fleets[item].y + env.offsetY, 18, 0,  10);
+            gameScreen.arc(env.fleets[item].x + env.offsetX, env.fleets[item].y + env.offsetY, 10, 0,  10);
             gameScreen.closePath();
 
             if (gameScreen.isPointInPath(evt.layerX, evt.layerY)) {
@@ -202,40 +202,22 @@ function app() {
     function getBaseOutput(planet) {
         var baseAgriculture = logic.ecologicalLevel[planet.ecologicalLevel][0];
         var baseProduction = logic.mineralLevel[planet.mineralLevel][0];
-        var baseResearch = logic.workers[env.player].research;
-        //['Factory Complex', 40, 'B', ['Construction', '*', 3] ],//['Construction', '+', 3, false] ],
-        //['Farm Complex', 20, 'B', ['Agriculture', '%', 1.1, ] ]
+        var baseResearch = logic.workers[planet.owner].research;
 
-        var constructionAgriculture = 0;
-        var constructionProduction = 0;
-        var constructionResearch = 0;
-
-
+        // Increasing basic planet output by percentage based buildings
         for (var planetConstruction in planet.constructions) {
             for (var building in logic.buildings) {
                 if (logic.buildings[building][0] === planet.constructions[planetConstruction]) {
-                    if (logic.buildings[building][3][1] === '+') {
+                    if (logic.buildings[building][3][1] === '%') {
                         switch (logic.buildings[building][3][0]) {
                             case "Agriculture":
-                                constructionAgriculture += logic.buildings[building][3][2];
+                                baseAgriculture *= logic.buildings[building][3][2];
                                 break;
                             case "Construction":
-                                constructionProduction += logic.buildings[building][3][2];
+                                baseProduction *= logic.buildings[building][3][2];
                                 break;
                             case "Research":
-                                constructionResearch += logic.buildings[building][3][2];
-                                break;
-                        }
-                    } else if (logic.buildings[building][3][1] === '%') {
-                        switch (logic.buildings[building][3][0]) {
-                            case "Agriculture":
-                                constructionAgriculture *= logic.buildings[building][3][2];
-                                break;
-                            case "Construction":
-                                constructionProduction *= logic.buildings[building][3][2];
-                                break;
-                            case "Research":
-                                constructionResearch *= logic.buildings[building][3][2];
+                                baseResearch *= logic.buildings[building][3][2];
                                 break;
                         }
                     }
@@ -243,14 +225,10 @@ function app() {
             }
         }
 
-        baseAgriculture += constructionAgriculture;
-        baseProduction += constructionProduction;
-        baseResearch += constructionResearch;
-
         return [baseAgriculture, baseProduction, baseResearch];
     }
 
-    function getPlanetOutput(planet) {
+    function getFixedOutput(planet) {
         var planetAgriculture = 0;
         var planetProduction = 0;
         var planetResearch = 0;
@@ -261,13 +239,41 @@ function app() {
                     if (logic.buildings[building][3][1] === '+') {
                         switch (logic.buildings[building][3][0]) {
                             case "Agriculture":
-                                constructionAgriculture += logic.buildings[building][3][2];
+                                planetAgriculture += logic.buildings[building][3][2];
                                 break;
                             case "Construction":
-                                constructionProduction += logic.buildings[building][3][2];
+                                planetProduction += logic.buildings[building][3][2];
                                 break;
                             case "Research":
-                                constructionResearch += logic.buildings[building][3][2];
+                                planetResearch += logic.buildings[building][3][2];
+                                break;
+                        }
+                    }
+                }
+            }
+        }
+
+        return [planetAgriculture, planetProduction, planetResearch];
+    }
+    
+     function getMultiOutput(planet) {
+        var planetAgriculture = 0;
+        var planetProduction = 0;
+        var planetResearch = 0;
+
+        for (var planetConstruction in planet.constructions) {
+            for (var building in logic.buildings) {
+                if (logic.buildings[building][0] === planet.constructions[planetConstruction]) {
+                    if (logic.buildings[building][3][1] === '*') {
+                        switch (logic.buildings[building][3][0]) {
+                            case "Agriculture":
+                                planetAgriculture += logic.buildings[building][3][2];
+                                break;
+                            case "Construction":
+                                planetProduction += logic.buildings[building][3][2];
+                                break;
+                            case "Research":
+                                planetResearch += logic.buildings[building][3][2];
                                 break;
                         }
                     }
@@ -303,12 +309,15 @@ function app() {
         }
 
         infoScreen += '</div>';
-
+        
         if (env.ownedPlanets.indexOf(planet.id) !== -1) {
 
-            var baseOutput = getBaseOutput(planet);
+            var percentOutput = getBaseOutput(planet);
+            var fixedOutput = getFixedOutput(planet);
+            var multiOutput = getMultiOutput(planet);
+                      
             if (planet.workForce[3] !== 0) {
-                turns = Math.ceil((planet.production[2] - planet.production[1]) / (planet.workForce[3] * baseOutput[1]));
+                turns = Math.ceil( (planet.production[2] - planet.production[1]) / ( (planet.workForce[3] * (percentOutput[1] + multiOutput[1])) + fixedOutput[1] ) );
             } else {
                 turns = '-';
             }
@@ -324,9 +333,15 @@ function app() {
             infoScreen += '<button id="research" style="float: left; clear: both; width: 100px; ">Research</button>';
             infoScreen += '<button id="reset" style="float: left; clear: both; width: 100px;">Reset workforce</button></div>';
 
-            var displayAgriculture = baseOutput[0].toString().slice(0, baseOutput[0].toString().indexOf('.') + 3);
-            var displayProduction = baseOutput[1].toString().slice(0, baseOutput[1].toString().indexOf('.') + 3);
-            var displayResearch = baseOutput[2].toString().slice(0, baseOutput[2].toString().indexOf('.') + 2);
+            var baseMixOutput = [
+                percentOutput[0]+multiOutput[0],
+                percentOutput[1]+multiOutput[1],
+                percentOutput[2]+multiOutput[2]            
+            ];
+            
+            var displayAgriculture = baseMixOutput[0].toString().slice(0, baseMixOutput[0].toString().indexOf('.') + 3);
+            var displayProduction = baseMixOutput[1].toString().slice(0, baseMixOutput[1].toString().indexOf('.') + 3);
+            var displayResearch = baseMixOutput[2].toString().slice(0, baseMixOutput[2].toString().indexOf('.') + 2);
             infoScreen += '<div style="float:right; text-align:right;">';
             infoScreen += '<p>Base Agriculture.. ' + displayAgriculture + '</p>';
             infoScreen += '<p>Base Production.. ' + displayProduction + '</p>';
@@ -339,9 +354,9 @@ function app() {
             displayAgriculture = 0;
             displayProduction = 0;
             displayResearch = 0;
-
+            
             if (planet.workForce[2] > 0) {
-                agricultureValue = (planet.workForce[2] * baseOutput[0]) * env.workers.agriculture;
+                agricultureValue = planet.workForce[2] * (percentOutput[0] + multiOutput[0]);
 
                 if (agricultureValue.toString().indexOf('.') !== -1) {
                     displayAgriculture = agricultureValue.toString().slice(0, agricultureValue.toString().indexOf('.') + 3);
@@ -351,7 +366,7 @@ function app() {
             }
 
             if (planet.workForce[3] > 0) {
-                productionValue = (planet.workForce[3] * baseOutput[1]) * env.workers.production;
+                productionValue = planet.workForce[3] * (percentOutput[1] + multiOutput[1]);
 
                 if (productionValue.toString().indexOf('.') !== -1) {
                     displayProduction = productionValue.toString().slice(0, productionValue.toString().indexOf('.') + 3);
@@ -361,7 +376,7 @@ function app() {
             }
 
             if (planet.workForce[4] > 0) {
-                researchValue = (planet.workForce[4] * baseOutput[2]) * env.workers.research;
+                researchValue = planet.workForce[4]  * (percentOutput[2] + multiOutput[2]);
 
                 if (researchValue.toString().indexOf('.') !== -1) {
                     displayResearch = researchValue.toString().slice(0, researchValue.toString().indexOf('.') + 3);
@@ -371,9 +386,9 @@ function app() {
             }
 
             infoScreen += '<br>';
-            infoScreen += '<p>Agriculture value.. ' + displayAgriculture + '</p>';
-            infoScreen += '<p>Production value.. ' + displayProduction + '</p>';
-            infoScreen += '<p>Research value.. ' + displayResearch + '</p>';
+            infoScreen += '<p>Agriculture value.. ' + displayAgriculture + ' + '+ fixedOutput[0] +'</p>';
+            infoScreen += '<p>Production value.. ' + displayProduction + ' + '+ fixedOutput[1] +'</p>';
+            infoScreen += '<p>Research value.. ' + displayResearch + ' + '+ fixedOutput[2] +'</p>';
             infoScreen += '</div></div>';
 
             // Production modal
@@ -1717,56 +1732,62 @@ function app() {
             // Planet production
             //lg('out '+logic.planets[item].production[0]);
             if (logic.planets[item].production[0]) {
-                var output = getBaseOutput(logic.planets[item]);
-                logic.planets[item].production[1] += (Math.round(output[1]) * logic.planets[item].workForce[3]);
+                
+                var planet = logic.planets[item];
+                
+                var percentOutput = getBaseOutput(planet);
+                var fixedOutput = getFixedOutput(planet);
+                var multiOutput = getMultiOutput(planet);
+                            
+                planet.production[1] += (planet.workForce[3] * (percentOutput[1] + multiOutput[1])) + fixedOutput[1];
 
-                if (logic.planets[item].production[1] >= logic.planets[item].production[2]) {
+                if (planet.production[1] >= planet.production[2]) {
 
                     link = createLink('planet', item, logic.planets[item].name);
-                    report('Planet ' + link + ' finished the production of ' + logic.planets[item].production[0]);
+                    report('Planet ' + link + ' finished the production of ' + planet.production[0]);
 
-                    if (logic.planets[item].production[3] === 'building') {
-                        logic.planets[item].constructions.push(logic.planets[item].production[0]);
+                    if (planet.production[3] === 'building') {
+                        planet.constructions.push(planet.production[0]);
 
-                    } else if (logic.planets[item].production[3] === 'design') {
+                    } else if (planet.production[3] === 'design') {
                         // TODO: check if fleet is present, use autojoin or create new one
-                        createShip(logic.planets[item], logic.planets[item].production[0], true);
+                        createShip(planet, planet.production[0], true);
                     }
 
 
-                    if (logic.planets[item].productionQueue.length !== 0) {
+                    if (planet.productionQueue.length !== 0) {
                         // TODO: Perform a check if an queued item still can be constructed
-                        if (logic.planets[item].productionQueue[0][0] === 'building') {
+                        if (planet.productionQueue[0][0] === 'building') {
                             for (option in logic.buildings) {
-                                if (logic.planets[item].productionQueue[0][1] === logic.buildings[option][0]) {
-                                    logic.planets[item].production = [logic.buildings[option][0], 0, logic.buildings[option][1], 'building'];
+                                if (planet.productionQueue[0][1] === logic.buildings[option][0]) {
+                                    planet.production = [logic.buildings[option][0], 0, logic.buildings[option][1], 'building'];
                                     break;
                                 }
                             }
-                        } else if (logic.planets[item].productionQueue[0][0] === 'design') {
+                        } else if (planet.productionQueue[0][0] === 'design') {
                             for (design in env.designs) {
-                                if (logic.planets[item].productionQueue[0][1] === env.designs[design].name) {
-                                    logic.planets[item].production = [env.designs[design].name, 0, env.designs[design].cost, 'design'];
+                                if (planet.productionQueue[0][1] === env.designs[design].name) {
+                                    planet.production = [env.designs[design].name, 0, env.designs[design].cost, 'design'];
                                     break;
                                 }
                             }
                         }
 
 
-                        if (logic.planets[item].production[0]) {
-                            report('Continuing construction of queued item ' + logic.planets[item].production[0]);
+                        if (planet.production[0]) {
+                            report('Continuing construction of queued item ' + planet.production[0]);
                         } else {
-                            report('Cannot continue construction of ' + logic.planets[item].productionQueue[0][1]);
+                            report('Cannot continue construction of ' + planet.productionQueue[0][1]);
                         }
 
-                        logic.planets[item].productionQueue.splice(0, 1);
+                        planet.productionQueue.splice(0, 1);
 
-                    } else if (logic.planets[item].prevProduction[0]) {
-                        logic.planets[item].production = logic.planets[item].prevProduction;
-                        logic.planets[item].prevProduction = [false, 0, 0];
-                        report('Continuing construction of previous item ' + logic.planets[item].production[0]);
+                    } else if (planet.prevProduction[0]) {
+                        planet.production = planet.prevProduction;
+                        planet.prevProduction = [false, 0, 0];
+                        report('Continuing construction of previous item ' + planet.production[0]);
                     } else {
-                        logic.planets[item].production = [false, 0, 0];
+                        planet.production = [false, 0, 0];
                         report('No further items in queue');
                     }
                 }
@@ -2840,7 +2861,7 @@ function app() {
     logic.buildings = [
         ['Factory Complex', 40, 'B', ['Construction', '*', 3]], //['Construction', '+', 3, false] ],
         ['Farm Complex', 20, 'B', ['Agriculture', '%', 1.15]], //['Agriculture', '%', 1.05] ],
-        ['Research Center', 50, 'B', ['Research', '*', 4]],
+        ['Research Center', 50, 'B', ['Research', '+', 4]],
         ['Marine Barracks', 35, 'B', ['PlanetCombat', 1, 4, 5]],
         ['Missile Base', 65, 'B', ['PlanetDefense', 1, 8, 8]]
     ];
@@ -3532,7 +3553,7 @@ function app() {
     env = logic.environments[0];
     genGalaxie(40);
     bindHandlers();
-    gameInterval = setInterval(mainloop, 20);
+    gameInterval = setInterval(mainloop, 100);
 
 
 
