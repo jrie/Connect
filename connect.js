@@ -34,7 +34,7 @@ function app() {
                 gameScreen.strokeText(planet.name, planet.x + playerEnv.offsetX - (textsize.width / 2), planet.y + planet.size + 16 + env.offsetY);
             }
 
-            gameScreen.arc(planet.x + playerEnv.offsetX, planet.y + playerEnv.offsetY, planet.size, 0, 10);
+            gameScreen.arc(planet.x + playerEnv.offsetX, planet.y + playerEnv.offsetY, planet.size, 0, 6.28);
 
             gameScreen.fill();
             gameScreen.closePath();
@@ -46,7 +46,7 @@ function app() {
         var playerEnv = logic.environments[logic.currentPlayer];
         for (var item in playerEnv.planets) {
             gameScreen.beginPath();
-            gameScreen.arc(playerEnv.planets[item].x + playerEnv.offsetX, playerEnv.planets[item].y + playerEnv.offsetY, playerEnv.planets[item].size + 2, 0, 10);
+            gameScreen.arc(playerEnv.planets[item].x + playerEnv.offsetX, playerEnv.planets[item].y + playerEnv.offsetY, playerEnv.planets[item].size + 2, 0, 6.28);
             gameScreen.closePath();
 
             if (gameScreen.isPointInPath(evt.layerX, evt.layerY)) {
@@ -65,7 +65,7 @@ function app() {
 
         for (var item in playerEnv.fleets) {
             gameScreen.beginPath();
-            gameScreen.arc(playerEnv.fleets[item].x + playerEnv.offsetX, playerEnv.fleets[item].y + playerEnv.offsetY, 12, 0,  10);
+            gameScreen.arc(playerEnv.fleets[item].x + playerEnv.offsetX, playerEnv.fleets[item].y + playerEnv.offsetY, 12, 0,  6.28);
             gameScreen.closePath();
 
             if (gameScreen.isPointInPath(evt.layerX, evt.layerY)) {
@@ -1360,7 +1360,7 @@ function app() {
 
         gameScreen.beginPath();
         gameScreen.strokeStyle = "rgba(240,240,240, 0.6)";
-        gameScreen.arc(env.activeSelection.x + env.offsetX, env.activeSelection.y + env.offsetY, env.selectionSize + 5 + env.selectionIteration, 0, 10);
+        gameScreen.arc(env.activeSelection.x + env.offsetX, env.activeSelection.y + env.offsetY, env.selectionSize + 5 + env.selectionIteration, 0, 6.28);
         gameScreen.stroke();
         gameScreen.closePath();
 
@@ -1394,8 +1394,8 @@ function app() {
             gameScreen.closePath();
 
             gameScreen.beginPath();
-            gameScreen.arc(env.activeRoutes[route][0].origin.x + env.offsetX, env.activeRoutes[route][0].origin.y + env.offsetY, 3, 0, 10);
-            gameScreen.arc(env.activeRoutes[route][1].x + env.offsetX, env.activeRoutes[route][1].y + env.offsetY, 3, 0, 10);
+            gameScreen.arc(env.activeRoutes[route][0].origin.x + env.offsetX, env.activeRoutes[route][0].origin.y + env.offsetY, 3, 0, 6.28);
+            gameScreen.arc(env.activeRoutes[route][1].x + env.offsetX, env.activeRoutes[route][1].y + env.offsetY, 3, 0, 6.28);
             gameScreen.fill();
             gameScreen.closePath();
         }
@@ -1937,7 +1937,7 @@ function app() {
                 var scanX = scanArea[1];
                 var scanY = scanArea[2];
                 gameScreen.beginPath();
-                gameScreen.arc(scanX, scanY, scanArea[0], 0, 10);
+                gameScreen.arc(scanX, scanY, scanArea[0], 0, 6.28);
                 gameScreen.closePath();
 
                 if (gameScreen.isPointInPath(targetFleet.x, targetFleet.y)) {
@@ -1977,7 +1977,7 @@ function app() {
                 var scanY = scanArea[2];
 
                 gameScreen.beginPath();
-                gameScreen.arc(scanX, scanY, scanArea[0], 0, 10);
+                gameScreen.arc(scanX, scanY, scanArea[0], 0, 6.28);
                 gameScreen.closePath();
 
 
@@ -2023,7 +2023,7 @@ function app() {
 
     function discoverPlanets(x, y, scanRange, obj) {
         gameScreen.beginPath();
-        gameScreen.arc(x, y, scanRange, 0, 10); // gameScreen.arc(x, y, scanRange/2, 0, 10);
+        gameScreen.arc(x, y, scanRange, 0, 6.28); // gameScreen.arc(x, y, scanRange/2, 0, 10);
         gameScreen.closePath();
 
         var playerEnv = logic.environments[obj.owner];
@@ -2337,15 +2337,16 @@ function app() {
         var scanX = 0;
         var scanY = 0;
 
+        gameScreen.beginPath();
         for (area in env.scanAreas) {
-            gameScreen.beginPath();
             scanArea = env.scanAreas[area];
             scanX = scanArea[1] + env.offsetX;
             scanY = scanArea[2] + env.offsetY;
-            gameScreen.arc(scanX, scanY, scanArea[0], 0, 10);
-            gameScreen.closePath();
-            gameScreen.fill();
+            gameScreen.arc(scanX, scanY, scanArea[0], 0, 6.28);
         }
+        
+        gameScreen.closePath();
+        gameScreen.fill();
 
         if (env.activeSelection) {
             updateSelectionInfo(env.activeSelection);
