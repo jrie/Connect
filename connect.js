@@ -12,7 +12,7 @@ function app() {
         gameScreen.font = "10px sans-serif";
         var textsize = 0;
         var planet = new Object();
-        
+
         for (item in playerEnv.planets) {
 
             planet = playerEnv.planets[item];
@@ -33,7 +33,7 @@ function app() {
                 textsize = gameScreen.measureText(planet.name);
                 gameScreen.strokeText(planet.name, planet.x + playerEnv.offsetX - (textsize.width / 2), planet.y + planet.size + 16 + env.offsetY);
             }
-            
+
             gameScreen.arc(planet.x + playerEnv.offsetX, planet.y + playerEnv.offsetY, planet.size, 0, 10);
 
             gameScreen.fill();
@@ -65,24 +65,24 @@ function app() {
 
         for (var item in playerEnv.fleets) {
             gameScreen.beginPath();
-            gameScreen.arc(playerEnv.fleets[item].x + playerEnv.offsetX, playerEnv.fleets[item].y + playerEnv.offsetY, 14, 0,  10);
+            gameScreen.arc(playerEnv.fleets[item].x + playerEnv.offsetX, playerEnv.fleets[item].y + playerEnv.offsetY, 12, 0,  10);
             gameScreen.closePath();
 
             if (gameScreen.isPointInPath(evt.layerX, evt.layerY)) {
                 if (playerEnv.fleets[item].location !== 'space') {
-                    
+
                     if (playerEnv.fleets[item].origin.owner === playerEnv.player || playerEnv.fleets[item].origin.foreignFleets.length === 0) {
                         return playerEnv.fleets[item].origin.stationedFleets[0];
                     } else {
                         for (fleetItem in playerEnv.fleets[item].origin.foreignFleets) {
                             if (playerEnv.fleets[fleetItem].origin.foreignFleets.owner === playerEnv.player) {
                                 return playerEnv.fleets[item].origin.foreignFleets[fleetItem];
-                            }       
+                            }
                         }
-                        
+
                     }
                 }
-                
+
                 return playerEnv.fleets[item];
             }
         }
@@ -115,6 +115,10 @@ function app() {
     function checkClick(evt) {
         //lg(evt);
 
+        if (document.getElementById("planetName") !== null) {
+            return;
+        }
+
         if (evt.originalTarget.id !== 'modal' && !env.strg) {
             modal.style.display = 'none';
             modal.innerHTML = '';
@@ -131,13 +135,13 @@ function app() {
                 return;
             }
         }
-        
-        if (fleet) {          
+
+        if (fleet) {
             // Retrieve fleet info from env.fleet for selection
             if (!fleet.hasOwnProperty('name')) {
                 fleet = getFleetById(fleet);
-            }            
-            
+            }
+
             if (fleet.location !== 'space') {
                 createSelection(fleet);
                 showFleetDialog(fleet.origin, env.strg);
@@ -186,7 +190,7 @@ function app() {
         }
 
     }
-    
+
     function getFleetById(fleetObj) {
         var fleetEnv = logic.environments[ parseInt(fleetObj.id.split('_')) ].fleets;
         for (fleetItem in fleetEnv ) {
@@ -254,7 +258,7 @@ function app() {
 
         return [planetAgriculture, planetProduction, planetResearch];
     }
-    
+
      function getMultiOutput(planet) {
         var planetAgriculture = 0;
         var planetProduction = 0;
@@ -308,13 +312,13 @@ function app() {
         }
 
         infoScreen += '</div>';
-        
+
         if (env.ownedPlanets.indexOf(planet.id) !== -1) {
 
             var percentOutput = getBaseOutput(planet);
             var fixedOutput = getFixedOutput(planet);
             var multiOutput = getMultiOutput(planet);
-                      
+
             if (planet.workForce[3] !== 0) {
                 turns = Math.ceil( (planet.production[2] - planet.production[1]) / ( (planet.workForce[3] * (percentOutput[1] + multiOutput[1])) + fixedOutput[1] ) );
             } else {
@@ -335,9 +339,9 @@ function app() {
             var baseMixOutput = [
                 percentOutput[0]+multiOutput[0],
                 percentOutput[1]+multiOutput[1],
-                percentOutput[2]+multiOutput[2]            
+                percentOutput[2]+multiOutput[2]
             ];
-            
+
             var displayAgriculture = baseMixOutput[0].toString().slice(0, baseMixOutput[0].toString().indexOf('.') + 3);
             var displayProduction = baseMixOutput[1].toString().slice(0, baseMixOutput[1].toString().indexOf('.') + 3);
             var displayResearch = baseMixOutput[2].toString().slice(0, baseMixOutput[2].toString().indexOf('.') + 2);
@@ -353,7 +357,7 @@ function app() {
             displayAgriculture = 0;
             displayProduction = 0;
             displayResearch = 0;
-            
+
             if (planet.workForce[2] > 0) {
                 agricultureValue = planet.workForce[2] * (percentOutput[0] + multiOutput[0]);
 
@@ -671,7 +675,7 @@ function app() {
         modal.style.display = 'inline';
         gameArea.focus();
     }
-    
+
     function showFleetDialog(planet, forceDisplay) {
 
         var options = '';
@@ -1196,13 +1200,11 @@ function app() {
 
             if (colonizeInfo[0]) {
 
-                lg(env);
-
                 document.getElementById('btnColonize').addEventListener('click', function() {
                     this.parentNode.removeChild(this);
 
-                    env = logic.environments[logic.currentPlayer];
-                    env.ownedPlanets.push(planet.id);
+                    var playerEnv = logic.environments[logic.currentPlayer];
+                    playerEnv.ownedPlanets.push(planet.id);
                     planet.population[0] = colonizeInfo[0];
                     planet.workForce = [colonizeInfo[0], colonizeInfo[0], 0, 0, 0];
 
@@ -1216,6 +1218,7 @@ function app() {
                      }
                      */
 
+
                     if (planet.stationedFleets[colonizeInfo[1]].ships.length === 1) {
                         // Remove fleet
 
@@ -1225,17 +1228,32 @@ function app() {
                         var targetFleet = planet.stationedFleets[colonizeInfo[1]];
                         removeFleetFromPlayerViews(targetFleet);
 
-                        env.fleets.splice(env.fleets.indexOf(planet.stationedFleets[colonizeInfo[1]]), 1);
+                        // Decrease count of design
+                        for (design in playerEnv.designs) {
+                            if (planet.stationedFleets[colonizeInfo[1]].ships[0].design === playerEnv.designs[design].name) {
+                                playerEnv.designs[design].count -= 1;
+                            }
+                        }
+
+                        playerEnv.fleets.splice(playerEnv.fleets.indexOf(planet.stationedFleets[colonizeInfo[1]]), 1);
                         planet.stationedFleets.splice(colonizeInfo[1], 1);
-                        env.activeSelection = false;
+                        playerEnv.activeSelection = false;
 
                         if (!isVisible && planet.stationedFleets.length !== 0) {
                             planet.stationedFleets[0].hideDrawing = false;
                         }
 
                     } else {
+                         // Decrease count of design
+                        for (design in playerEnv.designs) {
+                            if (planet.stationedFleets[colonizeInfo[1]].ships[colonizeInfo[2]].design === playerEnv.designs[design].name) {
+                                playerEnv.designs[design].count -= 1;
+                            }
+                        }
+
                         // Remove single ship from fleet
                         planet.stationedFleets[colonizeInfo[1]].ships.splice(colonizeInfo[2], 1);
+
                     }
 
                     modal.innerHTML = '<h2>Colony name</h2><input id="planetName" autocomplete="off" maxlength=25 width=25/>';
@@ -1251,7 +1269,7 @@ function app() {
                             discoverPlanets(planet.x, planet.y, 150, planet);
 
                             logic.scanAreas[logic.currentPlayer].push([150, planet.x, planet.y]);
-                            env.scanAreas.push([150, planet.x, planet.y]);
+                            playerEnv.scanAreas.push([150, planet.x, planet.y]);
 
                             createSelection(planet);
                             scrollToLocation(planet, showPlanetDialog);
@@ -1716,13 +1734,13 @@ function app() {
             // Planet production
             //lg('out '+logic.planets[item].production[0]);
             if (logic.planets[item].production[0]) {
-                
+
                 var planet = logic.planets[item];
-                
+
                 var percentOutput = getBaseOutput(planet);
                 var fixedOutput = getFixedOutput(planet);
                 var multiOutput = getMultiOutput(planet);
-                            
+
                 planet.production[1] += (planet.workForce[3] * (percentOutput[1] + multiOutput[1])) + fixedOutput[1];
 
                 if (planet.production[1] >= planet.production[2]) {
@@ -1799,32 +1817,32 @@ function app() {
                         }
 
                     } else {
-                        
+
                         var wasStationedFleet = false;
-                        
+
                         if (targetFleet.origin.foreignFleets.length === 0) {
                             targetFleet.origin.stationedFleets.splice(targetFleet.origin.stationedFleets.indexOf(targetFleet), 1);
                             wasStationedFleet = true;
-                            
+
                             if (targetFleet.origin.stationedFleets.length !== 0) {
                                 targetFleet.origin.stationedFleets[0].hideDrawing = false;
-                            }                            
+                            }
                         }
-                        
+
                         if (!wasStationedFleet) {
                             for (fleetItem in targetFleet.origin.foreignFleets) {
                                 if (targetFleet.id === targetFleet.origin.foreignFleets[fleetItem].id ) { // use unqiue fleetId to
                                     targetFleet.origin.foreignFleets.splice(fleetItem, 1);
                                     break;
                                 }
-                            }    
+                            }
                         }
                     }
 
                     targetFleet.hideDrawing = false;
                     targetFleet.location = 'space';
                 }
-                
+
                 lg(targetFleet);
 
 
@@ -1836,7 +1854,7 @@ function app() {
                 logic.scanAreas[targetFleet.owner][targetFleet.scanArea][2] = targetFleet.y;
                 logic.environments[targetFleet.owner].scanAreas[targetFleet.scanArea][1] = targetFleet.x;
                 logic.environments[targetFleet.owner].scanAreas[targetFleet.scanArea][2] = targetFleet.y;
-                
+
                 if (targetFleet.turns <= 0) {
                     env = logic.environments[targetFleet.owner];
 
@@ -1894,7 +1912,7 @@ function app() {
                     var link2 = createLink('planet', targetFleet.origin.id, targetFleet.origin.name);
                     report(link1 + ' arrived at destination ' + link2);
                 }
-                
+
                 // Detection for fleet during movement in scanAreas
                 updateScanAreas(targetFleet);
             }
@@ -1931,7 +1949,7 @@ function app() {
                     }
                 }
             }
-            
+
         }
     }
 
@@ -1941,7 +1959,7 @@ function app() {
             if (player === targetFleet.owner) {
                 continue;
             }
-            
+
             var targetX = targetFleet.x;
             var targetY = targetFleet.y;
 
@@ -1949,10 +1967,10 @@ function app() {
                 targetX = targetFleet.origin.x;
                 targetY = targetFleet.origin.y;
             }
-            
+
             var removeFromPlayer = true;
             var isFleetIncluded = false;
-            
+
             for (area in  logic.environments[player].scanAreas) {
                 var scanArea = logic.environments[player].scanAreas[area];
                 var scanX = scanArea[1];
@@ -1962,8 +1980,8 @@ function app() {
                 gameScreen.arc(scanX, scanY, scanArea[0], 0, 10);
                 gameScreen.closePath();
 
-                
-                
+
+
                 if (gameScreen.isPointInPath(targetX, targetY)) {
                     for (fleetItem in logic.environments[player].foreignFleets) {
                         if (targetFleet.id === logic.environments[player].foreignFleets[fleetItem].id) {
@@ -2015,7 +2033,7 @@ function app() {
         var distance = 0;
         var link1 = '';
         var link2 = '';
-        
+
         for (activeItem in logic.planets) {
             var planet = logic.planets[activeItem];
 
@@ -2087,8 +2105,8 @@ function app() {
                 fleet.destination = false;
                 fleet.needsMove = false;
                 fleet.hideDrawing = false;
-                
-                // Create unique fleet id              
+
+                // Create unique fleet id
                 fleet.id = createFleetId(fleet, planet.owner);
                 lg(fleet.id);
 
@@ -2116,7 +2134,7 @@ function app() {
 
         }
     }
-    
+
     function createFleetId(fleet, owner) {
         var date = new Date();
         var fleetId = owner+"_"+date.getTime()+date.getMilliseconds();
@@ -2146,7 +2164,7 @@ function app() {
         fleet.needsMove = false;
         fleet.hideDrawing = false;
         fleet.scanArea = -1;
-        
+
         // Create hopefully unique id for fleets
         fleet.id = createFleetId(fleet, player);
 
@@ -2304,13 +2322,13 @@ function app() {
 
     var mainLoopCalculating = false;
     function mainloop() {
-        
+
         if (mainLoopCalculating) {
             return;
         }
-        
+
         mainLoopCalculating = true;
-        
+
         gameArea.width = gameArea.width;
         gameScreen.fillStyle = 'rgba(255,255,255, 0.02)';
 
@@ -2318,7 +2336,7 @@ function app() {
         var scanArea = [];
         var scanX = 0;
         var scanY = 0;
-       
+
         for (area in env.scanAreas) {
             gameScreen.beginPath();
             scanArea = env.scanAreas[area];
@@ -2328,7 +2346,7 @@ function app() {
             gameScreen.closePath();
             gameScreen.fill();
         }
-        
+
         if (env.activeSelection) {
             updateSelectionInfo(env.activeSelection);
             drawSelection();
@@ -2341,7 +2359,7 @@ function app() {
         }
 
         drawFleets();
-        
+
         mainLoopCalculating = false;
     }
 
