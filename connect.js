@@ -20,7 +20,6 @@ function app() {
             planetObj = playerEnv.planets[x];
             gameScreen.beginPath();
             
-            // TODO: Update the planet display only if a planet is in scanRange of the current player
             if (planetObj.owner === -1) {
                 gameScreen.fillStyle = "rgba(150,150,175, 1)";
                 if (playerEnv.knownPlanets.indexOf(planetObj.id) !== -1) {
@@ -329,12 +328,14 @@ function app() {
 
     function showPlanetDialog(planet, openTabItem) {
         var playerEnv = logic.environments[logic.currentPlayer];
+        var name = '';
+        
         if (playerEnv.ownedPlanets.indexOf(planet.id) !== -1) {
             name = planet.name;
         } else {
             name = planet.displayName;
         }
-
+              
         var infoScreen = '<div id="planetInfo" name="' + name + '">';
         infoScreen += '<div>';
         infoScreen += '<h3>' + name + ' (' + planet.type + ')</h3>';
