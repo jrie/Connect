@@ -335,8 +335,8 @@ function app() {
             name = planet.displayName;
         }
 
-        var infoScreen = '<div id="planetInfo" name="' + name + '" style="border-radius: 5px; background-color: #3c3c3c; padding: 10px; color: #fff; font-family: sans-serif; font-weight: bold; width: 100%; display:inline-block; border: 1px solid #5a5a5a;">';
-        infoScreen += '<div style="width:100%;">';
+        var infoScreen = '<div id="planetInfo" name="' + name + '">';
+        infoScreen += '<div>';
         infoScreen += '<h3>' + name + ' (' + planet.type + ')</h3>';
         infoScreen += '<br><h5>Description<h5>';
         infoScreen += '<p>' + name + ' is a ' + logic.terrains[planet.terrain][0] + ' ' + planet.type + '.</p>';
