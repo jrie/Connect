@@ -202,9 +202,13 @@ function app() {
                 
             }
         } else {
+            /*
             if (playerEnv.activeSelection.type === "planet") {
                 scrollToLocation(playerEnv.activeSelection, false);
+                playerEnv.activeSelection = false;
+                return;
             }
+            */
 
             if (!playerEnv.strg) {
                 playerEnv.activeSelection = false;
