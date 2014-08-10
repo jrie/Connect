@@ -8,12 +8,14 @@ function app() {
 
     function drawPlanets() {
         var playerEnv = logic.environments[logic.currentPlayer];
-        var textsize = 0;
-        var planet = new Object();
+        var planet = {};
 
         gameScreen.strokeStyle = 'rgba(255, 255, 255, 0.5)';
         
-        for (var x = 0; x <  playerEnv.planets.length; x++ ) {
+        //for (var x = 0, planets = playerEnv.planets.length; x < planets; x++ ) {
+        var x = playerEnv.planets.length;
+        var textsize = 0.0;
+        while (x--) {
 
             planetObj = playerEnv.planets[x];
             gameScreen.beginPath();
@@ -37,12 +39,14 @@ function app() {
             gameScreen.fill();
             gameScreen.closePath();
         }
-
     }
 
     function checkPlanets(evt) {
         var playerEnv = logic.environments[logic.currentPlayer];
-        for (var x = playerEnv.planets.length - 1; x > -1; x--) {
+        //for (var x = playerEnv.planets.length - 1; x > -1; x--) {
+
+        var x = playerEnv.planets.length;
+        while (x--) {
             gameScreen.beginPath();
             gameScreen.arc(playerEnv.planets[x].x + playerEnv.offsetX, playerEnv.planets[x].y + playerEnv.offsetY, playerEnv.planets[x].size + 4, 0, 6.28);
             gameScreen.closePath();
@@ -61,7 +65,10 @@ function app() {
     function checkFleets(evt) {
          var playerEnv = logic.environments[logic.currentPlayer];
 
-        for (var x = playerEnv.fleets.length - 1; x > -1; x--) {
+        //for (var x = playerEnv.fleets.length - 1; x > -1; x--) {
+        var x = playerEnv.fleets.length;
+        var fleetItem = 0;
+        while (x--) {
             gameScreen.beginPath();
             gameScreen.arc(playerEnv.fleets[x].x + playerEnv.offsetX, playerEnv.fleets[x].y + playerEnv.offsetY, 10, 0,  6.28);
             gameScreen.closePath();
@@ -72,7 +79,9 @@ function app() {
                     if (playerEnv.fleets[x].origin.foreignFleets.length === 0 || playerEnv.fleets[x].origin.owner === playerEnv.player) {
                         return playerEnv.fleets[x].origin.stationedFleets[0];
                     } else {
-                        for (var fleetItem in playerEnv.fleets[x].origin.foreignFleets) {
+                        //for (var fleetItem in playerEnv.fleets[x].origin.foreignFleets) {
+                        fleetItem = playerEnv.fleets[x].origin.foreignFleets.length;
+                        while (fleetItem--) {
                             if (playerEnv.fleets[fleetItem].origin.foreignFleets.owner === playerEnv.player) {
                                 return playerEnv.fleets[x].origin.foreignFleets[fleetItem];
                             }
@@ -81,7 +90,7 @@ function app() {
                     }
                 }
 
-                return playerEnv.fleets[item];
+                return playerEnv.fleets[x];
             }
         }
 
@@ -92,7 +101,9 @@ function app() {
         gameScreen.lineWidth = 10;
         var playerEnv = logic.environments[logic.currentPlayer];
 
-        for (var x = playerEnv.activeRoutes.length - 1; x > -1; x--) {
+        //for (var x = playerEnv.activeRoutes.length - 1; x > -1; x--) {
+        var x = playerEnv.activeRoutes.length;
+        while (x--) {
             gameScreen.beginPath();
             gameScreen.moveTo(playerEnv.activeRoutes[x][0].origin.x + playerEnv.offsetX, playerEnv.activeRoutes[x][0].origin.y + playerEnv.offsetY);
             gameScreen.lineTo(playerEnv.activeRoutes[x][1].x + playerEnv.offsetX, playerEnv.activeRoutes[x][1].y + playerEnv.offsetY);
@@ -154,12 +165,14 @@ function app() {
             if (playerEnv.activeSelection.type === 'fleet' && playerEnv.activeSelection.location !== 'space') {
                 if (playerEnv.activeSelection.origin !== planetObj) {
                     if (!setDestination(playerEnv.activeSelection, planetObj)) {
-                        //createSelection(fleet);
+                        createSelection(fleet);
                         return;
                     }
                 } else {
                     if (playerEnv.activeSelection.destination) {
-                        for (var x = playerEnv.activeRoutes.length-1; x > -1; x--) {
+                        var x = playerEnv.activeRoutes.length;
+                        //for (var x = playerEnv.activeRoutes.length-1; x > -1; x--) {
+                        while (x--) {
                             if (playerEnv.activeRoutes[x][0] === playerEnv.activeSelection) {
                                 playerEnv.activeRoutes.splice(x, 1);
                                 break;
@@ -168,7 +181,7 @@ function app() {
                     }
                     playerEnv.activeSelection.destination = false;
                     playerEnv.activeSelection.needsMove = false;
-                    //env.activeSelection = false;
+                    scrollToLocation(planetObj, showPlanetDialog);
                 }
             } else {
                 
@@ -183,11 +196,16 @@ function app() {
                         playerEnv.activeSelection = false;
                     }
                     
-                    
+                } else {
+                    playerEnv.activeSelection = false;
                 }
                 
             }
         } else {
+            if (playerEnv.activeSelection.type === "planet") {
+                scrollToLocation(playerEnv.activeSelection, false);
+            }
+
             if (!playerEnv.strg) {
                 playerEnv.activeSelection = false;
                 statusBar.innerHTML = '';
@@ -197,8 +215,10 @@ function app() {
     }
 
     function getFleetById(fleetObj) {
-        var fleetEnv = logic.environments[ parseInt(fleetObj.id.split('_')) ].fleets;
-        for (var x = fleetEnv.length-1; x > -1; x--) {
+        var fleetEnv = logic.environments[ parseInt(fleetObj.id.split('_')[0]) ].fleets;
+        var x = fleetEnv.length;
+        //for (var x = fleetEnv.length-1; x > -1; x--) {
+        while (x--) {
             if (fleetObj.id === fleetEnv[x].id) {
                 return fleetEnv[x];
             }
@@ -213,8 +233,13 @@ function app() {
         var baseResearch = logic.workers[planet.owner].research;
 
         // Increasing basic planet output by percentage based buildings
-        for (var x = planet.constructions.length -1; x > -1; x--) {
-            for (var y = logic.buildings.length -1; y > -1; y--) {
+        //for (var x = planet.constructions.length -1; x > -1; x--) {
+        var x = planet.constructions.length;
+        var y = 0;
+        while (x--) {
+            y = logic.buildings.length;
+            while (y--) {
+            //for (var y = logic.buildings.length -1; y > -1; y--) {
                 if (planet.constructions[x] === logic.buildings[y][0]) {
                     if (logic.buildings[y][3][1] === '%') {
                         switch (logic.buildings[y][3][0]) {
@@ -241,8 +266,11 @@ function app() {
         var planetProduction = 0;
         var planetResearch = 0;
 
-        for (var x = planet.constructions.length -1; x > -1; x--) {
-            for (var y = logic.buildings.length -1; y > -1; y--) {
+        var x = planet.constructions.length;
+        var y = 0;
+        while (x--) {
+            y = logic.buildings.length;
+            while (y--) {
                 if (planet.constructions[x] === logic.buildings[y][0]) {
                     if (logic.buildings[y][3][1] === '+') {
                         switch (logic.buildings[y][3][0]) {
@@ -269,8 +297,11 @@ function app() {
         var planetProduction = 0;
         var planetResearch = 0;
 
-       for (var x = planet.constructions.length -1; x > -1; x--) {
-            for (var y = logic.buildings.length -1; y > -1; y--) {
+        var x = planet.constructions.length;
+        var y = 0;
+        while (x--) {
+            y = logic.buildings.length;
+            while (y--) {
                 if (planet.constructions[x] === logic.buildings[y][0]) {
                     if (logic.buildings[y][3][1] === '*') {
                         switch (logic.buildings[y][3][0]) {
@@ -406,7 +437,9 @@ function app() {
             infoScreen += '<li style="padding: 5px;">CONSTRUCTIONS</li>';
             if (planet.constructions.length !== 0) {
 
-                for (var x = 0; x < playerEnv.availableBuildings.length; x++) {
+                //for (var x = 0; x < playerEnv.availableBuildings.length; x++) {
+                var x = playerEnv.availableBuildings.length;
+                while (x--) {
                     if (planet.constructions.indexOf(playerEnv.availableBuildings[x]) === -1) {
                         if (planet.production[0] === playerEnv.availableBuildings[x]) {
                             infoScreen += '<li><a href="#" style="color:#ffa300;" class="constructionItem" name="building">' + playerEnv.availableBuildings[x] + '</a></li>';
@@ -416,14 +449,18 @@ function app() {
                     }
                 }
             } else {
-                for (var x = playerEnv.availableBuildings.length -1; x > -1; x--) {
+                //for (var x = playerEnv.availableBuildings.length -1; x > -1; x--) {
+                var x = playerEnv.availableBuildings.length;
+                while (x--) {
                     infoScreen += '<li><a href="#" class="constructionItem" name="building">' + playerEnv.availableBuildings[x] + '</a></li>';
                 }
             }
 
             // TODO: Add a check for a shipyards, distinguish by design size and option to build or not
             infoScreen += '<li style="border-top: 1px dashed #666; padding: 5px;">SHIP DESIGNS</li>';
-            for (var x = 0; x < playerEnv.designs.length; x++) {
+            //for (var x = 0; x < playerEnv.designs.length; x++) {
+            var x = playerEnv.designs.length;
+            while (x--) {
                 if (planet.production[0] === playerEnv.designs[x].name) {
                     infoScreen += '<li><a href="#" style="color:#ffa300;" class="constructionItem" name="design">' + playerEnv.designs[x].name + '</a></li>';
                 } else {
@@ -434,7 +471,10 @@ function app() {
             infoScreen += '</ul></div>';
 
             infoScreen += '<div style="float: right;"><h5>QUEUED ITEMS</h5><ul id="productionQueue" style="width:130px; overflow:auto; height: 85px">';
-            for (var x = 0; x < planet.productionQueue.length; x++) {
+
+            //for (var x = 0; x < planet.productionQueue.length; x++) {
+            var x = planet.productionQueue.length;
+            while (x--) {
                 infoScreen += '<li>' + planet.productionQueue[x][1] + '</li>';
             }
             infoScreen += '</ul></div>';
@@ -450,7 +490,9 @@ function app() {
         if (playerEnv.ownedPlanets.indexOf(planet.id) !== -1) {
             var tabRegisters = document.getElementsByClassName('tabregister');
 
-            for (var x = tabRegisters.length-1; x > -1; x--) {
+            //for (var x = tabRegisters.length-1; x > -1; x--) {
+            var x = tabRegisters.length;
+            while (x--) {
                 if (openTabItem) {
                     if (openTabItem === x) {
                         tabRegisters[x].className = tabRegisters[x].className += ' activetab';
@@ -524,16 +566,19 @@ function app() {
                 });
 
 
-                var buildingOptions = document.getElementsByClassName('constructionItem');
+                var constructionOptions = document.getElementsByClassName('constructionItem');
 
-                for (var x = buildingOptions.length - 1; x > -1; x--) {
-
-                    buildingOptions[x].addEventListener('click', function(evt) {
+                //for (var x = constructionOptions.length - 1; x > -1; x--) {
+                var x = constructionOptions.length;
+                while (x--) {
+                    constructionOptions[x].addEventListener('click', function(evt) {
                         evt.preventDefault();
 
                         // Planet contruction handling
                         if (evt.target.name === 'building') {
-                            for (var option = playerEnv.buildings.length - 1; option > -1; option--) {
+                            //for (var option = playerEnv.buildings.length - 1; option > -1; option--) {
+                            var option = playerEnv.buildings.length;
+                            while (option--) {
                                 if (playerEnv.buildings[option][0] === evt.target.innerHTML) {
 
                                     if (!playerEnv.strg) {
@@ -605,7 +650,9 @@ function app() {
                                 }
                             }
                         } else if (evt.target.name === 'design') {
-                            for (var option = playerEnv.designs.length - 1; option > -1; option--) {
+                            //for (var option = playerEnv.designs.length - 1; option > -1; option--) {
+                            var option = playerEnv.designs.length;
+                            while (option--) {
                                 if (playerEnv.designs[option].name === evt.target.innerHTML) {
 
                                     if (!playerEnv.strg) {
@@ -690,8 +737,12 @@ function app() {
         if (planetObj.owner === -1) {
             if (playerEnv.ownedPlanets.indexOf(planetObj.id) === -1) {
                 var stationedFleets = planetObj.stationedFleets;
-                for (var fleetItem = stationedFleets.length - 1; fleetItem > -1; fleetItem--) {
-                    for (var x = stationedFleets[fleetItem].ships.length-1; x > -1; x--) {
+                //for (var fleetItem = stationedFleets.length - 1; fleetItem > -1; fleetItem--) {
+                var fleetItem = stationedFleets.length;
+                while (fleetItem--) {
+                    //for (var x = stationedFleets[fleetItem].ships.length-1; x > -1; x--) {
+                    var x = stationedFleets[fleetItem].ships.length;
+                    while (x--) {
                         var effect = getModule(stationedFleets[fleetItem].ships[x].design, 'Colonize');
                         if (effect[0]) {
                             if (colonizeInfo < effect[1]) {
@@ -700,6 +751,8 @@ function app() {
                         }
                     }
                 }
+                
+                lg(colonizeInfo);
 
                 if (colonizeInfo[0] !== 0) {
                     options += '<br><button id="btnColonize">Colonize</button><br>';
@@ -721,11 +774,14 @@ function app() {
                 
                 var fleetItem = new Object();
                 var targetLocation = '';
-                for (var item = planetObj.stationedFleets.length-1; item > -1; item--) {
-                    fleetItem = planetObj.stationedFleets[item];
-                    targetLocation = '';
+
+                //for (var item = planetObj.stationedFleets.length-1; item > -1; item--) {
+                var x = planetObj.stationedFleets.length;
+                while (x--) {
+                    fleetItem = planetObj.stationedFleets[x];
                     if (fleetItem.destination) {
-                        if (playerEnv.unknownPlanets.indexOf(fleetItem.destination.id) !== -1 && playerEnv.ownedPlanets.indexOf(fleetItem.destination.id) === -1) {
+                    targetLocation = '';
+                        if (playerEnv.knownPlanets.indexOf(fleetItem.destination.id) === -1) {
                             targetLocation = ' - travelling to planetObj at ' + Math.ceil(fleetItem.destination.x) + '-' + Math.ceil(fleetItem.destination.y) + ' (' + Math.floor(fleetItem.turns) + ' turns)';
                         } else {
                             targetLocation = ' - travelling to ' + fleetItem.destination.name + ' (' + Math.floor(fleetItem.turns) + ' turns)';
@@ -753,14 +809,16 @@ function app() {
                 var fleetItem = new Object();
                 var targetLocation = '';
 
-                for (var item = planetObj.foreignFleets.length-1; item > -1; item--) {
+                //for (var item = planetObj.foreignFleets.length-1; item > -1; item--) {
+                var item = planetObj.foreignFleets.length;
+                while (item--) {
                     fleetItem = planetObj.foreignFleets[item];
-                    targetLocation = '';
                     if ( fleetItem.owner === logic.currentPlayer) {     // TODO: MAke a check for the fleetId
+                    targetLocation = '';
                         fleetItem = getFleetById(fleetItem);
 
                         if (fleetItem.destination) {
-                            if (playerEnv.unknownPlanets.indexOf(fleetItem.destination.id) !== -1 && playerEnv.ownedPlanets.indexOf(fleetItem.destination.id) === -1) {
+                            if (playerEnv.knownPlanets.indexOf(fleetItem.destination.id) === -1) {
                                 targetLocation = ' - travelling to planetObj at ' + Math.ceil(fleetItem.destination.x) + '-' + Math.ceil(fleetItem.destination.y) + ' (' + Math.floor(fleetItem.turns) + ' turns)';
                             } else {
                                 targetLocation = ' - travelling to ' + fleetItem.destination.name + ' (' + Math.floor(fleetItem.turns) + ' turns)';
@@ -812,7 +870,9 @@ function app() {
 
                 // Activate fleet
                 if (!playerEnv.strg) {
-                    for (var item = playerEnv.fleets.length-1; item > -1; item--) {
+                    //for (var item = playerEnv.fleets.length-1; item > -1; item--) {
+                    var item = playerEnv.fleets.length;
+                    while (item--) {
                         if (evt.target.name.split('|')[1] === playerEnv.fleets[item].id) {
                             createSelection(playerEnv.fleets[item]);
                             modal.style.display = 'none';
@@ -1049,10 +1109,11 @@ function app() {
                         // TODO: Create a new fleet from and check with logic.fleets instead of targetFleet
 
                         var fleetShips = targetFleet.ships.length;
-
+                        var details = '';
+                        var ship = 0;
                         for (var item = 0; item < partedFleetTypes.length; item++) {
-                            var details = partedFleetTypes[item].split('_', 2);
-                            for (var ship = 0; ship < targetFleet.ships.length; ship++) {
+                            details = partedFleetTypes[item].split('_', 2);
+                            for (ship = 0; ship < targetFleet.ships.length; ship++) {
                                 if (targetFleet.ships[ship].type === details[0] && targetFleet.ships[ship].design === details[1]) {
                                     if (partedFleetCount[item] > 0) {
                                         newFleetList.push(targetFleet.ships[ship]);
@@ -1391,7 +1452,9 @@ function app() {
 
         gameScreen.fillStyle = '#232323';
 
-        for (var route = 0; route < playerEnv.activeRoutes.length; route++) {
+        //for (var route = 0; route < playerEnv.activeRoutes.length; route++) {
+        var route = playerEnv.activeRoutes.length;
+        while (route--) {
             if (playerEnv.activeSelection) {
                 if (playerEnv.activeRoutes[route][0] === playerEnv.activeSelection) {
                     gameScreen.strokeStyle = "rgba(180,90,20, 1)";
@@ -1424,7 +1487,9 @@ function app() {
         var fleet = new Object();
 
         gameScreen.beginPath();
-        for (var item = 0; item < playerEnv.fleets.length; item++) {
+        //for (var item = 0; item < playerEnv.fleets.length; item++) {
+        var item = playerEnv.fleets.length;
+        while (item--) {
             fleet = playerEnv.fleets[item];
 
             // TODO: Position player fleets in different formation
@@ -1439,7 +1504,9 @@ function app() {
         gameScreen.closePath();
 
         gameScreen.beginPath();
-        for (var item = playerEnv.foreignFleets.length - 1; item > -1; item--) {
+        //for (var item = playerEnv.foreignFleets.length - 1; item > -1; item--) {
+        var item = playerEnv.foreignFleets.length;
+        while (item--) {
             fleet = playerEnv.foreignFleets[item];
             if (!fleet.hideDrawing) {
                 gameScreen.strokeStyle = "rgba(255,0,0, 0.75)";
@@ -1457,7 +1524,9 @@ function app() {
         // TODO: Disable return once fleets can be ranged up
         return true;
 
-        for (var planet = playerEnv.planets.length -1; planet > -1; planet--) {
+        //for (var planet = playerEnv.planets.length -1; planet > -1; planet--) {
+        var p = playerEnv.planets.length;
+        while (item--) {
             var distanceX = Math.abs(playerEnv.planets[planet].x - destination.x);
             var distanceY = Math.abs(playerEnv.planets[planet].y - destination.y);
             var distance = Math.sqrt(Math.pow(distanceX, 2) + Math.pow(distanceY, 2));
@@ -1478,7 +1547,9 @@ function app() {
         }
 
         if (fleet.destination) {
-            for (var route = playerEnv.activeRoutes.length -1; route > -1; route--) {
+            //for (var route = playerEnv.activeRoutes.length -1; route > -1; route--) {
+            var route = playerEnv.activeRoutes.length;
+            while (route--) {
                 if (playerEnv.activeRoutes[route][0] === fleet) {
                     playerEnv.activeRoutes.splice(route, 1);
                     break;
@@ -1489,7 +1560,9 @@ function app() {
         fleet.speed = fleet.ships[0].speed;
         fleet.range = fleet.ships[0].range;
 
-        for (var item = fleet.ships.length -1; item > -1; item--) {
+        //for (var item = fleet.ships.length -1; item > -1; item--) {
+        var item = fleet.ships.length;
+        while (item--) {
             if (fleet.ships[item].speed < fleet.speed) {
                 fleet.speed = fleet.ships[item].speed;
             }
@@ -1535,13 +1608,12 @@ function app() {
 
     var scrollInterval = false;
     function scrollToLocation(object, callElement) {
-
-        if (env.scrollActive) {
+        var playerEnv = logic.environments[logic.currentPlayer];
+        if (playerEnv.scrollActive) {
             clearInterval(scrollInterval);
-
         }
 
-        env.scrollActive = true;
+        playerEnv.scrollActive = true;
 
         var targetX = 0;
         if (callElement) {
@@ -1560,12 +1632,12 @@ function app() {
         var stepX = 0;
         var stepY = 0;
 
-        var distanceX = env.offsetX - targetX;
+        var distanceX = playerEnv.offsetX - targetX;
         if (distanceX !== 0) {
             stepX = (distanceX / 15);
         }
 
-        var distanceY = env.offsetY - targetY;
+        var distanceY = playerEnv.offsetY - targetY;
         if (distanceY !== 0) {
             stepY = (distanceY / 15);
         }
@@ -1576,32 +1648,33 @@ function app() {
         createSelection(object);
 
         function doScroll() {
-            if (Math.floor(Math.abs(env.offsetX)) === targetX && Math.floor(Math.abs(env.offsetY)) === targetY) {
+            if (Math.floor(Math.abs(playerEnv.offsetX)) === targetX && Math.floor(Math.abs(playerEnv.offsetY)) === targetY) {
                 clearInterval(scrollInterval);
 
                 if (callElement) {
                     callElement(object);
                 }
 
-                env.scrollActive = false;
+                playerEnv.scrollActive = false;
                 return;
             }
 
-            env.offsetX -= stepX;
-            env.offsetY -= stepY;
+            playerEnv.offsetX -= stepX;
+            playerEnv.offsetY -= stepY;
         }
 
-        scrollInterval = setInterval(doScroll, 50);
+        scrollInterval = setInterval(doScroll, 35);
     }
 
 
     function createSelection(object) {
-        env.activeSelection = object;
-        env.selectionIteration = 0;
+        var playerEnv = logic.environments[logic.currentPlayer];
+        playerEnv.activeSelection = object;
+        playerEnv.selectionIteration = 0;
         if (object.type === "fleet") {
-            env.selectionSize = 5;
+            playerEnv.selectionSize = 5;
         } else {
-            env.selectionSize = object.size;
+            playerEnv.selectionSize = object.size;
         }
     }
 
@@ -1636,7 +1709,9 @@ function app() {
 
     function bindInfoLinks() {
         var infoLinks = document.getElementsByClassName('infoLink');
-        for (var x = infoLinks.length-1; x > -1; x--) {
+        //for (var x = infoLinks.length-1; x > -1; x--) {
+        var x = infoLinks.length;
+        while (x--) {
             infoLinks[x].addEventListener('click', openInfoItem);
         }
     }
@@ -1661,7 +1736,9 @@ function app() {
             var index = parseInt(info[1]);
             var planetObj = false;
 
-            for (var x = playerEnv.planets.length -1; planetObj > -1; planetObj-- in env.planets) {
+            //for (var x = playerEnv.planets.length -1; x > -1; x--) {
+            var x = playerEnv.planets.length;
+            while (x--) {
                 if (playerEnv.planets[x].id === index) {
                     planetObj = playerEnv.planets[x];
                     break;
@@ -1679,7 +1756,7 @@ function app() {
                         }
                     }
 
-                    if (!playerEnv.strg) {
+                    if (!playerEnv.strg || playerEnv.activeSelection != planetObj) {
                         scrollToLocation(planetObj, showPlanetDialog);
                     } else {
                         scrollToLocation(planetObj);
@@ -1693,15 +1770,17 @@ function app() {
                         scrollToLocation(planetObj);
                     }
 
-                } else if (env.unknownPlanets.indexOf(index) !== -1) {
+                } else if (playerEnv.unknownPlanets.indexOf(index) !== -1) {
                     scrollToLocation(planetObj);
                 }
             }
 
         } else if (info[0] === 'fleet') {
-            for (var fleetItem = playerEnv.fleets.length -1; fleetItem > -1; fleetItem--) {
-                if (playerEnv.fleets[fleetItem].name === info[1]) {
-                    scrollToLocation(playerEnv.fleets[fleetItem]);
+            //for (var fleetItem = playerEnv.fleets.length -1; fleetItem > -1; fleetItem--) {
+            var item = playerEnv.fleets.length;
+            while (item--) {
+                if (playerEnv.fleets[item].name === info[1]) {
+                    scrollToLocation(playerEnv.fleets[item]);
                     break;
                 }
             }
@@ -1728,8 +1807,9 @@ function app() {
             // TODO - Add logic to process player turn actions and report changes to env variables
         }
 
-        for (var item = logic.planets.length -1; item > -1; item--) {		// TODO: make use of only owned planets
-
+        //for (var item = logic.planets.length -1; item > -1; item--) {		// TODO: make use of only owned planets
+        var item = logic.planets.length;
+        while (item--) {
             // Population growth
             if (logic.planets[item].population[0] !== 0 && logic.planets[item].population[0] < logic.planets[item].population[1]) {
                 var previous = logic.planets[item].population[0];
@@ -1820,8 +1900,11 @@ function app() {
 
 
         // Fleet movement
-        var targetFleet = new Object();
-        for (var item = logic.fleets.length -1; item > -1; item--) {
+        var targetFleet = {};
+
+        //for (var item = logic.fleets.length -1; item > -1; item--) {
+        var item = logic.fleets.length;
+        while (item--) {
             targetFleet = logic.fleets[item];
 
             if (targetFleet.needsMove) {
@@ -1913,7 +1996,10 @@ function app() {
                     }
 
                     // Remove route item
-                    for (var route = playerEnv.activeRoutes.length-1; route > -1; route--) {
+
+                    //for (var route = playerEnv.activeRoutes.length-1; route > -1; route--) {
+                    var route = playerEnv.activeRoutes.length;
+                    while (route--) {
                         if (playerEnv.activeRoutes[route][0] === targetFleet) {
                             playerEnv.activeRoutes.splice(route, 1);
                             break;
@@ -1953,8 +2039,13 @@ function app() {
             var playerEnv = logic.environments[player];
             var scanX = 0.0;
             var scanY = 0.0;
-            for (var area = playerEnv.scanAreas.length -1; area > -1; area--) {
-                var scanArea = playerEnv.scanAreas[area];
+
+            //for (var area = playerEnv.scanAreas.length -1; area > -1; area--) {
+            var area = playerEnv.scanAreas.length;
+            var scanArea = [0.0, 0.0, 0.0, 0.0];
+            var item = 0;
+            while (area--) {
+                scanArea = playerEnv.scanAreas[area];
                 scanX = scanArea[1];
                 scanY = scanArea[2];
                 gameScreen.beginPath();
@@ -1962,9 +2053,11 @@ function app() {
                 gameScreen.closePath();
 
                 if (gameScreen.isPointInPath(targetFleet.x, targetFleet.y)) {
-                    for (var fleetItem = playerEnv.foreignFleets.length -1; fleetItem > -1; fleetItem--) {
-                        if (targetFleet.id === playerEnv.foreignFleets[fleetItem].id) {
-                            playerEnv.foreignFleets.splice(fleetItem, 1);
+                    //for (var fleetItem = playerEnv.foreignFleets.length -1; fleetItem > -1; fleetItem--) {
+                    item = playerEnv.foreignFleets.length;
+                    while (item--) {
+                        if (targetFleet.id === playerEnv.foreignFleets[item].id) {
+                            playerEnv.foreignFleets.splice(item, 1);
                             break;
                         }
                     }
@@ -1994,22 +2087,30 @@ function app() {
             
             var playerEnv = logic.environments[player]; 
 
-            for (var area = playerEnv.scanAreas.length -1; area > -1; area--) {
-                var scanArea = playerEnv.scanAreas[area];
-                var scanX = scanArea[1];
-                var scanY = scanArea[2];
+            var scanArea = [0.0, 0.0, 0.0, 0.0];
+            var scanX = 0.0;
+            var scanY = 0.0;
+
+            //for (var area = playerEnv.scanAreas.length -1; area > -1; area--) {
+            var area = playerEnv.scanAreas.length;
+            while (area--) {
+                scanArea = playerEnv.scanAreas[area];
+                scanX = scanArea[1];
+                scanY = scanArea[2];
 
                 gameScreen.beginPath();
                 gameScreen.arc(scanX, scanY, scanArea[0], 0, 6.28);
                 gameScreen.closePath();
 
                 if (gameScreen.isPointInPath(targetX, targetY)) {
-                    for (var fleetItem = playerEnv.foreignFleets.length -1; fleetItem > -1; fleetItem--) {
-                        if (targetFleet.id === playerEnv.foreignFleets[fleetItem].id) {
+                    //for (var fleetItem = playerEnv.foreignFleets.length -1; fleetItem > -1; fleetItem--) {
+                    var item = playerEnv.foreignFleets.length;
+                    while (item--) {
+                        if (targetFleet.id === playerEnv.foreignFleets[item].id) {
                             isFleetIncluded = true;
                             removeFromPlayer = false;
-                            playerEnv.foreignFleets[fleetItem].x = targetFleet.x;
-                            playerEnv.foreignFleets[fleetItem].y = targetFleet.y;
+                            playerEnv.foreignFleets[item].x = targetFleet.x;
+                            playerEnv.foreignFleets[item].y = targetFleet.y;
                             break;
                         }
                     }
@@ -2031,9 +2132,11 @@ function app() {
 
             // if removeFromPlayer, we can safely remove the ship from the foreignfleets list
             if (removeFromPlayer) {
-                for (var fleetItem = playerEnv.foreignFleets.length -1; fleetItem > -1; fleetItem--) {
-                    if (targetFleet.id === playerEnv.foreignFleets[fleetItem].id) {
-                        playerEnv.foreignFleets.splice(fleetItem, 1);
+                //for (var fleetItem = playerEnv.foreignFleets.length -1; fleetItem > -1; fleetItem--) {
+                var item = playerEnv.foreignFleets.length;
+                while (item--) {
+                    if (targetFleet.id === playerEnv.foreignFleets[item].id) {
+                        playerEnv.foreignFleets.splice(item, 1);
                         break;
                     }
                 }
@@ -2042,9 +2145,9 @@ function app() {
     }
 
 
-    function discoverPlanets(x, y, scanRange, obj) {
+    function discoverPlanets(cordX, cordY, scanRange, obj) {
         gameScreen.beginPath();
-        gameScreen.arc(x, y, scanRange, 0, 6.28); // gameScreen.arc(x, y, scanRange/2, 0, 10);
+        gameScreen.arc(cordX, cordY, scanRange, 0, 6.28);
         gameScreen.closePath();
 
         var playerEnv = logic.environments[obj.owner];
@@ -2055,17 +2158,19 @@ function app() {
         var link1 = '';
         var link2 = '';
 
+        //for (var x = logic.planets.length-1; x > -1; x--) {
+        var planetObj = {};
         for (var x = logic.planets.length-1; x > -1; x--) {
-            var planet = logic.planets[x];
+            planetObj = logic.planets[x];
 
-            if (gameScreen.isPointInPath(planet.x, planet.y)) {
-                if (playerEnv.knownPlanets.indexOf(planet.id) === -1 && playerEnv.unknownPlanets.indexOf(planet.id) === -1) {
-                    distanceX = Math.abs(x - planet.x);
-                    distanceY = Math.abs(y - planet.y);
+            if (gameScreen.isPointInPath(planetObj.x, planetObj.y)) {
+                if (playerEnv.knownPlanets.indexOf(planetObj.id) === -1 && playerEnv.unknownPlanets.indexOf(planetObj.id) === -1) {
+                    distanceX = Math.abs(cordX - planetObj.x);
+                    distanceY = Math.abs(cordY - planetObj.y);
                     distance = Math.sqrt(Math.pow(distanceX, 2) + Math.pow(distanceY, 2));
 
-                    playerEnv.planets.push(planet);
-                    playerEnv.unknownPlanets.push(planet.id);
+                    playerEnv.planets.push(planetObj);
+                    playerEnv.unknownPlanets.push(planetObj.id);
 
                     link1 = '';
                     if (obj.type === 'fleet') {
@@ -2073,14 +2178,14 @@ function app() {
                     } else {
                         link1 = createLink(obj.type, obj.id, obj.type + ' ' + obj.name);
                     }
-                    link2 = createLink('planet', planet.id, 'planet in ' + Math.ceil(distance) + ' units');
+                    link2 = createLink('planet', planetObj.id, 'planet in ' + Math.ceil(distance) + ' units');
                     report(link1 + ' discovered a ' + link2 + ' away.');
 
                     // TODO: Logic creates foreign fleets objects, passing to player
-                    if (planet.stationedFleets.length !== 0) {
-                        for (var x = planet.stationedFleets.length-1; x > -1; x--) {
-                            fleet = planet.stationedFleets[x];
-                            foreignFleet = new Object();
+                    if (planetObj.stationedFleets.length !== 0) {
+                        for (var x = planetObj.stationedFleets.length-1; x > -1; x--) {
+                            fleet = planetObj.stationedFleets[x];
+                            foreignFleet = {};
                             foreignFleet.x = fleet.x;
                             foreignFleet.y = fleet.y;
                             foreignFleet.id = fleet.id;
@@ -2354,15 +2459,17 @@ function app() {
             return;
         }
         
-        var playerEnv = logic.environments[logic.currentPlayer];
-
         mainLoopCalculating = true;
+
+        var playerEnv = logic.environments[logic.currentPlayer];
 
         gameArea.width = gameArea.width;
         gameScreen.fillStyle = 'rgba(255,255,255, 0.02)';
 
         gameScreen.beginPath();
-        for (var x = 0; x < playerEnv.scanAreas.length; x++) {
+        //for (var x = 0; x < playerEnv.scanAreas.length; x++) {
+        var x = playerEnv.scanAreas.length;
+        while (x--) {
             scanX = playerEnv.scanAreas[x][1] + playerEnv.offsetX;
             scanY = playerEnv.scanAreas[x][2] + playerEnv.offsetY;
             gameScreen.arc(scanX, scanY, playerEnv.scanAreas[x][0], 0, 6.28);
@@ -2606,12 +2713,13 @@ function app() {
                 //lg('design');
 
                 for (var module = playerEnv.designs[item].modules.length-1; module > -1; module--) {
-                    //lg('Module');
-                    //lg(env.designs[item].modules[module]);
+                    lg('Module');
+                    lg(env.designs[item].modules[module]);
 
-                    for (var moduleItem = logic.shipModules.lenght-1; moduleItem > -1; moduleItem--) {
+                    for (var moduleItem = logic.shipModules.length-1; moduleItem > -1; moduleItem--) {
+                        lg( logic.shipModules[moduleItem].name );
                         if (playerEnv.designs[item].modules[module] === logic.shipModules[moduleItem].name) {
-                            //lg(logic.shipModules[moduleItem].effects);
+                            lg(logic.shipModules[moduleItem].effects);
                             
                             for (var effect = logic.shipModules[moduleItem].effects.length -1; effect > -1; effect--) {
                                 if (category === logic.shipModules[moduleItem].effects[effect][0]) {
@@ -2772,8 +2880,8 @@ function app() {
         var fleetListing = document.getElementById('fleetListing');
         
         var playerEnv = logic.environments[logic.currentPlayer];
-        playerEnv.designs.forEach(function(fleetDesign) {
-            designListing.innerHTML += '<li><a href="#" class="fleetDesign" name="' + fleetDesign.name + '">' + fleetDesign.count + ' x ' + fleetDesign.name + ' (' + fleetDesign.type + ')</a></li>';
+        playerEnv.designs.forEach(function(design) {
+            designListing.innerHTML += '<li><a href="#" class="fleetDesign" name="' + design.name + '">' + design.count + ' x ' + design.name + ' (' + design.type + ')</a></li>';
         });
 
         for (var item = 0; item < playerEnv.fleets.length; item++) {
@@ -3073,7 +3181,7 @@ function app() {
 
 
             env.workers.agriculture = 1;	// % efficiency
-            env.workers.production = 1;	// % efficiency
+            env.workers.production = 1;         // % efficiency
             env.workers.research = 1;		// % efficiency
 
             env.marines.attack = 1;
