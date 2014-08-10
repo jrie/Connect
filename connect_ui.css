@@ -1,0 +1,315 @@
+* {
+    font-family: "Helvetica", "Courier New", "sans-serif";
+}
+
+body {
+    background-color: #000;
+}
+
+h1, h2, h3, h4, h5, p, ul {
+    padding: 0px;
+    margin: 0px;
+}
+
+h3 {
+    text-transform: uppercase;
+}
+
+p {
+    font-size: 12px;
+}
+
+ul {
+    list-style: none;
+    font-size: 12px;
+}
+
+li {
+    cursor: pointer;
+
+}
+
+li:hover {
+    background-color: #4a4a4a;
+}
+
+li a {
+    padding: 4px;
+}
+
+#modal li a:hover {
+    border-radius: 0;
+}
+
+#modal a {
+    cursor: pointer;
+    display: block;
+    margin: 4px;
+    text-decoration: none;
+    color: #fff;
+}
+
+#modal a:hover {
+    background-color: #cecece;
+    border-radius: 5px;
+    color: #000;
+}
+
+#modal #fleetListing a:hover {
+    background-color: inherit;
+}
+
+#modal #fleetListing li:hover {
+    background-color: #3a3a3a;
+}
+
+button {
+    text-transform: uppercase;
+    font-size: 10px;
+    color: #cecece;
+    background-color: #3a3a3a;
+}
+
+span {
+    text-transform: uppercase;
+    font-size: 10px;
+}
+
+ul li span {
+    display: inline-block;
+    width: 50px;
+}
+
+#fleetInfo span {
+    cursor: pointer;
+    width: 40px;
+    padding: 5px;
+    text-align: center;
+    float: left;
+    clear: both;
+}
+
+#fleetInfo span.active,
+#fleetInfo span:hover,
+#fleetInfo span:focus {
+    border-radius: 5px;
+    background-color: #aeaeae;
+    color: #6a6a6a;
+}
+
+#fleetInfo span:active {
+    color: #000;
+    background-color: #dedede;
+}
+
+#fleetInfo span::focus {
+    color: #000;
+
+}
+
+#modal a.selectedFleet  {
+    background-color: #8a8e8a;
+}
+
+.dynamicInput {
+    border: none;
+    font-size: 12px;
+    background-color: transparent;
+
+}
+
+input, textarea, #logwindow {
+    color: #cecece;
+    background-color: #2a2a2a;
+    font-size: 12px;
+}
+
+#logwindow  {
+    padding: 5px 5px;
+    width: 254px;
+    width: auto;
+    height: 75px;
+    font-family:sans-serif;
+    overflow: auto;
+    height: 610px;
+}
+
+#logwindow span {
+    text-transform: none;
+    font-size: 10px;
+    display: inline-block;
+    width: 100%;
+}
+
+#logwindow span:hover {
+    cursor: default;
+    background-color: #3a3a3a;
+}
+
+.infoLink {
+    color: #fff;
+    font-weight: bold;
+    padding: 0px 5px;
+    text-decoration: none;
+}
+
+.infoLink:hover {
+    text-decoration: underline;
+}
+
+#modal a.tabregister {
+    padding: 5px 10px;
+    font-size: 14px;
+    color: #000;
+    display: inline;
+    border-radius: 5px 5px 0px 0px;
+    margin: 0px;
+    background-color: #7a7a7a;
+    border: 1px solid #0A0A0A;
+    border-bottom: 0px;
+    margin-right: 2px;
+}
+
+#gameScreen {
+    margin: 0px auto;
+    width: 1060px;
+    border: 1px solid #5a5a5a;
+}
+
+#gameScreenArea {
+    background-color:#151540;
+    display: inline;
+    position:relative;
+    z-index:0;
+    float: left;
+}
+
+#modal {
+    position:absolute;
+    display: none;
+    z-index:1;
+    min-width: 375px;
+    top: 10%;
+    left: 12%;
+}
+
+#modal a.tabregister:hover {
+    background-color: #5e5e5e;
+    color: #fff;
+}
+
+#modal a.tabregister.activetab {
+    background-color: #0A0A0A;
+    color: #dedede;
+}
+
+.planetstats {
+    background-color: #0A0A0A;
+    display: block;
+    padding: 10px;
+}
+
+.tabcontent {
+    background-color: #555555;
+    border: 1px solid #0A0A0A;
+    border-radius: 0 0 5px 5px;
+    color: #dedede;
+    display: block;
+    height: 120px;
+    padding: 10px;
+}
+
+hr {
+    border: none;
+    border-bottom: 1px solid #222;
+    clear: both;
+}
+
+#productionQueue li {
+    padding: 3px 6px;
+}
+
+#stats {
+    height: 23px;
+    background-color: #4a4a4a;
+    padding: 0px 5px;
+    border-bottom: 1px solid #1a1a1a;
+
+}
+
+#stats .statsItem {
+    float: left;
+    background-color: #1a1a1a;
+    padding: 0px 15px;
+    margin-right: 5px;
+    margin-top: 5px;
+    border-radius: 3px 3px 0px 0px;
+    cursor: pointer;
+    min-width: 90px;
+    overflow: hidden;
+    font-size: 15px;
+    color: #acacac;
+    text-decoration: none;
+    display: block;
+}
+
+#statusBar {
+    clear: both;
+    display: block;
+    background-color: #4a4a4a;
+    color:#acacac;
+    font-size: 15px;
+    height: 15px;
+    padding: 0px 10px;
+}
+
+#resizeRight {
+    background-color: #5a5a5a;
+    border: 1px solid #000;
+    border-top: 0px;
+    border-bottom: 0px;
+    cursor: pointer;
+    float: left;
+    height: 620px;
+    width: 4px;
+}
+
+#overlayContainer {
+    display: none;
+}
+
+#combatOverlay {
+    background-color:#000
+        height: 100%;
+    left: 0px;
+    opacity: 0.7;
+    position: fixed;
+    top: 0px;
+    width: 100%;
+}
+
+#combatDisplay {
+    background-color: #000;
+    border: 1px solid #7a7a7a;
+    border-radius: 10px;
+    position:fixed;
+    height: 70%;
+    width: 70%;
+    left: 15%;
+    top:15%;
+}
+
+#combatArea {
+    background-color:#000;
+    border: 1px solid #3a3a3a;
+    border-bottom-width: 0px;
+    border-radius:10px 10px 0px 0px;
+    margin: 2% 2% 0px 2%;
+}
+
+#combatReport {
+    border: 1px solid #3a3a3a;
+    border-radius: 0px 0px 10px 10px;
+    margin: 0px 2% 2% 2%;
+    width: 96%;
+}
