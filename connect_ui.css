@@ -234,9 +234,7 @@ hr {
     clear: both;
 }
 
-#productionQueue li {
-    padding: 3px 6px;
-}
+
 
 #stats {
     height: 23px;
@@ -260,6 +258,13 @@ hr {
     color: #acacac;
     text-decoration: none;
     display: block;
+}
+
+#stats .statsItem:hover {
+    background-color: #eee;
+    color: #000;
+    text-decoration:underline;
+    cursor: pointer;
 }
 
 #statusBar {
@@ -330,6 +335,8 @@ hr {
     Game dialogs ----------------------------------------
 */
 
+/* Planet modal */
+
 #planetInfo {
     background-color: #3c3c3c;
     border: 1px solid #5a5a5a;
@@ -345,3 +352,67 @@ hr {
 #planetInfo > div {
     width: auto;
 }
+
+#planetInfo #workForceModal button {
+    clear: both;
+    float: left;
+    width: 100px;
+}
+
+#planetinfo #productionQueue li {
+    padding: 3px 6px;
+}
+
+#planetinfo #productionList {
+    float: left;
+    width: 200px;
+}
+
+#planetinfo #productionList ul,
+#planetinfo #productionQueue ul {
+    height: 100%;
+    overflow: auto;
+    padding: 0px;
+    width: 100%;
+}
+
+#planetinfo h5 {
+    font-size: 12px;
+    padding: 5px;
+}
+
+#planetinfo #productionQueue {
+    overflow: auto;
+    height: 94px;
+    width: 130px;
+}
+
+#planetinfo #productionModal li a,
+#planetinfo #productionQueue li { 
+    cursor: pointer;
+    display: block;
+    margin: 4px;
+    text-decoration: none;
+    color: #fff;
+}
+
+#planetinfo #productionModal li a:hover,
+#planetinfo #productionQueue li:hover {
+    background-color: #cecece;
+    border-radius: 5px;
+    color: #000;
+}
+
+#planetinfo #productionList li:hover {
+    background-color: transparent;
+}
+
+#planetinfo #productionList #activeConstruction {
+    color:#ffa300;
+}
+
+#planetinfo #productionList #activeConstruction:hover {
+    color: #000;
+}
+
+

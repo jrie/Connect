@@ -372,10 +372,10 @@ function app() {
 
             // Workforce modal
             infoScreen += '<div class="tabcontent" id="workForceModal">';
-            infoScreen += '<div style="float: left;"><button id="agriculture" style="float: left; clear: both; width: 100px;">Agriculture</button>';
-            infoScreen += '<button id="production" style="float: left; clear: both; width: 100px;">Production</button>';
-            infoScreen += '<button id="research" style="float: left; clear: both; width: 100px; ">Research</button>';
-            infoScreen += '<button id="reset" style="float: left; clear: both; width: 100px;">Reset workforce</button></div>';
+            infoScreen += '<div style="float: left;"><button id="agriculture">Agriculture</button>';
+            infoScreen += '<button id="production">Production</button>';
+            infoScreen += '<button id="research">Research</button>';
+            infoScreen += '<button id="reset">Reset workforce</button></div>';
 
             var baseMixOutput = [
                 percentOutput[0]+multiOutput[0],
@@ -437,8 +437,8 @@ function app() {
 
             // Production modal
             infoScreen += '<div class="tabcontent" id="productionModal" style="display: none;">';
-            infoScreen += '<div style="float: left; width: 200px;">';
-            infoScreen += '<ul style="width:100%; height: 100%; padding: 0px; overflow:auto;">';
+            infoScreen += '<div id="productionList">';
+            infoScreen += '<ul>';
             infoScreen += '<li style="padding: 5px;">CONSTRUCTIONS</li>';
             if (planet.constructions.length !== 0) {
 
@@ -447,7 +447,7 @@ function app() {
                 while (x--) {
                     if (planet.constructions.indexOf(playerEnv.availableBuildings[x]) === -1) {
                         if (planet.production[0] === playerEnv.availableBuildings[x]) {
-                            infoScreen += '<li><a href="#" style="color:#ffa300;" class="constructionItem" name="building">' + playerEnv.availableBuildings[x] + '</a></li>';
+                            infoScreen += '<li><a href="#" id="activeConstruction" class="constructionItem" name="building">' + playerEnv.availableBuildings[x] + '</a></li>';
                         } else {
                             infoScreen += '<li><a href="#" class="constructionItem" name="building">' + playerEnv.availableBuildings[x] + '</a></li>';
                         }
@@ -467,7 +467,7 @@ function app() {
             var x = playerEnv.designs.length;
             while (x--) {
                 if (planet.production[0] === playerEnv.designs[x].name) {
-                    infoScreen += '<li><a href="#" style="color:#ffa300;" class="constructionItem" name="design">' + playerEnv.designs[x].name + '</a></li>';
+                    infoScreen += '<li><a href="#" id="activeConstruction" class="constructionItem" name="design">' + playerEnv.designs[x].name + '</a></li>';
                 } else {
                     infoScreen += '<li><a href="#" class="constructionItem" name="design">' + playerEnv.designs[x].name + '</a></li>';
                 }
@@ -475,7 +475,7 @@ function app() {
 
             infoScreen += '</ul></div>';
 
-            infoScreen += '<div style="float: right;"><h5>QUEUED ITEMS</h5><ul id="productionQueue" style="width:130px; overflow:auto; height: 85px">';
+            infoScreen += '<div style="float: right;"><h5>QUEUED ITEMS</h5><ul id="productionQueue">';
 
             //for (var x = 0; x < planet.productionQueue.length; x++) {
             var x = planet.productionQueue.length;
@@ -2794,7 +2794,7 @@ function app() {
             var targetDesign = new Object();
             var playerEnv = logic.environments[logic.currentPlayer];
             
-            for (var design = playerEnv.designs.length; design > -1; design--) {
+            for (var design = playerEnv.designs.length-1; design > -1; design--) {
                 if (playerEnv.designs[design].name === evt.target.name) {
                     targetDesign = playerEnv.designs[design];
                     break;
@@ -3208,7 +3208,7 @@ function app() {
             env.buildings = [];
             env.lastFleetId = 0;
 
-            for (var option = 0; option < logic.buildings; option++) {
+            for (var option = 0; option < logic.buildings.length; option++) {
                 if (env.availableBuildings.indexOf(logic.buildings[option][0]) !== -1) {
                     env.buildings.push(logic.buildings[option]);
                 }
