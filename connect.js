@@ -182,7 +182,7 @@ function app() {
                     }
                     playerEnv.activeSelection.destination = false;
                     playerEnv.activeSelection.needsMove = false;
-                    scrollToLocation(planetObj, showPlanetDialog);
+                    //scrollToLocation(planetObj, showPlanetDialog);
                 }
             } else {
                 
