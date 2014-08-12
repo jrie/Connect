@@ -771,15 +771,15 @@ function app() {
         var shipListing = '';
         if (planetObj.owner === logic.currentPlayer || (planetObj.owner === -1 && planetObj.foreignFleets.length === 0)) {
             if (planetObj.stationedFleets.length > 1 || forceDisplay) {
-                shipListing = '<div id="fleetInfo" style="width:50px; float:left; display: inline-block; padding: 4px; border-radius:5px; background-color:#5a5a5a">';
+                shipListing = '<div id="fleetControls">';
                 shipListing += '<span id="joinFleets">Join</span>';
                 shipListing += '<span id="nameFleet">Rename</span>';
                 shipListing += '<span id="splitFleet">Split</span>';
                 shipListing += '</div>';
 
-                shipListing += '<ul id="shipListing" style="height: 120px; float: left; overflow:auto; display: inline-block; margin-bottom:5px; border-radius: 5px; background-color: #3c3c3c; padding: 10px; color: #fff; font-family: sans-serif; font-weight: bold; min-width: 275px;">';
+                shipListing += '<ul id="shipListing">';
                 
-                var fleetItem = new Object();
+                var fleetItem = {};
                 var targetLocation = '';
 
                 //for (var item = planetObj.stationedFleets.length-1; item > -1; item--) {
@@ -800,20 +800,20 @@ function app() {
                 }
 
                 shipListing += '</ul>';
-                shipListing += '<div id="fleetDetails" style="clear: both; width:538px; height: 110px; padding: 8px; border-radius:5px; border: 1px solid #8a8a8a; background-color:#5a5a5a;"></div>';
+                shipListing += '<div id="fleetDetails"></div>';
 
             }
         } else {
             if (forceDisplay) {
-                shipListing = '<div id="fleetInfo" style="width:50px; float:left; display: inline-block; padding: 4px; border-radius:5px; background-color:#5a5a5a">';
+                shipListing = '<div id="fleetControls">';
                 shipListing += '<span id="joinFleets">Join</span>';
                 shipListing += '<span id="nameFleet">Rename</span>';
                 shipListing += '<span id="splitFleet">Split</span>';
                 shipListing += '</div>';
 
-                shipListing += '<ul id="shipListing" style="height: 120px; float: left; overflow:auto; display: inline-block; margin-bottom:5px; border-radius: 5px; background-color: #3c3c3c; padding: 10px; color: #fff; font-family: sans-serif; font-weight: bold; min-width: 275px;">';
+                shipListing += '<ul id="shipListing">';
 
-                var fleetItem = new Object();
+                var fleetItem = {};
                 var targetLocation = '';
 
                 //for (var item = planetObj.foreignFleets.length-1; item > -1; item--) {
@@ -821,7 +821,7 @@ function app() {
                 while (item--) {
                     fleetItem = planetObj.foreignFleets[item];
                     if ( fleetItem.owner === logic.currentPlayer) {     // TODO: MAke a check for the fleetId
-                    targetLocation = '';
+                        targetLocation = '';
                         fleetItem = getFleetById(fleetItem);
 
                         if (fleetItem.destination) {
@@ -837,8 +837,6 @@ function app() {
                 }
 
                 shipListing += '</ul>';
-                shipListing += '<div id="fleetDetails" style="clear: both; width:538px; height: 110px; padding: 8px; border-radius:5px; border: 1px solid #8a8a8a; background-color:#5a5a5a;"></div>';
-
             }
         }
 
@@ -943,15 +941,15 @@ function app() {
 
                     var detailScreen = document.getElementById('fleetDetails');
                     var details = '';
-                    details += '<div style="float: left; width: 50%"><h5>Ship Classes - <input value="' + evt.target.name.split('|')[0] + '" id="nameFleet" class="dynamicInput"/></h5>';
+                    details += '<div><h5>Ship Classes - <input value="' + evt.target.name.split('|')[0] + '" id="nameFleet" class="dynamicInput"/></h5>';
 
-                    details += '<ul id="fleetListing" style="width:100%; height: 90px; overflow:auto;"></ul></div>';
-                    details += '<div id="splitFleetModal" style="display: none; float: left; padding-left: 10px;"><input value="New fleet name" id="partedFleetName" autocomplete="off" style="width: 100%; border: 1px solid #5a5a5a; font-size: 10px; padding: 2px;"/><ul id="partedFleet" style="height: 70px; overflow: auto; width: 245px"><br><span>Drop ships here</span></ul><button id="partFleet" style="float: right;">Split</button></div>';
+                    details += '<ul id="fleetListing"></ul></div>';
+                    details += '<div id="splitFleetModal"><input value="New fleet name" id="partedFleetName" autocomplete="off" /><ul id="partedFleet"><br><span>Drop ships here</span></ul><button id="partFleet" style="float: right;">Split</button></div>';
                     detailScreen.innerHTML = details;
 
                     if (activeItem) {
                         if (activeItem.id === 'splitFleet') {
-                            document.getElementById('splitFleetModal').style.display = 'block';
+                            document.getElementById('splitFleetModal').style.display = 'inline-block';
                         }
                     }
 
@@ -1165,14 +1163,12 @@ function app() {
                     activeItem = false;
 
                     var fleetSelection = document.getElementsByClassName('selectedFleet');
-                    var modX = 0;
                     
                     for (var x = 0; x < fleetSelection.length; x++) {
-                        for (var fleetItem in planetObj.stationedFleets) {
+                        for (var fleetItem = planetObj.stationedFleets.length-1; fleetItem > -1; fleetItem--) {
                             if (!joinedFleet) {
-                                if (planetObj.stationedFleets[fleetItem].id === fleetSelection[x-modX].name.split('|')[1]) {
+                                if (planetObj.stationedFleets[fleetItem].id === fleetSelection[x].name.split('|')[1]) {
                                     joinedFleet = planetObj.stationedFleets[fleetItem];
-                                    modX++;
                                 }
                             } else if (joinedFleet) {
                                 if (planetObj.stationedFleets[fleetItem].id === fleetSelection[x].name.split('|')[1]) {
@@ -1251,7 +1247,7 @@ function app() {
                         activeItem.className = 'active';
 
                         if (document.getElementById('splitFleetModal')) {
-                            document.getElementById('splitFleetModal').style.display = 'block';
+                            document.getElementById('splitFleetModal').style.display = 'inline-block';
                         }
 
                     } else {
@@ -2310,7 +2306,7 @@ function app() {
             fleet.name = 'Joined fleet ' + env.fleets.length;
         }
 
-        for (var x = shipList.length -1; x > -1; x++) {
+        for (var x = shipList.length -1; x > -1; x--) {
             fleet.ships.push(shipList[x]);
             fleet.count++;
         }

@@ -89,46 +89,6 @@ ul li span {
     color: #000;
 }
 
-/* Fleet listing */
-#modal #fleetListing a:hover {
-    background-color: inherit;
-}
-
-#modal #fleetListing li:hover {
-    background-color: #3a3a3a;
-}
-
-#fleetInfo span {
-    cursor: pointer;
-    width: 40px;
-    padding: 5px;
-    text-align: center;
-    float: left;
-    clear: both;
-}
-
-#fleetInfo span.active,
-#fleetInfo span:hover,
-#fleetInfo span:focus {
-    border-radius: 5px;
-    background-color: #aeaeae;
-    color: #6a6a6a;
-}
-
-#fleetInfo span:active {
-    color: #000;
-    background-color: #dedede;
-}
-
-#fleetInfo span::focus {
-    color: #000;
-
-}
-
-#modal a.selectedFleet  {
-    background-color: #8a8e8a;
-}
-
 .dynamicInput {
     border: none;
     font-size: 12px;
@@ -415,4 +375,108 @@ hr {
     color: #000;
 }
 
+/* Fleet per planet listing */
+#fleetDetails {
+    background-color:#5a5a5a;
+    border: 1px solid #8a8a8a;
+    border-radius: 5px;
+    clear: both;
+    min-height: 110px;
+    padding: 8px;
+    width: 358px;
+}
 
+
+/* Fleet modal */
+#fleetListing a:hover {
+    background-color: inherit;
+}
+
+#fleetListing li:hover {
+    background-color: #3a3a3a;
+}
+
+#fleetControls {
+    background-color: #5a5a5a;
+    border-radius: 5px;
+    display: inline-block;
+    float: right;
+    padding: 4px;
+    width: 50px;
+}
+
+#fleetControls span {
+    cursor: pointer;
+    width: 40px;
+    padding: 5px;
+    text-align: center;
+    float: left;
+    clear: both;
+}
+
+#fleetControls span.active,
+#fleetControls span:hover,
+#fleetControls span:focus {
+    border-radius: 5px;
+    background-color: #aeaeae;
+    color: #6a6a6a;
+}
+
+#fleetControls span:active {
+    color: #000;
+    background-color: #dedede;
+}
+
+#fleetControls span:focus {
+    color: #000;
+}
+
+#shipListing {
+    background-color: #3c3c3c;
+    border-radius: 5px;
+    color: #fff;
+    display: inline-block;
+    float: left;
+    height: 120px;
+    margin-bottom: 5px;
+    min-width: 275px;
+    overflow: auto;
+    padding: 10px;
+    font-weight: bold;
+}
+
+#fleetListing {
+    height: 90px;
+    overflow: auto;
+}
+
+#fleetListing li:hover {
+    background-color: transparent;
+    color: #fff;
+    cursor: pointer;
+}
+
+#fleetListing a:hover {
+    color: #fff;
+}
+
+a.selectedFleet  {
+    background-color: #8a8e8a;
+}
+
+#splitFleetModal {
+    display: none;
+    width: 100%;
+}
+
+#splitFleetModal #partedFleetName {
+    font-size: 10px;
+    padding: 2px;
+    width: 100%;
+}
+
+#splitFleetModal #partedFleet {
+    height: 70px;
+    overflow: auto;
+    width: 100%;
+}
