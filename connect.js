@@ -2471,12 +2471,16 @@ function app() {
         gameArea.width = gameArea.width;
         gameScreen.fillStyle = 'rgba(255,255,255, 0.02)';
 
-        gameScreen.beginPath();
+        // drawScanAreas
         //for (var x = 0; x < playerEnv.scanAreas.length; x++) {
+
+        gameScreen.beginPath();
+        
         var x = playerEnv.scanAreas.length;
         while (x--) {
             scanX = playerEnv.scanAreas[x][1] + playerEnv.offsetX;
             scanY = playerEnv.scanAreas[x][2] + playerEnv.offsetY;
+            gameScreen.moveTo(scanX, scanY)
             gameScreen.arc(scanX, scanY, playerEnv.scanAreas[x][0], 0, 6.28);
         }
         
