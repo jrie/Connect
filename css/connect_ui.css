@@ -386,13 +386,16 @@ hr {
     width: 358px;
 }
 
-
 /* Fleet modal */
+#fleetListing {
+    display: inline;
+}
+
 #fleetListing a:hover {
     background-color: inherit;
 }
 
-#fleetListing li:hover {
+#fleetListing li.fleet:hover {
     background-color: #3a3a3a;
 }
 

@@ -1,5 +1,5 @@
 function checkMouseResize(evt) {
-    if (evt.clientX <= 250 || evt.clientX >= (document.getElementById('gameScreen').clientWidth - 80)) {
+    if (evt.clientX <= 250 || evt.clientX >= (document.getElementById('gameScreen').clientWidth - 150)) {
         return;
     }
     document.getElementById('gameScreenArea').width = evt.clientX - document.getElementById('gameScreenArea').offsetLeft;
