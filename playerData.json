@@ -1,0 +1,123 @@
+{
+    "author": "jrie",
+    "version": "v0.01",
+    "description": "Connect PlayerData",
+    "playerData": {
+        "playerName": "DarkDescent",
+        "plyayerID": "",
+        "playerColor": "0xdedede"
+    },
+    "baseData": {
+        "baseWorkersAgriculture": 1,
+        "baseWorkersProduction": 1,
+        "baseWorkersResearch": 1,
+        "baseMarinesAttack": 5,
+        "baseMarinesDefense": 5,
+        "baseMarinesEvasion": 5
+    },
+    "availableBuildings": {
+        "Factory Complex": {
+            "cost": 40,
+            "type": "Construction",
+            "is": "B",
+            "factor": "*",
+            "value": 1.05,
+            "text": "Basic construction facility for our planets, increasing base production by 5% each active construction worker."
+        },
+        "Farm Complex": {
+            "cost": 40,
+            "type": "Agriculture",
+            "is": "B",
+            "factor": "*",
+            "value": 1.05,
+            "text": "Basic agriculture facility, increasing the base agriculture output of our planets by 5% each active farmer."
+        },
+        "Research Center": {
+            "cost": 50,
+            "type": "Research",
+            "is": "B",
+            "factor": "+",
+            "value": 4,
+            "text": "Assiting our researchers anaylizing the ecological as well as the environmental values of our colonies, providing 4 research points per turn."
+        },
+        "Marine Barracks": {
+            "cost": 35,
+            "type": "Marines",
+            "is": "B",
+            "base": 4,
+            "trains": 1,
+            "duration": 5,
+            "text": "Defending the colonies is an important task, our well trained marines help to do so.<br/><br/>Training one unit each 5 turns."
+        },
+        "Missile Base": {
+            "cost": 65,
+            "type": "PlanetDefense",
+            "is": "B",
+            "space": 300,
+            "of": "Missiles",
+            "text": "The missle base helps protecting the space around our planets. Providing 300 units space of our very best missiles; aiding our fleets."
+        }
+    },
+    "availableTechs": {
+        "Force fields": {
+            "Advancend Magnetism": {
+                "Cost": 250,
+                "Includes": {
+                    "Class I Shields": {
+                        "type": "shipShields",
+                        "strength": 5,
+                        "regeneration": 0.3,
+                        "text": "First established shield for our ships, inflicting up to 5 damage, regenerating 30% per combat turn."
+                    },
+                    "ECM Jammer": {
+                        "type": "shipModules",
+                        "function": "missileEvasion",
+                        "factor": "%",
+                        "value": 70,
+                        "text": "Allows our ships to evade missile.<br/>The chance to evade missiles is increased by 70%."
+                    },
+                    "Mass Driver": {
+                        "type": "shipWeapons",
+                        "function": "projectile",
+                        "targets": "all",
+                        "damageMin": 6,
+                        "damageMax": 6,
+                        "extensions": [true, false, false, true],
+                        "text": "Mass drivers shot projecticles at hyper-velocity, dealing 6 damage. Extensions are auto fire, armor piercing, heavymount and point defense."
+                    }
+                }
+            }
+        }
+    },
+    "visibleTechs": {
+        "Force fields": {
+            "Gravitic Fields": {
+                "Cost": 650,
+                "Includes": {
+                    "Anti-Grav Harness": "Allows ground troops and armor to fly.<br/><br/>Adds +10 to ground combat ability.",
+                    "Gyro Destabilizer": "Inflictss 3 to 7 points of structural damage.<br/>Range of 15 units.",
+                    "Inertial Stabilizer": "Adds +50 to the ships beam defense."
+                }
+            }
+        },
+        "Physics": {
+            "Fusion Physics": {
+                "Cost": 150,
+                "Includes": {
+                    "Fusion Beam": "Advanced beam for ships, dealing 2 to 6 damage.",
+                    "Fusion Rifle": "Very standard rifle for ground troops, increasing groud combat unit damage by +10."
+                }
+            }
+        },
+        "Biology": {
+            "Astro Biology": {
+                "Cost": 80,
+                "Includes": {
+                    "Biospheres": "Through control of environmental conditions, a planet can increase the population limit by 2 million",
+                    "Hyproponic Farm": "An automate, sealed envrionment which allows us to increase the food output of any planet by +2 food."
+                }
+            }
+        }
+    }
+
+}

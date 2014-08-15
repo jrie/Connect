@@ -1,0 +1,126 @@
+{
+    "author": "jrie",
+    "version": "v0.01",
+    "name": "Connect Techtree",
+    "Force fields": {
+        "Advancend Magnetism": {
+            "Cost": 250,
+            "Includes": {
+                "Class I Shields": {
+                    "type": "shipShields",
+                    "strength": 5,
+                    "regeneration": 0.3,
+                    "text": "First established shield for our ships, inflicting up to 5 damage, regenerating 30% per combat turn."
+                },
+                "ECM Jammer": {
+                    "type": "shipModules",
+                    "function": "missileEvasion",
+                    "factor": "%",
+                    "value": 0.7,
+                    "text": "Allows our ships to evade missile.<br/>The chance to evade missiles is increased by 70%."
+                },
+                "Mass Driver": {
+                    "type": "shipWeapons",
+                    "is": "projectile",
+                    "targets": "all",
+                    "damageMin": 6,
+                    "damageMax": 6,
+                    "autofire": true,
+                    "armorPiercing": false,
+                    "heavyMount": false,
+                    "pointDefense": true,
+                    "text": "Mass drivers shot projecticles at hyper-velocity, dealing 6 damage."
+                }
+            }
+        },
+        "Gravitic Fields": {
+            "Cost": 650,
+            "Includes": {
+                "Anti-Grav Harness": {
+                    "type": "planetCombat",
+                    "function": "mobdef",
+                    "value": 10,
+                    "text": "Allows ground troops and armor to fly.<br/><br/>Adds +10 to ground combat ability."
+                },
+                "Gyro Destabilizer": {
+                    "type": "shipWeapons",
+                    "is": "beam",
+                    "targets": "Structure",
+                    "damageMin": 3,
+                    "damageMax": 7,
+                    "range": 15,
+                    "text": "Inflictss 3 to 7 points of structural damage.<br/>Range of 15 units."
+                },
+                "Inertial Stabilizer": {
+                    "type": "shipModules",
+                    "is": "antiBeam",
+                    "does": "defense",
+                    "value": 0.5,
+                    "text": "Adds +50 to the ships beam defense."
+                }
+            }
+        }
+    },
+    "Physics": {
+        "Fusion Physics": {
+            "Cost": 150,
+            "Includes": {
+                "Fusion Beam": {
+                    "type": "shipWeapons",
+                    "is": "beam",
+                    "targets": "all",
+                    "damageMin": 2,
+                    "damageMax": 6,
+                    "text": "Advanced beam for ships, dealing 2 to 6 damage."
+                },
+                "Fusion Rifle": {
+                    "type": "planetCombat",
+                    "does": "attack",
+                    "value": 10,
+                    "text": "Very standard rifle for ground troops, increasing groud combat unit damage by +10."
+                }
+            }
+        }
+    },
+    "Construction": {
+        "Construction Level 1": {
+            "Cost": 350,
+            "Includes": {
+                "Extended Factory Complex": {
+                    "cost": 120,
+                    "type": "building",
+                    "does": "construction",
+                    "is": "E",
+                    "extends": "Factory Complex",
+                    "factor": "*",
+                    "value": 1.05,
+                    "text": "Extends our factory complexes with more advanced machinery. Scaling our production by addional 5% cummulative to the bonus of the Factory Complex."
+                },
+                "Space mining facility": {
+                    "cost": 120,
+                    "type": "building",
+                    "does": "construction",
+                    "is": "B",
+                    "factor": "+",
+                    "value": 7,
+                    "text": "Space mining around our planets allow us to harvest the ressources of the galaxy, increasing our production base output by plus 7 units."
+                }
+            }
+        },
+        "Construction Level 1": {
+            "Cost": 650,
+            "Includes": {
+                "Robotic Factory": {
+                    "cost": 275,
+                    "type": "building",
+                    "does": "construction",
+                    "is": "R",
+                    "replaces": "Extended Factory Complex",
+                    "factor": "*",
+                    "value": 2,
+                    "text": "Replaces our extented factory complexes by almost only robotic workforce. Scaling our production by addional 2 per worker.<br/> If this building is destroyed, we only can rely on our basic Factory Complexes."
+                }
+            }
+        }
+    }
+}

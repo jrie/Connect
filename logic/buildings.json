@@ -1,0 +1,48 @@
+{
+    "author": "jrie",
+    "version": "v0.01",
+    "name": "Connect Buildings",
+    "buildings": {
+        "Factory Complex": {
+            "cost": 40,
+            "type": "Construction",
+            "is": "B",
+            "factor": "*",
+            "value": 1.05,
+            "text": "Basic construction facility for our planets, increasing base production by 5% each active construction worker."
+        },
+        "Farm Complex": {
+            "cost": 40,
+            "type": "Agriculture",
+            "is": "B",
+            "factor": "*",
+            "value": 1.05,
+            "text": "Basic agriculture facility, increasing the base agriculture output of our planets by 5% each active farmer."
+        },
+        "Research Center": {
+            "cost": 50,
+            "type": "Research",
+            "is": "B",
+            "factor": "+",
+            "value": 4,
+            "text": "Assiting our researchers anaylizing the ecological as well as the environmental values of our colonies, providing 4 research points per turn."
+        },
+        "Marine Barracks": {
+            "cost": 35,
+            "type": "Marines",
+            "is": "B",
+            "base": 4,
+            "trains": 1,
+            "duration": 5,
+            "text": "Defending the colonies is an important task, our well trained marines help to do so.<br/><br/>Training one unit each 5 turns."
+        },
+        "Missile Base": {
+            "cost": 65,
+            "type": "PlanetDefense",
+            "is": "B",
+            "space": 300,
+            "of": "Missiles",
+            "text": "The missle base helps protecting the space around our planets. Providing 300 units space of our very best missiles; aiding our fleets."
+        }
+    }
+}
