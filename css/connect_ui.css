@@ -63,7 +63,8 @@ ul li span {
 }
 
 #gameScreenArea {
-    background-color:#151540;
+    /*background-color:#151540;*/
+    background-color:070707;
     display: inline;
     position:relative;
     z-index:0;
