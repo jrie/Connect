@@ -3,6 +3,8 @@ connect
 
 An approach for a space game based on HTML5 and javascript - linked to the feeling of Master of Orion 2.
 
+Note: The game was mainly tested in Firefox, Chrome workability has just been added and can only run properly if the command "--allow-file-access-from-files" is added to allow Chrome to load local ressources using ajax.
+
 At present the game elements are pretty simple, main focus has been set on getting the logic and some ui interaction in place, in favor of working with graphic elements. Its pretty simple at its state, but can already be "played" in a very simple fashion, meaning that a basic space combat simulation is done and the option to start with one or more players. Its not in any way a full game as the underlying structure has no research or agriculture implemented, but production is working as is and also basic fleet management and the options to switch players on demand in an - at the moment - totally random generated galaxie without any order.
 
 But the general idea was to move slightly away from Moo2 and add other details alike manageable trade routes between planets or systems, galaxie generation in formations or other cool stuff. But thats far away as other basic features are missing at the moment and also the variant to play in multiplayer mode using a server and client solution which also would require to separate the present codebase between logic and player environments.
