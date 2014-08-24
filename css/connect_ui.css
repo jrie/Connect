@@ -320,17 +320,24 @@ hr {
     width: 100px;
 }
 
-#planetinfo #productionQueue li {
+#productionQueue li {
     padding: 3px 6px;
 }
 
-#planetinfo #productionList {
+#productionList {
     float: left;
     width: 200px;
+    height: 125px;
+    overflow: auto;
 }
 
-#planetinfo #productionList ul,
-#planetinfo #productionQueue ul {
+#productionQueue {
+    height: 105px;
+    overflow: auto;
+}
+
+#productionList ul,
+#productionQueue ul {
     height: 100%;
     overflow: auto;
     padding: 0px;

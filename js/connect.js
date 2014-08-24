@@ -1,3 +1,5 @@
+var animations = {};
+var logic = {};
 function app() {
 
     function updateActions(type, action, data) {
@@ -28,9 +30,9 @@ function app() {
                 gameScreen.fillStyle = "rgba(150,150,175, 1)";
                 if (playerEnv.knownPlanets.indexOf(planetObj.id) !== -1) {
                     textsize = gameScreen.measureText(planetObj.displayName);
-                    gameScreen.strokeText(planetObj.displayName, planetObj.x + playerEnv.offsetX - (textsize.width/2), planetObj.y + planetObj.size + 16 + env.offsetY);
+                    gameScreen.strokeText(planetObj.displayName, planetObj.x + playerEnv.offsetX - (textsize.width / 2), planetObj.y + planetObj.size + 16 + env.offsetY);
                 }
-             } else if (planetObj.owner !== playerEnv.player) {
+            } else if (planetObj.owner !== playerEnv.player) {
                 gameScreen.fillStyle = "rgba(170,70,70, 1)";
             } else {
                 gameScreen.fillStyle = "rgba(150,150,175, 1)";
@@ -70,7 +72,7 @@ function app() {
         var fleetItem = 0;
         while (x--) {
             gameScreen.beginPath();
-            gameScreen.arc(playerEnv.fleets[x].x + playerEnv.offsetX, playerEnv.fleets[x].y + playerEnv.offsetY, 10, 0,  6.28);
+            gameScreen.arc(playerEnv.fleets[x].x + playerEnv.offsetX, playerEnv.fleets[x].y + playerEnv.offsetY, 10, 0, 6.28);
             gameScreen.closePath();
 
             if (gameScreen.isPointInPath(evt.layerX, evt.layerY)) {
@@ -126,7 +128,7 @@ function app() {
             return;
         }
 
-        if (evt.originalTarget.id !== 'modal' && !env.strg) {
+        if (evt.target.id !== 'modal' && !env.strg) {
             modal.style.display = 'none';
             modal.innerHTML = '';
         }
@@ -203,12 +205,12 @@ function app() {
             }
         } else {
             /*
-            if (playerEnv.activeSelection.type === "planet") {
-                scrollToLocation(playerEnv.activeSelection, false);
-                playerEnv.activeSelection = false;
-                return;
-            }
-            */
+             if (playerEnv.activeSelection.type === "planet") {
+             scrollToLocation(playerEnv.activeSelection, false);
+             playerEnv.activeSelection = false;
+             return;
+             }
+             */
 
             if (!playerEnv.strg) {
                 playerEnv.activeSelection = false;
@@ -219,7 +221,7 @@ function app() {
     }
 
     function getFleetById(fleetObj) {
-        var fleetEnv = logic.environments[ Number(fleetObj.id.split('_')[0]) ].fleets;
+        var fleetEnv = logic.environments[ parseInt(fleetObj.id.split('_')[0]) ].fleets;
         var x = fleetEnv.length;
         while (x--) {
             if (fleetObj.id === fleetEnv[x].id) {
@@ -293,7 +295,7 @@ function app() {
         return [planetAgriculture, planetProduction, planetResearch];
     }
 
-     function getMultiOutput(planet) {
+    function getMultiOutput(planet) {
         var planetAgriculture = 0;
         var planetProduction = 0;
         var planetResearch = 0;
@@ -359,7 +361,7 @@ function app() {
             var multiOutput = getMultiOutput(planet);
 
             if (planet.workForce[3] !== 0) {
-                turns = Math.ceil( (planet.production[2] - planet.production[1]) / ( (planet.workForce[3] * (percentOutput[1] + multiOutput[1])) + fixedOutput[1] ) );
+                turns = Math.ceil((planet.production[2] - planet.production[1]) / ((planet.workForce[3] * (percentOutput[1] + multiOutput[1])) + fixedOutput[1]));
             } else {
                 turns = '-';
             }
@@ -376,9 +378,9 @@ function app() {
             infoScreen += '<button id="reset">Reset workforce</button></div>';
 
             var baseMixOutput = [
-                percentOutput[0]+multiOutput[0],
-                percentOutput[1]+multiOutput[1],
-                percentOutput[2]+multiOutput[2]
+                percentOutput[0] + multiOutput[0],
+                percentOutput[1] + multiOutput[1],
+                percentOutput[2] + multiOutput[2]
             ];
 
             var displayAgriculture = baseMixOutput[0].toString().slice(0, baseMixOutput[0].toString().indexOf('.') + 3);
@@ -418,7 +420,7 @@ function app() {
             }
 
             if (planet.workForce[4] > 0) {
-                researchValue = planet.workForce[4]  * (percentOutput[2] + multiOutput[2]);
+                researchValue = planet.workForce[4] * (percentOutput[2] + multiOutput[2]);
 
                 if (researchValue.toString().indexOf('.') !== -1) {
                     displayResearch = researchValue.toString().slice(0, researchValue.toString().indexOf('.') + 3);
@@ -428,9 +430,9 @@ function app() {
             }
 
             infoScreen += '<br>';
-            infoScreen += '<p>Agriculture value.. ' + displayAgriculture + ' + '+ fixedOutput[0] +'</p>';
-            infoScreen += '<p>Production value.. ' + displayProduction + ' + '+ fixedOutput[1] +'</p>';
-            infoScreen += '<p>Research value.. ' + displayResearch + ' + '+ fixedOutput[2] +'</p>';
+            infoScreen += '<p>Agriculture value.. ' + displayAgriculture + ' + ' + fixedOutput[0] + '</p>';
+            infoScreen += '<p>Production value.. ' + displayProduction + ' + ' + fixedOutput[1] + '</p>';
+            infoScreen += '<p>Research value.. ' + displayResearch + ' + ' + fixedOutput[2] + '</p>';
             infoScreen += '</div></div>';
 
             // Production modal
@@ -637,7 +639,7 @@ function app() {
                                             document.getElementById('productionQueue').innerHTML += '<li class="queueItem">' + playerEnv.buildings[option][0] + '</li>';
 
                                             queueItems = document.getElementById('productionQueue').getElementsByTagName('LI');
-                                            for (var queueItem = queueItems.length-1; queueItem > -1; queueItem--) {
+                                            for (var queueItem = queueItems.length - 1; queueItem > -1; queueItem--) {
                                                 queueItems[queueItem].addEventListener('click', removeQueueItem);
                                             }
 
@@ -776,7 +778,7 @@ function app() {
                 while (x--) {
                     fleetItem = planetObj.stationedFleets[x];
                     if (fleetItem.destination) {
-                    targetLocation = '';
+                        targetLocation = '';
                         if (playerEnv.knownPlanets.indexOf(fleetItem.destination.id) === -1) {
                             targetLocation = ' - travelling to planet at ' + Math.ceil(fleetItem.destination.x) + '-' + Math.ceil(fleetItem.destination.y) + ' (' + Math.floor(fleetItem.turns) + ' turns)';
                         } else {
@@ -784,7 +786,7 @@ function app() {
                         }
                     }
 
-                    shipListing += '<li><a href="#" name="' + fleetItem.name +'|'+ fleetItem.id + '" class="">' + fleetItem.name + targetLocation + '</a></li>';
+                    shipListing += '<li><a href="#" name="' + fleetItem.name + '|' + fleetItem.id + '" class="">' + fleetItem.name + targetLocation + '</a></li>';
 
                 }
 
@@ -808,7 +810,7 @@ function app() {
                 var item = planetObj.foreignFleets.length;
                 while (item--) {
                     fleetItem = planetObj.foreignFleets[item];
-                    if ( fleetItem.owner === logic.currentPlayer) {     // TODO: MAke a check for the fleetId
+                    if (fleetItem.owner === logic.currentPlayer) {     // TODO: MAke a check for the fleetId
                         targetLocation = '';
                         fleetItem = getFleetById(fleetItem);
 
@@ -819,7 +821,7 @@ function app() {
                                 targetLocation = ' - travelling to ' + fleetItem.destination.name + ' (' + Math.floor(fleetItem.turns) + ' turns)';
                             }
                         }
-                        shipListing += '<li><a href="#" name="' + fleetItem.name +'|'+ fleetItem.id + '" class="">' + fleetItem.name + targetLocation + '</a></li>';
+                        shipListing += '<li><a href="#" name="' + fleetItem.name + '|' + fleetItem.id + '" class="">' + fleetItem.name + targetLocation + '</a></li>';
                     }
 
                 }
@@ -839,7 +841,7 @@ function app() {
                 var activeSelections = document.getElementsByClassName('selectedFleet');
 
                 if (activeSelections.length !== 0) {
-                    for (var x = activeSelections.length-1; x > -1; x--) {
+                    for (var x = activeSelections.length - 1; x > -1; x--) {
                         activeSelections[x].className = '';
                     }
 
@@ -1152,7 +1154,7 @@ function app() {
                     var fleetSelection = document.getElementsByClassName('selectedFleet');
 
                     for (var x = 0; x < fleetSelection.length; x++) {
-                        for (var fleetItem = planetObj.stationedFleets.length-1; fleetItem > -1; fleetItem--) {
+                        for (var fleetItem = planetObj.stationedFleets.length - 1; fleetItem > -1; fleetItem--) {
                             if (!joinedFleet) {
                                 if (planetObj.stationedFleets[fleetItem].id === fleetSelection[x].name.split('|')[1]) {
                                     joinedFleet = planetObj.stationedFleets[fleetItem];
@@ -1163,7 +1165,7 @@ function app() {
                                         joinedFleet.ships.push(planetObj.stationedFleets[fleetItem].ships[ship]);
                                     }
 
-                                    for (var route = playerEnv.activeRoutes.length-1; route > -1; route--) {
+                                    for (var route = playerEnv.activeRoutes.length - 1; route > -1; route--) {
                                         if (playerEnv.activeRoutes[route][0] === planetObj.stationedFleets[fleetItem]) {
                                             playerEnv.activeRoutes.splice(route, 1);
                                             break;
@@ -1308,15 +1310,15 @@ function app() {
                         }
 
                     } else {
-                         // Decrease count of design
-                         /*
-                        for (var design = playerEnv.designs.length - 1; design > -1; design--) {
-                            if (planetObj.stationedFleets[colonizeInfo[1]].ships[colonizeInfo[2]].design === playerEnv.designs[design].name) {
-                                playerEnv.designs[design].count -= 1;
-                            }
-                        }
-                        */
-                       
+                        // Decrease count of design
+                        /*
+                         for (var design = playerEnv.designs.length - 1; design > -1; design--) {
+                         if (planetObj.stationedFleets[colonizeInfo[1]].ships[colonizeInfo[2]].design === playerEnv.designs[design].name) {
+                         playerEnv.designs[design].count -= 1;
+                         }
+                         }
+                         */
+
                         // Remove single ship from fleet
                         planetObj.stationedFleets[colonizeInfo[1]].ships.splice(colonizeInfo[2], 1);
 
@@ -1643,13 +1645,13 @@ function app() {
                 }
 
                 playerEnv.scrollActive = false;
-                
+
                 return;
             }
 
             playerEnv.offsetX -= stepX;
             playerEnv.offsetY -= stepY;
-            
+
         }
 
         scrollInterval = setInterval(doScroll, 45);
@@ -1721,7 +1723,7 @@ function app() {
         modal.style.display = 'none';
 
         if (info[0] === 'planet') {
-            var index = Number(info[1]);
+            var index = parseInt(info[1]);
             var planetObj = false;
 
             var x = playerEnv.planets.length;
@@ -1805,12 +1807,12 @@ function app() {
                     logic.planets[item].population[0] = logic.planets[item].population[1];
                 }
 
-                if (Number.toInteger(previous) < Number.toInteger(logic.planets[item].population[0])) {
+                if (parseInt(previous) < parseInt(logic.planets[item].population[0])) {
                     logic.planets[item].workForce[0] += 1;
                     logic.planets[item].workForce[1] += 1;
 
                     var link = createLink('planet', logic.planets[item].id, logic.planets[item].name);
-                    report('Population of ' + link + ' grown to ' + Number.toInteger(logic.planets[item].population[0]));
+                    report('Population of ' + link + ' grown to ' + parseInt(logic.planets[item].population[0]));
                 }
             }
 
@@ -1843,14 +1845,14 @@ function app() {
                     if (planet.productionQueue.length !== 0) {
                         // TODO: Perform a check if an queued item still can be constructed
                         if (planet.productionQueue[0][0] === 'building') {
-                            for (var option = logic.buildings.length -1; option > -1; option--) {
+                            for (var option = logic.buildings.length - 1; option > -1; option--) {
                                 if (planet.productionQueue[0][1] === logic.buildings[option][0]) {
                                     planet.production = [logic.buildings[option][0], 0, logic.buildings[option][1], 'building'];
                                     break;
                                 }
                             }
                         } else if (planet.productionQueue[0][0] === 'design') {
-                            for (var design = logic.environments[planet.owner].designs.length-1; design > -1; design--) {
+                            for (var design = logic.environments[planet.owner].designs.length - 1; design > -1; design--) {
                                 if (planet.productionQueue[0][1] === env.designs[design].name) {
                                     planet.production = [env.designs[design].name, 0, env.designs[design].cost, 'design'];
                                     break;
@@ -1895,7 +1897,7 @@ function app() {
             if (targetFleet.needsMove) {
 
                 if (targetFleet.location === 'planet') {
-                    if (targetFleet.origin.owner === logic.currentPlayer)  {
+                    if (targetFleet.origin.owner === logic.currentPlayer) {
                         targetFleet.origin.stationedFleets.splice(targetFleet.origin.stationedFleets.indexOf(targetFleet), 1);
 
                         if (targetFleet.origin.stationedFleets.length !== 0) {
@@ -1916,8 +1918,8 @@ function app() {
                         }
 
                         if (!wasStationedFleet) {
-                            for (var fleetItem = targetFleet.origin.foreignFleets.length -1; fleetItem > -1; fleetItem--) {
-                                if (targetFleet.id === targetFleet.origin.foreignFleets[fleetItem].id ) {
+                            for (var fleetItem = targetFleet.origin.foreignFleets.length - 1; fleetItem > -1; fleetItem--) {
+                                if (targetFleet.id === targetFleet.origin.foreignFleets[fleetItem].id) {
                                     targetFleet.origin.foreignFleets.splice(fleetItem, 1);
                                     break;
                                 }
@@ -1992,7 +1994,7 @@ function app() {
 
                     if (playerEnv.knownPlanets.indexOf(targetFleet.origin.id) === -1) {
                         playerEnv.knownPlanets.push(targetFleet.origin.id);
-                        discoverPlanets(targetFleet.origin.x, targetFleet.origin.y, 150/1.3, targetFleet);
+                        discoverPlanets(targetFleet.origin.x, targetFleet.origin.y, 150 / 1.3, targetFleet);
                     }
 
 
@@ -2014,7 +2016,7 @@ function app() {
 
     function removeFleetFromPlayerViews(targetFleet) {
 
-        for (var player = logic.players-1; player > -1; player--) {
+        for (var player = logic.players - 1; player > -1; player--) {
 
             if (player === targetFleet.owner) {
                 continue;
@@ -2050,8 +2052,8 @@ function app() {
     }
 
 
-    function updateScanAreas(targetFleet)  {
-        for (var player = logic.players-1; player > -1; player--) {
+    function updateScanAreas(targetFleet) {
+        for (var player = logic.players - 1; player > -1; player--) {
             if (player === targetFleet.owner) {
                 continue;
             }
@@ -2138,7 +2140,7 @@ function app() {
         var link2 = '';
 
         var planetObj = new Object();
-        for (var x = logic.planets.length-1; x > -1; x--) {
+        for (var x = logic.planets.length - 1; x > -1; x--) {
             planetObj = logic.planets[x];
 
             if (gameScreen.isPointInPath(planetObj.x, planetObj.y)) {
@@ -2161,7 +2163,7 @@ function app() {
 
                     // TODO: Logic creates foreign fleets objects, passing to player
                     if (planetObj.stationedFleets.length !== 0) {
-                        for (var x = planetObj.stationedFleets.length-1; x > -1; x--) {
+                        for (var x = planetObj.stationedFleets.length - 1; x > -1; x--) {
                             fleet = planetObj.stationedFleets[x];
                             foreignFleet = new Object();
                             foreignFleet.x = fleet.x;
@@ -2171,13 +2173,13 @@ function app() {
                             playerEnv.foreignFleets.push(foreignFleet);
                         }
                     }
-                    
+
                     if (!playerEnv.activeAnimations.hasOwnProperty(logic.terrains[planetObj.terrain][3])) {
                         playerEnv.activeAnimations[ logic.terrains[planetObj.terrain][3] ] = [];
                     }
                     playerEnv.activeAnimations[ logic.terrains[planetObj.terrain][3] ].push([planetObj.x, planetObj.y]);
-                }    
-                
+                }
+
             }
         }
     }
@@ -2186,7 +2188,7 @@ function app() {
         var playerEnv = logic.environments[planet.owner];
         var shipDesign = false;
 
-        for (var x = playerEnv.designs.length-1; x > -1; x--) {
+        for (var x = playerEnv.designs.length - 1; x > -1; x--) {
             if (design === playerEnv.designs[x].name) {
                 shipDesign = playerEnv.designs[x];
                 break;
@@ -2248,7 +2250,7 @@ function app() {
     function createFleetId(owner) {
         while (true) {
             var date = new Date();
-            var fleetId = owner+"_"+date.getTime()+date.getMilliseconds();
+            var fleetId = owner + "_" + date.getTime() + date.getMilliseconds();
 
             if (fleetId !== logic.environments[owner].lastFleetId) {
                 logic.environments[owner].lastFleetId = fleetId;
@@ -2288,7 +2290,7 @@ function app() {
             fleet.name = 'Joined fleet ' + env.fleets.length;
         }
 
-        for (var x = shipList.length -1; x > -1; x--) {
+        for (var x = shipList.length - 1; x > -1; x--) {
             fleet.ships.push(shipList[x]);
             fleet.count++;
         }
@@ -2402,12 +2404,12 @@ function app() {
 
         for (var player = 0; player < logic.players; player++) {
             var playerEnv = logic.environments[player];
-            var planetObj =  playerEnv.planets[0];
+            var planetObj = playerEnv.planets[0];
             playerEnv.scanAreas.push([150, planetObj.x, planetObj.y]);
 
             logic.scanAreas[player].push([150, planetObj.x, planetObj.y]);
             var key = logic.terrains[planetObj.terrain][3];
-            
+
             if (!playerEnv.activeAnimations.hasOwnProperty(key)) {
                 playerEnv.activeAnimations[key] = [];
             }
@@ -2426,13 +2428,13 @@ function app() {
 
 
 
-    function createAnimation(animObj, imgUrl, xSize, ySize, duration, stepX, lastX, setX, setY) {
+    function createAnimation(animObj, imgUrl, xWidth, xSize, ySize, duration, stepX, lastX, setX, setY) {
         var imgLoader = new XMLHttpRequest();
         var img = new Image();
 
         imgLoader.onreadystatechange = function() {
             if (imgLoader.readyState === 4) {
-                img.src = imgUrl;
+                img["src"] = imgUrl;
 
                 animObj[imgUrl] = {
                     "src": img,
@@ -2440,16 +2442,16 @@ function app() {
                     "y": ySize,
                     "duration": duration,
                     "stepx": stepX,
-                    "steps": Math.floor(img.width/stepX),
+                    "steps": Math.floor(xWidth / stepX),
                     "step": 0,
                     "current": duration,
                     "setX": setX,
                     "setY": setY,
                     "lastX": lastX
-                };                
+                };
             }
         };
-        
+
         for (var x = 0; x < logic.environments.length; x++) {
             logic.environments[x].activeAnimations[imgUrl] = [];
         }
@@ -2457,7 +2459,7 @@ function app() {
         imgLoader.open("GET", imgUrl);
         imgLoader.send();
     }
-    
+
     function drawAnimations() {
         var playerEnv = logic.environments[logic.currentPlayer];
         var keys = Object.keys(playerEnv.activeAnimations);
@@ -2467,44 +2469,46 @@ function app() {
             activeAnimationItems = playerEnv.activeAnimations[key];
             var items = activeAnimationItems.length;
 
-            var offsetX, x, y = 0;
-            
+            var offsetX = 0;
+            var x = 0;
+            var y = 0;
+
             var animProps = animations[key];
-            var imgSrc = animProps.src;
-            animProps.current -= 20;
-            
-            if (animProps.current <= 0) {
-                animProps.current = animProps.duration;
-                if (animProps.step >= animProps.steps) {
-                    animProps.step = 0;
+
+            var imgSrc = animProps["src"];
+            animProps["current"] -= 20;
+
+
+            if (animProps["current"] <= 0) {
+                animProps["current"] = animProps["duration"];
+                if (animProps["step"] >= animProps["steps"]) {
+                    animProps["step"] = 0;
                 } else {
-                    animProps.step += 1;
+                    animProps["step"] += 1;
                 }
             }
-            
-            var offsetX = animProps.stepx * animProps.step;
-            
-            if (animProps.setX !== false && animProps.setY !== false) {
-                if (offsetX >= animProps.lastX) {
+
+            var offsetX = animProps["stepx"] * animProps["step"];
+
+            if (animProps["setX"] !== false && animProps["setY"] !== false) {
+                if (offsetX >= animProps["lastX"]) {
                     offsetX = 0;
-                    animProps.step = 0;
+                    animProps["step"] = 0;
                 }
-                gameScreen.drawImage(imgSrc, animProps.setX-offsetX, animProps.setY);
-                
+                gameScreen.drawImage(imgSrc, animProps["setX"] - offsetX, animProps["setY"]);
                 continue;
             }
-            
+
             var size = 13;
-            while(items--) {
-                current = activeAnimationItems[items];
-                x = (activeAnimationItems[items][0]+playerEnv.offsetX);
-                y = (activeAnimationItems[items][1]+playerEnv.offsetY);
+            while (items--) {
+                x = (activeAnimationItems[items][0] + playerEnv.offsetX);
+                y = (activeAnimationItems[items][1] + playerEnv.offsetY);
                 gameScreen.save();
                 gameScreen.beginPath();
-                gameScreen.rect(x-size, y-size, animProps.x, animProps.y);
+                gameScreen.rect(x - size, y - size, animProps["x"], animProps["y"]);
                 gameScreen.clip();
-                gameScreen.drawImage(imgSrc, (x-offsetX)-size, y-size);
-                gameScreen.restore();                
+                gameScreen.drawImage(animProps["src"], (x - offsetX) - size, y - size);
+                gameScreen.restore();
             }
         }
     }
@@ -2746,7 +2750,7 @@ function app() {
 
     function calculateDesign(design) {
 
-        for (var item = logic.shipEngines.length-1; item > -1; item--) {
+        for (var item = logic.shipEngines.length - 1; item > -1; item--) {
             if (design.engines[0] === logic.shipEngines[item].name) {
                 design.speed = design.engines[1] * logic.shipEngines[item].speed;
                 design.cost += design.engines[1] * logic.shipEngines[item].cost;
@@ -2755,8 +2759,8 @@ function app() {
             }
         }
 
-        for (var subitem = design.weapons.length-1; subitem > -1; subitem--) {
-            for (var item = logic.shipWeapons.length-1; item > -1; item--) {
+        for (var subitem = design.weapons.length - 1; subitem > -1; subitem--) {
+            for (var item = logic.shipWeapons.length - 1; item > -1; item--) {
                 if (design.weapons[subitem][0] === logic.shipWeapons[item].name) {
                     design.cost += design.weapons[subitem][1] * logic.shipWeapons[item].cost;
                     break;
@@ -2764,15 +2768,15 @@ function app() {
             }
         }
 
-        for (var item = logic.shipShields.length-1; item > -1; item--) {
+        for (var item = logic.shipShields.length - 1; item > -1; item--) {
             if (design.shields[0] === logic.shipShields[item].name) {
                 design.cost += logic.shipShields[item].cost;
                 break;
             }
         }
 
-        for (var subitem = design.modules.length-1; subitem > -1; subitem--) {
-            for (var item = logic.shipModules.length-1; item > -1; item--) {
+        for (var subitem = design.modules.length - 1; subitem > -1; subitem--) {
+            for (var item = logic.shipModules.length - 1; item > -1; item--) {
                 if (design.modules[subitem] === logic.shipModules[item].name) {
                     design.cost += logic.shipModules[item].cost;
 
@@ -2792,20 +2796,20 @@ function app() {
     function getModule(designName, category) {
         var playerEnv = logic.environments[logic.currentPlayer];
 
-        for (var item = playerEnv.designs.length-1; item > -1; item--) {
+        for (var item = playerEnv.designs.length - 1; item > -1; item--) {
             if (designName === playerEnv.designs[item].name) {
                 //lg('design');
 
-                for (var module = playerEnv.designs[item].modules.length-1; module > -1; module--) {
+                for (var module = playerEnv.designs[item].modules.length - 1; module > -1; module--) {
                     lg('Module');
                     lg(env.designs[item].modules[module]);
 
-                    for (var moduleItem = logic.shipModules.length-1; moduleItem > -1; moduleItem--) {
-                        lg( logic.shipModules[moduleItem].name );
+                    for (var moduleItem = logic.shipModules.length - 1; moduleItem > -1; moduleItem--) {
+                        lg(logic.shipModules[moduleItem].name);
                         if (playerEnv.designs[item].modules[module] === logic.shipModules[moduleItem].name) {
                             lg(logic.shipModules[moduleItem].effects);
 
-                            for (var effect = logic.shipModules[moduleItem].effects.length -1; effect > -1; effect--) {
+                            for (var effect = logic.shipModules[moduleItem].effects.length - 1; effect > -1; effect--) {
                                 if (category === logic.shipModules[moduleItem].effects[effect][0]) {
                                     return [true, logic.shipModules[moduleItem].effects[effect][1]];
                                 }
@@ -2873,7 +2877,7 @@ function app() {
             var targetDesign = new Object();
             var playerEnv = logic.environments[logic.currentPlayer];
 
-            for (var design = playerEnv.designs.length-1; design > -1; design--) {
+            for (var design = playerEnv.designs.length - 1; design > -1; design--) {
                 if (playerEnv.designs[design].name === evt.target.name) {
                     targetDesign = playerEnv.designs[design];
                     break;
@@ -2937,7 +2941,7 @@ function app() {
                 target = evt.target.parentNode.parentNode;
             }
 
-            target = env.fleets[ Number(target.attributes.name.value) ];
+            target = env.fleets[ parseInt(target.attributes.name.value) ];
             modal.style.display = 'none';
             modal.innerHTML = '';
             createSelection(target);
@@ -2980,12 +2984,12 @@ function app() {
 
 
         var fleetDesigns = document.getElementsByClassName('fleetDesign');
-        for (var x = fleetDesigns.length -1; x > -1; x--) {
+        for (var x = fleetDesigns.length - 1; x > -1; x--) {
             fleetDesigns[x].addEventListener('click', displayDesignDetails);
         }
 
         var fleets = document.getElementsByClassName('fleet');
-        for (var x = fleets.length -1; x > -1; x--) {
+        for (var x = fleets.length - 1; x > -1; x--) {
             fleets[x].addEventListener('click', showLocation);
         }
 
@@ -3031,7 +3035,7 @@ function app() {
         ['Jungle', [2, 3], [2, 3], "img/terrain4.png"],
         ['Vulcanic', [3, 3], [0, 1], "img/terrain5.png"]
     ];
-    
+
     logic.mineralLevel = [
         [0, 'Very poor'],
         [1, 'Poor'],
@@ -3159,7 +3163,7 @@ function app() {
         }
         logic.shipClasses.splice(0, size);
 
-         // Create shipModules objects
+        // Create shipModules objects
         size = logic.shipModules.length;
         for (var item = 0; item < size; item++) {
             var shipModule = logic.shipModules[item];
@@ -3368,7 +3372,7 @@ function app() {
      addComponent(design, 'engine', 'Nuclear Drive' , 2);
      addComponent(design, 'module', 'Basic colonization module');
      calculateDesign(design);
-
+     
      env.designs.push(design);
      */
 
@@ -3407,26 +3411,26 @@ function app() {
 
 
     function getDesign(designOwner, designName) {
-        for (var design = logic.environments[designOwner].designs.length -1; design > -1; design--) {
+        for (var design = logic.environments[designOwner].designs.length - 1; design > -1; design--) {
             if (designName === logic.environments[designOwner].designs[design].name) {
                 return logic.environments[designOwner].designs[design];
             }
         }
     }
 
-    var animations = new Object();
-    //function createAnimation(animObj, imgUrl, xSize, ySize, duration, stepX, lastX, setX, setY) {
-    createAnimation(animations, "img/terrain0.png", 26, 25, 760, 30, 0, false, false, false);
-    createAnimation(animations, "img/terrain1.png", 26, 25, 760, 30, 0, false, false, false);
-    createAnimation(animations, "img/terrain2.png", 26, 25, 760, 30, 0, false, false, false);
-    createAnimation(animations, "img/terrain3.png", 26, 25, 760, 30, 0, false, false, false);
-    createAnimation(animations, "img/terrain4.png", 26, 25, 760, 30, 0, false, false, false);
-    createAnimation(animations, "img/terrain5.png", 26, 25, 760, 30, 0, false, false, false);
-    createAnimation(animations, "img/stars1.png", 800, 600, 140, 2, 3200, 0, 0);
-    
+
+    //function createAnimation(animObj, imgUrl, xWidth, xSize, ySize, duration, stepX, lastX, setX, setY) {
+    createAnimation(animations, "img/terrain0.png", 176, 26, 25, 760, 30, 0, false, false, false);
+    createAnimation(animations, "img/terrain1.png", 176, 26, 25, 760, 30, 0, false, false, false);
+    createAnimation(animations, "img/terrain2.png", 176, 26, 25, 760, 30, 0, false, false, false);
+    createAnimation(animations, "img/terrain3.png", 176, 26, 25, 760, 30, 0, false, false, false);
+    createAnimation(animations, "img/terrain4.png", 176, 26, 25, 760, 30, 0, false, false, false);
+    createAnimation(animations, "img/terrain5.png", 176, 26, 25, 760, 30, 0, false, false, false);
+    createAnimation(animations, "img/stars1.png", 3860, 800, 600, 140, 2, 3160, 0, 0);
+
     var playerEnv = logic.environments[0];
     playerEnv.activeAnimations[ "img/stars1.png" ].push([0, 0]);
-        
+
     env = logic.environments[0];
     genGalaxie(40);
     bindHandlers();
