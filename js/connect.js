@@ -2474,7 +2474,11 @@ function app() {
             var y = 0;
 
             var animProps = animations[key];
-
+            
+            if (!animProps) {
+                return;
+            }
+            
             var imgSrc = animProps["src"];
             animProps["current"] -= 20;
 
