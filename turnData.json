@@ -99,6 +99,9 @@
         },
         "colonizedPlanets": {
             "pIndex3": ["0_1408368928994998", "shipdesign"]
+        },
+        "renamedPlanets": {
+            "pIndex4": ["oldName", "newName"]
         }
     }
 }
