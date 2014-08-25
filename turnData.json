@@ -1,0 +1,104 @@
+{
+    "author": "jrie",
+    "name": "Player turn data",
+    "player": "DarkDescent",
+    "id": "017_DarkDescent_x001_1408368928994994",
+    "fleetData": {
+        "0_1408368928994996": {
+            "pIndex": 1,
+            "designName1": 1,
+            "designName2": 3,
+            "designName3": 1,
+            "cords": [50, 25]
+        },
+        "0_1408368928994997": {
+            "pIndex": false,
+            "designName1": 1,
+            "designName2": 3,
+            "designName3": 1,
+            "cords": [50, 25]
+        }
+    },
+    "turn": {
+        "fleetAction": {
+            "rename": {
+                "0_1408368928994996": ["old name", "new fleet name"]
+            },
+            "join": {
+                "pIndex1": {
+                    "name": "fleetName",
+                    "fleetIds": ["0_1408368928994996", "0_1408368928994997"],
+                    "design1": "count1",
+                    "design3": "count2",
+                    "newFleetId": "0_1408368928994995"
+                }
+            },
+            "split": {
+                "pIndex1": {
+                    "sourceFleet": "0_1408368928994996",
+                    "name": "joinedFleet",
+                    "newFleetId": "0_1508368928994997",
+                    "designs": {
+                        "name1": "count1",
+                        "name2": "count2"
+                    }
+                }
+            },
+            "moving": {
+                "0_1408368928994995": ["turns", "speed", "range", "at25", "at30", "to15", "to20"]
+            }
+        },
+        "planetData": {
+            "growth": {
+                "pIndex1": ["Turns to grow", 2.14, 8]
+            },
+            "constructionData": {
+                "pIndex1": [5, "building", 20, 40, 5],
+                "pIndex2": [2, 10, 30, 40, "design", "name", "attachTrue"],
+                "pIndex3": [1, 25, 30, 5, "design", "name", "attachFalse"]
+            },
+            "workermovement": {
+                "pIndex1": [2, 2, -2, 0],
+                "pIndex1": [6, 6, -3, 0]
+            },
+            "marines": {
+                "pIndex1": [3, 4]
+            },
+            "qeues": {
+                "pIndex1": ["Item1", "Item2", "Item20"],
+                "pIndex2": ["Item1"]
+            }
+        },
+        "planetSingleData": {
+            "pIndex1": {
+                "g": [0.14, 5.24, 8],
+                "wm": [2, 2, -2, 0],
+                "c": [2, 10, 30, 40, "design", "name", "attachTrue"],
+                "q": {
+                    "Item1 Building": 1,
+                    "Item2 Building": 1,
+                    "design": 10,
+                    "design": 3
+                },
+                "m": [4, 3, 2],
+                "f": ["0_1408368928994996", "0_1408368928994997"]
+            },
+            "pIndex2": {
+                "g": [false, 8, 8],
+                "wm": [2, 2, -2, 0],
+                "c": [2, 10, 30, 40, "design", "name", "attachTrue"],
+                "q": {
+                    "Item1 Building": 1,
+                    "Item2 Building": 1,
+                    "design": 10,
+                    "design": 3
+                },
+                "m": [4, 3, 2],
+                "f": ["0_1408368928994998"]
+            }
+        },
+        "colonizedPlanets": {
+            "pIndex3": ["0_1408368928994998", "shipdesign"]
+        }
+    }
+}

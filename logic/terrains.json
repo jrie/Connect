@@ -1,0 +1,65 @@
+{
+    "author": "jrie",
+    "version": "v0.01",
+    "name": "Connect Terrains, mineral and ecological level descriptors",
+    "levels": {
+        "mineralLevels": {
+            "0": "Very poor",
+            "1": "Poor",
+            "2": "Average",
+            "3": "Rich"
+        },
+        "ecologicalLevels": {
+            "0": "Very poor",
+            "1": "Poor",
+            "2": "Average",
+            "3": "Rich"
+        }
+    },
+    "terrains": {
+        "frequencies": {
+            "Tundra": 18,
+            "Desert": 23,
+            "Aquatic": 18,
+            "Barren": 17,
+            "Jungle": 18,
+            "Vulcanic": 8
+        },
+        "Tundra": {
+            "minMineral": 1,
+            "maxMineral": 2,
+            "minEcological": 0,
+            "maxEcological": 2
+        },
+        "Desert": {
+            "minMineral": 1,
+            "maxMineral": 3,
+            "minEcological": 0,
+            "maxEcological": 1
+        },
+        "Aquatic": {
+            "minMineral": 1,
+            "maxMineral": 2,
+            "minEcological": 2,
+            "maxEcological": 3
+        },
+        "Barren": {
+            "minMineral": 2,
+            "maxMineral": 3,
+            "minEcological": 1,
+            "maxEcological": 2
+        },
+        "Jungle": {
+            "minMineral": 2,
+            "maxMineral": 3,
+            "minEcological": 2,
+            "maxEcological": 3
+        },
+        "Vulcanic": {
+            "minMineral": 3,
+            "maxMineral": 3,
+            "minEcological": 0,
+            "maxEcological": 1
+        }
+    }
+}

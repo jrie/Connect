@@ -2449,39 +2449,37 @@ function app() {
                     "setY": setY,
                     "lastX": lastX
                 };
+                
+                for (var x = 0; x < logic.environments.length; x++) {
+                    logic.environments[x].activeAnimations[imgUrl] = [];
+                }
             }
         };
-
-        for (var x = 0; x < logic.environments.length; x++) {
-            logic.environments[x].activeAnimations[imgUrl] = [];
-        }
 
         imgLoader.open("GET", imgUrl);
         imgLoader.send();
     }
 
     function drawAnimations() {
+        
         var playerEnv = logic.environments[logic.currentPlayer];
         var keys = Object.keys(playerEnv.activeAnimations);
         var key = "";
         var activeAnimationItems = [];
+        var imgSrc = new Image();
+        var animProps = new Object();
+        var x = 0;
+        var y = 0;
+        var offsetX = 0;
+        var size = 13;
+        var items = 0;
+        
         for (var key in playerEnv.activeAnimations) {
             activeAnimationItems = playerEnv.activeAnimations[key];
-            var items = activeAnimationItems.length;
 
-            var offsetX = 0;
-            var x = 0;
-            var y = 0;
-
-            var animProps = animations[key];
-            
-            if (!animProps) {
-                return;
-            }
-            
-            var imgSrc = animProps["src"];
+            animProps = animations[key];
+            imgSrc = animProps["src"];
             animProps["current"] -= 20;
-
 
             if (animProps["current"] <= 0) {
                 animProps["current"] = animProps["duration"];
@@ -2492,7 +2490,7 @@ function app() {
                 }
             }
 
-            var offsetX = animProps["stepx"] * animProps["step"];
+            offsetX = animProps["stepx"] * animProps["step"];
 
             if (animProps["setX"] !== false && animProps["setY"] !== false) {
                 if (offsetX >= animProps["lastX"]) {
@@ -2502,8 +2500,9 @@ function app() {
                 gameScreen.drawImage(imgSrc, animProps["setX"] - offsetX, animProps["setY"]);
                 continue;
             }
+            
+            items = activeAnimationItems.length;
 
-            var size = 13;
             while (items--) {
                 x = (activeAnimationItems[items][0] + playerEnv.offsetX);
                 y = (activeAnimationItems[items][1] + playerEnv.offsetY);

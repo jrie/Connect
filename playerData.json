@@ -1,10 +1,10 @@
 {
     "author": "jrie",
     "version": "v0.01",
-    "description": "Connect PlayerData",
+    "name": "Connect PlayerData Boilerplate",
     "playerData": {
         "playerName": "DarkDescent",
-        "plyayerID": "",
+        "plyayerID": "DarkDescent_x001_1408368928994994",
         "playerColor": "0xdedede"
     },
     "baseData": {
