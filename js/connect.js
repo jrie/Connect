@@ -2465,7 +2465,6 @@ function app() {
         var playerEnv = logic.environments[logic.currentPlayer];
         var keys = Object.keys(playerEnv.activeAnimations);
         var key = "";
-        var activeAnimationItems = [];
         var imgSrc = new Image();
         var animProps = new Object();
         var x = 0;
@@ -2475,8 +2474,6 @@ function app() {
         var items = 0;
         
         for (var key in playerEnv.activeAnimations) {
-            activeAnimationItems = playerEnv.activeAnimations[key];
-
             animProps = animations[key];
             imgSrc = animProps["src"];
             animProps["current"] -= 20;
@@ -2501,8 +2498,7 @@ function app() {
                 continue;
             }
             
-            items = activeAnimationItems.length;
-
+            items = playerEnv.activeAnimations[key].length;
             while (items--) {
                 x = (activeAnimationItems[items][0] + playerEnv.offsetX);
                 y = (activeAnimationItems[items][1] + playerEnv.offsetY);
