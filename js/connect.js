@@ -2450,14 +2450,16 @@ function app() {
                     "lastX": lastX
                 };
                 
-                for (var x = 0; x < logic.environments.length; x++) {
-                    logic.environments[x].activeAnimations[imgUrl] = [];
-                }
+               
             }
         };
 
         imgLoader.open("GET", imgUrl);
         imgLoader.send();
+        
+        for (var x = 0; x < logic.environments.length; x++) {
+            logic.environments[x].activeAnimations[imgUrl] = [];
+        }
     }
 
     function drawAnimations() {
@@ -2472,9 +2474,15 @@ function app() {
         var offsetX = 0;
         var size = 13;
         var items = 0;
+        var activeAnimationItems = [];
         
         for (var key in playerEnv.activeAnimations) {
             animProps = animations[key];
+            
+            if (!animProps.hasOwnProperty("src")) {
+                return;
+            }
+            
             imgSrc = animProps["src"];
             animProps["current"] -= 20;
 
@@ -2498,6 +2506,7 @@ function app() {
                 continue;
             }
             
+            activeAnimationItems = playerEnv.activeAnimations[key];
             items = playerEnv.activeAnimations[key].length;
             while (items--) {
                 x = (activeAnimationItems[items][0] + playerEnv.offsetX);
@@ -3426,9 +3435,6 @@ function app() {
     createAnimation(animations, "img/terrain4.png", 176, 26, 25, 760, 30, 0, false, false, false);
     createAnimation(animations, "img/terrain5.png", 176, 26, 25, 760, 30, 0, false, false, false);
     createAnimation(animations, "img/stars1.png", 3860, 800, 600, 140, 2, 3160, 0, 0);
-
-    var playerEnv = logic.environments[0];
-    playerEnv.activeAnimations[ "img/stars1.png" ].push([0, 0]);
 
     env = logic.environments[0];
     genGalaxie(40);
