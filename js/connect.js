@@ -18,47 +18,62 @@ function app() {
 
         gameScreen.strokeStyle = 'rgba(255, 255, 255, 0.5)';
 
-        var x = playerEnv.planets.length;
-        var textsize = 0.0;
+        var items = playerEnv.planets.length;
+        var textsize = 0;
 
         gameScreen.lineWidth = 1;
         gameScreen.beginPath();
-        while (x--) {
-            planetObj = playerEnv.planets[x];
+        var x = 0;
+        var y = 0;
+        while (items--) {
+            planetObj = playerEnv.planets[items];
+            x = planetObj.x + playerEnv.offsetX;
+            y = planetObj.y + playerEnv.offsetY;
 
             if (planetObj.owner === -1) {
-                gameScreen.fillStyle = "rgba(150,150,175, 1)";
+                //gameScreen.fillStyle = "rgba(150,150,175, 1)";
                 if (playerEnv.knownPlanets.indexOf(planetObj.id) !== -1) {
                     textsize = gameScreen.measureText(planetObj.displayName);
-                    gameScreen.strokeText(planetObj.displayName, planetObj.x + playerEnv.offsetX - (textsize.width / 2), planetObj.y + planetObj.size + 16 + env.offsetY);
+                    gameScreen.strokeText(planetObj.displayName, x - (textsize.width / 2), y + 26);
                 }
             } else if (planetObj.owner !== playerEnv.player) {
-                gameScreen.fillStyle = "rgba(170,70,70, 1)";
+                //gameScreen.fillStyle = "rgba(170,70,70, 1)";
+                if (playerEnv.knownPlanets.indexOf(planetObj.id) !== -1) {
+                    textsize = gameScreen.measureText(planetObj.name);
+                    gameScreen.strokeText(planetObj.name, x - (textsize.width / 2), y + 26);
+                }
             } else {
-                gameScreen.fillStyle = "rgba(150,150,175, 1)";
+                //gameScreen.fillStyle = "rgba(150,150,175, 1)";
                 textsize = gameScreen.measureText(planetObj.name);
-                gameScreen.strokeText(planetObj.name, planetObj.x + playerEnv.offsetX - (textsize.width / 2), planetObj.y + planetObj.size + 16 + env.offsetY);
+                gameScreen.strokeText(planetObj.name, x - (textsize.width / 2), y + 26);
             }
 
-            gameScreen.moveTo(planetObj.x + playerEnv.offsetX, planetObj.y + playerEnv.offsetY);
-            gameScreen.arc(planetObj.x + playerEnv.offsetX, planetObj.y + playerEnv.offsetY, planetObj.size, 0, 6.28);
+            //gameScreen.moveTo(x, y);
+            //gameScreen.arc(x, y, 12, 0, 6.3);
         }
-        gameScreen.fill();
         gameScreen.closePath();
     }
 
     function checkPlanets(evt) {
         var playerEnv = logic.environments[logic.currentPlayer];
-        var x = playerEnv.planets.length;
-        while (x--) {
+        var items = playerEnv.planets.length;
+
+        var x = 0;
+        var y = 0;
+        var planetObj = {};
+        while (items--) {
+            planetObj = playerEnv.planets[items];
+            x = planetObj.x + playerEnv.offsetX;
+            y = planetObj.y + playerEnv.offsetY;
             gameScreen.beginPath();
-            gameScreen.arc(playerEnv.planets[x].x + playerEnv.offsetX, playerEnv.planets[x].y + playerEnv.offsetY, playerEnv.planets[x].size + 4, 0, 6.28);
+            gameScreen.moveTo(x, y);
+            gameScreen.arc(x, y, 24, 0, 6.3);
             gameScreen.closePath();
 
             if (gameScreen.isPointInPath(evt.layerX, evt.layerY)) {
-                if (playerEnv.knownPlanets.indexOf(playerEnv.planets[x].id) !== -1 || playerEnv.unknownPlanets.indexOf(playerEnv.planets[x].id) !== -1) {
-                    lg(playerEnv.planets[x]);
-                    return playerEnv.planets[x];
+                if (playerEnv.knownPlanets.indexOf(planetObj.id) !== -1 || playerEnv.unknownPlanets.indexOf(planetObj.id) !== -1) {
+                    lg(planetObj);
+                    return planetObj;
                 }
             }
         }
@@ -68,30 +83,37 @@ function app() {
 
     function checkFleets(evt) {
         var playerEnv = logic.environments[logic.currentPlayer];
-        var x = playerEnv.fleets.length;
-        var fleetItem = 0;
-        while (x--) {
+        var items = playerEnv.fleets.length;
+        var x = 0;
+        var y = 0;
+        var foreignItems = 0;
+        while (items--) {
+            fleetObj = playerEnv.fleets[items];
+            x = fleetObj.x + playerEnv.offsetX;
+            y = fleetObj.y + playerEnv.offsetY;
+
+            gameScreen.moveTo(x, y);
             gameScreen.beginPath();
-            gameScreen.arc(playerEnv.fleets[x].x + playerEnv.offsetX, playerEnv.fleets[x].y + playerEnv.offsetY, 10, 0, 6.28);
+            gameScreen.arc(x, y, 10, 0, 6.3);
             gameScreen.closePath();
 
             if (gameScreen.isPointInPath(evt.layerX, evt.layerY)) {
-                if (playerEnv.fleets[x].location !== 'space') {
+                if (fleetObj.location !== 'space') {
 
-                    if (playerEnv.fleets[x].origin.foreignFleets.length === 0 || playerEnv.fleets[x].origin.owner === playerEnv.player) {
-                        return playerEnv.fleets[x].origin.stationedFleets[0];
+                    if (fleetObj.origin.foreignFleets.length === 0 || fleetObj.origin.owner === playerEnv.player) {
+                        return fleetObj.origin.stationedFleets[0];
                     } else {
-                        fleetItem = playerEnv.fleets[x].origin.foreignFleets.length;
-                        while (fleetItem--) {
-                            if (playerEnv.fleets[fleetItem].origin.foreignFleets.owner === playerEnv.player) {
-                                return playerEnv.fleets[x].origin.foreignFleets[fleetItem];
+                        foreignItems = fleetObj.origin.foreignFleets.length;
+                        while (foreignItems--) {
+                            if (playerEnv.fleets[foreignItems].origin.foreignFleets.owner === playerEnv.player) {
+                                return fleetObj.origin.foreignFleets[foreignItems];
                             }
                         }
 
                     }
                 }
 
-                return playerEnv.fleets[x];
+                return fleetObj;
             }
         }
 
@@ -99,20 +121,23 @@ function app() {
     }
 
     function checkRoutes(evt) {
-        gameScreen.lineWidth = 10;
+        gameScreen.lineWidth = 20;
         var playerEnv = logic.environments[logic.currentPlayer];
 
-        var x = playerEnv.activeRoutes.length;
-        while (x--) {
-            gameScreen.beginPath();
-            gameScreen.moveTo(playerEnv.activeRoutes[x][0].origin.x + playerEnv.offsetX, playerEnv.activeRoutes[x][0].origin.y + playerEnv.offsetY);
-            gameScreen.lineTo(playerEnv.activeRoutes[x][1].x + playerEnv.offsetX, playerEnv.activeRoutes[x][1].y + playerEnv.offsetY);
+        var items = playerEnv.activeRoutes.length;
+        var x = playerEnv.offsetX;
+        var y = playerEnv.offsetY;
+        var route = {};
+        while (items--) {
+            route = playerEnv.activeRoutes[items];
 
+            gameScreen.beginPath();
+            gameScreen.moveTo(route[0].origin.x + x, route[0].origin.y + y);
+            gameScreen.lineTo(route[1].x + x, route[1].y + y);
             gameScreen.closePath();
 
             if (gameScreen.isPointInStroke(evt.layerX, evt.layerY)) {
-                createSelection(playerEnv.activeRoutes[x][0]);
-                gameScreen.lineWidth = 1;
+                createSelection(route[0]);
                 return true;
             }
         }
@@ -1429,7 +1454,7 @@ function app() {
 
         gameScreen.beginPath();
         gameScreen.strokeStyle = "rgba(240,240,240, 0.6)";
-        gameScreen.arc(playerEnv.activeSelection.x + playerEnv.offsetX, playerEnv.activeSelection.y + playerEnv.offsetY, playerEnv.selectionSize + 5 + playerEnv.selectionIteration, 0, 6.28);
+        gameScreen.arc(playerEnv.activeSelection.x + playerEnv.offsetX, playerEnv.activeSelection.y + playerEnv.offsetY, playerEnv.selectionSize + 5 + playerEnv.selectionIteration, 0, 6.3);
         gameScreen.lineWidth = 1;
         gameScreen.stroke();
         gameScreen.closePath();
@@ -1465,8 +1490,8 @@ function app() {
             gameScreen.closePath();
 
             gameScreen.beginPath();
-            gameScreen.arc(playerEnv.activeRoutes[route][0].origin.x + playerEnv.offsetX, playerEnv.activeRoutes[route][0].origin.y + playerEnv.offsetY, 3, 0, 6.28);
-            gameScreen.arc(playerEnv.activeRoutes[route][1].x + playerEnv.offsetX, playerEnv.activeRoutes[route][1].y + playerEnv.offsetY, 3, 0, 6.28);
+            gameScreen.arc(playerEnv.activeRoutes[route][0].origin.x + playerEnv.offsetX, playerEnv.activeRoutes[route][0].origin.y + playerEnv.offsetY, 3, 0, 6.3);
+            gameScreen.arc(playerEnv.activeRoutes[route][1].x + playerEnv.offsetX, playerEnv.activeRoutes[route][1].y + playerEnv.offsetY, 3, 0, 6.3);
             gameScreen.fill();
             gameScreen.closePath();
         }
@@ -1639,6 +1664,7 @@ function app() {
         function doScroll() {
             if (Math.floor(Math.abs(playerEnv.offsetX)) === targetX && Math.floor(Math.abs(playerEnv.offsetY)) === targetY) {
                 clearInterval(scrollInterval);
+                bindHandlers();
 
                 if (callElement) {
                     callElement(object);
@@ -1653,8 +1679,8 @@ function app() {
             playerEnv.offsetY -= stepY;
 
         }
-
-        scrollInterval = setInterval(doScroll, 45);
+        unbindHandlers();
+        scrollInterval = setInterval(doScroll, 24 + Math.ceil(Math.abs(stepX)));
     }
 
 
@@ -1707,10 +1733,13 @@ function app() {
     }
 
     function createLink(type, linkName, linkMsg) {
-        if (linkMsg) {
-            return '<a href="#" class="infoLink" name="' + type + '_' + linkName + '">' + linkMsg + '</a>';
-        } else {
-            return '<a href="#" class="infoLink" name="' + type + '_' + linkName + '">' + linkName + '</a>';
+        // TODO: Remove this check once logic player seperation is established
+        if (logic.currentPlayer === 0) {
+            if (linkMsg) {
+                return '<a href="#" class="infoLink" name="' + type + '_' + linkName + '">' + linkMsg + '</a>';
+            } else {
+                return '<a href="#" class="infoLink" name="' + type + '_' + linkName + '">' + linkName + '</a>';
+            }
         }
     }
 
@@ -1726,10 +1755,10 @@ function app() {
             var index = parseInt(info[1]);
             var planetObj = false;
 
-            var x = playerEnv.planets.length;
-            while (x--) {
-                if (playerEnv.planets[x].id === index) {
-                    planetObj = playerEnv.planets[x];
+            var items = playerEnv.planets.length;
+            while (items--) {
+                if (playerEnv.planets[items].id === index) {
+                    planetObj = playerEnv.planets[items];
                     break;
                 }
             }
@@ -2034,7 +2063,7 @@ function app() {
                 scanX = scanArea[1];
                 scanY = scanArea[2];
                 gameScreen.beginPath();
-                gameScreen.arc(scanX, scanY, scanArea[0], 0, 6.28);
+                gameScreen.arc(scanX, scanY, scanArea[0], 0, 6.3);
                 gameScreen.closePath();
 
                 if (gameScreen.isPointInPath(targetFleet.x, targetFleet.y)) {
@@ -2082,7 +2111,7 @@ function app() {
                 scanY = scanArea[2];
 
                 gameScreen.beginPath();
-                gameScreen.arc(scanX, scanY, scanArea[0], 0, 6.28);
+                gameScreen.arc(scanX, scanY, scanArea[0], 0, 6.3);
                 gameScreen.closePath();
 
                 if (gameScreen.isPointInPath(targetX, targetY)) {
@@ -2128,7 +2157,8 @@ function app() {
 
     function discoverPlanets(cordX, cordY, scanRange, obj) {
         gameScreen.beginPath();
-        gameScreen.arc(cordX, cordY, scanRange, 0, 6.28);
+        gameScreen.moveTo(cordX, cordY);
+        gameScreen.arc(cordX, cordY, scanRange, 0, 6.3);
         gameScreen.closePath();
 
         var playerEnv = logic.environments[obj.owner];
@@ -2140,26 +2170,21 @@ function app() {
         var link2 = '';
 
         var planetObj = new Object();
-        for (var x = logic.planets.length - 1; x > -1; x--) {
-            planetObj = logic.planets[x];
+        var discoveredPlanets = [];
+        var items = logic.planets.length;
+        while (items--) {
+            planetObj = logic.planets[items];
 
             if (gameScreen.isPointInPath(planetObj.x, planetObj.y)) {
                 if (playerEnv.knownPlanets.indexOf(planetObj.id) === -1 && playerEnv.unknownPlanets.indexOf(planetObj.id) === -1) {
                     distanceX = Math.abs(cordX - planetObj.x);
                     distanceY = Math.abs(cordY - planetObj.y);
-                    distance = Math.sqrt(Math.pow(distanceX, 2) + Math.pow(distanceY, 2));
+                    distance = Math.ceil(Math.sqrt(Math.pow(distanceX, 2) + Math.pow(distanceY, 2)));
 
                     playerEnv.planets.push(planetObj);
                     playerEnv.unknownPlanets.push(planetObj.id);
 
-                    link1 = '';
-                    if (obj.type === 'fleet') {
-                        link1 = createLink(obj.type, obj.name, obj.type + ' ' + obj.name);
-                    } else {
-                        link1 = createLink(obj.type, obj.id, obj.type + ' ' + obj.name);
-                    }
-                    link2 = createLink('planet', planetObj.id, 'planet in ' + Math.ceil(distance) + ' units');
-                    report(link1 + ' discovered a ' + link2 + ' away.');
+                    discoveredPlanets.push([distance, obj, planetObj.id]);
 
                     // TODO: Logic creates foreign fleets objects, passing to player
                     if (planetObj.stationedFleets.length !== 0) {
@@ -2180,6 +2205,36 @@ function app() {
                     playerEnv.activeAnimations[ logic.terrains[planetObj.terrain][3] ].push([planetObj.x, planetObj.y]);
                 }
 
+            }
+
+        }
+
+        function sortByDistance(p1, p2) {
+            if (p1[0] >= p2[0]) {
+                return true;
+            }
+
+            return false;
+        }
+
+        if (playerEnv.player === logic.currentPlayer) {
+            var items = 0;
+            var maxItems = discoveredPlanets.length;
+            var item = [];
+
+            discoveredPlanets.sort(sortByDistance);
+
+            while (items < maxItems) {
+                item = discoveredPlanets[items];
+                link1 = '';
+                if (item[1].type === 'fleet') {
+                    link1 = createLink(item[1].type, item[1].name, item[1].type + ' ' + item[1].name);
+                } else {
+                    link1 = createLink(item[1].type, item[1].id, item[1].type + ' ' + item[1].name);
+                }
+                link2 = createLink('planet', item[2], 'planet in ' + item[0] + ' units');
+                report(link1 + ' discovered a ' + link2 + ' away.');
+                items++;
             }
         }
     }
@@ -2405,6 +2460,7 @@ function app() {
         for (var player = 0; player < logic.players; player++) {
             var playerEnv = logic.environments[player];
             var planetObj = playerEnv.planets[0];
+
             playerEnv.scanAreas.push([150, planetObj.x, planetObj.y]);
 
             logic.scanAreas[player].push([150, planetObj.x, planetObj.y]);
@@ -2449,21 +2505,21 @@ function app() {
                     "setY": setY,
                     "lastX": lastX
                 };
-                
-               
+
+
             }
         };
 
         imgLoader.open("GET", imgUrl);
         imgLoader.send();
-        
+
         for (var x = 0; x < logic.environments.length; x++) {
             logic.environments[x].activeAnimations[imgUrl] = [];
         }
     }
 
     function drawAnimations() {
-        
+
         var playerEnv = logic.environments[logic.currentPlayer];
         var keys = Object.keys(playerEnv.activeAnimations);
         var key = "";
@@ -2475,16 +2531,16 @@ function app() {
         var size = 13;
         var items = 0;
         var activeAnimationItems = [];
-        
+
         for (var key in playerEnv.activeAnimations) {
             animProps = animations[key];
-            
+
             if (!animProps.hasOwnProperty("src")) {
                 return;
             }
-            
+
             imgSrc = animProps["src"];
-            animProps["current"] -= 20;
+            animProps["current"] -= 1;
 
             if (animProps["current"] <= 0) {
                 animProps["current"] = animProps["duration"];
@@ -2505,7 +2561,7 @@ function app() {
                 gameScreen.drawImage(imgSrc, animProps["setX"] - offsetX, animProps["setY"]);
                 continue;
             }
-            
+
             activeAnimationItems = playerEnv.activeAnimations[key];
             items = playerEnv.activeAnimations[key].length;
             while (items--) {
@@ -2546,28 +2602,30 @@ function app() {
     var scanY = 0;
 
     function mainloop() {
-        unbindHandlers();
-        if (mainLoopCalculating) {
-            return;
-        }
+        //unbindHandlers();
+        /*
+         if (mainLoopCalculating) {
+         return;
+         }
+         */
 
-        mainLoopCalculating = true;
+        //mainLoopCalculating = true;
 
         var playerEnv = logic.environments[logic.currentPlayer];
 
         gameArea.width = gameArea.width;
         gameScreen.lineWidth = 1;
-        gameScreen.fillStyle = 'rgba(255,255,255, 0.02)';
+        gameScreen.fillStyle = 'rgba(255,255,255, 0.025)';
 
         // drawScanAreas
         gameScreen.beginPath();
 
-        var x = playerEnv.scanAreas.length;
-        while (x--) {
-            scanX = playerEnv.scanAreas[x][1] + playerEnv.offsetX;
-            scanY = playerEnv.scanAreas[x][2] + playerEnv.offsetY;
+        var items = playerEnv.scanAreas.length;
+        while (items--) {
+            scanX = playerEnv.scanAreas[items][1] + playerEnv.offsetX;
+            scanY = playerEnv.scanAreas[items][2] + playerEnv.offsetY;
             gameScreen.moveTo(scanX, scanY);
-            gameScreen.arc(scanX, scanY, playerEnv.scanAreas[x][0], 0, 6.28);
+            gameScreen.arc(scanX, scanY, playerEnv.scanAreas[items][0], 0, 6.3);
         }
 
         gameScreen.closePath();
@@ -2586,7 +2644,7 @@ function app() {
         }
 
         drawFleets();
-        bindHandlers();
+        //bindHandlers();
         mainLoopCalculating = false;
     }
 
@@ -3380,7 +3438,7 @@ function app() {
      addComponent(design, 'engine', 'Nuclear Drive' , 2);
      addComponent(design, 'module', 'Basic colonization module');
      calculateDesign(design);
-     
+
      env.designs.push(design);
      */
 
@@ -3428,18 +3486,18 @@ function app() {
 
 
     //function createAnimation(animObj, imgUrl, xWidth, xSize, ySize, duration, stepX, lastX, setX, setY) {
-    createAnimation(animations, "img/terrain0.png", 176, 26, 25, 760, 30, 0, false, false, false);
-    createAnimation(animations, "img/terrain1.png", 176, 26, 25, 760, 30, 0, false, false, false);
-    createAnimation(animations, "img/terrain2.png", 176, 26, 25, 760, 30, 0, false, false, false);
-    createAnimation(animations, "img/terrain3.png", 176, 26, 25, 760, 30, 0, false, false, false);
-    createAnimation(animations, "img/terrain4.png", 176, 26, 25, 760, 30, 0, false, false, false);
-    createAnimation(animations, "img/terrain5.png", 176, 26, 25, 760, 30, 0, false, false, false);
-    createAnimation(animations, "img/stars1.png", 3860, 800, 600, 140, 2, 3160, 0, 0);
+    createAnimation(animations, "img/terrain0.png", 176, 26, 25, 120, 30, 0, false, false, false);
+    createAnimation(animations, "img/terrain1.png", 176, 26, 25, 120, 30, 0, false, false, false);
+    createAnimation(animations, "img/terrain2.png", 176, 26, 25, 120, 30, 0, false, false, false);
+    createAnimation(animations, "img/terrain3.png", 176, 26, 25, 120, 30, 0, false, false, false);
+    createAnimation(animations, "img/terrain4.png", 176, 26, 25, 120, 30, 0, false, false, false);
+    createAnimation(animations, "img/terrain5.png", 176, 26, 25, 120, 30, 0, false, false, false);
+    createAnimation(animations, "img/stars1.png", 3860, 800, 600, 6, 0.4, 3160, 0, 0);
 
     env = logic.environments[0];
-    genGalaxie(40);
+    genGalaxie(25);
     bindHandlers();
-    gameInterval = setInterval(mainloop, 20);
+    gameInterval = setInterval(mainloop, 1);
 }
 
 document.addEventListener('load', app());
