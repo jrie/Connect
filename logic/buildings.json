@@ -1,7 +1,8 @@
 {
     "author": "jrie",
     "version": "v0.01",
-    "name": "Connect Buildings",
+    "dataName": "buildings",
+    "description": "Connect Buildings",
     "buildings": {
         "Factory Complex": {
             "cost": 40,

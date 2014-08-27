@@ -1,7 +1,8 @@
 {
     "author": "jrie",
     "version": "v0.01",
-    "name": "Connect Terrains, mineral and ecological level descriptors",
+    "dataName": "terrains",
+    "description": "Connect Terrains, mineral and ecological level descriptors",
     "levels": {
         "mineralLevels": {
             "0": "Very poor",
@@ -16,15 +17,15 @@
             "3": "Rich"
         }
     },
-    "terrains": {
-        "frequencies": {
-            "Tundra": 18,
-            "Desert": 23,
-            "Aquatic": 18,
-            "Barren": 17,
-            "Jungle": 18,
-            "Vulcanic": 8
-        },
+    "frequencies": {
+        "Tundra": 18,
+        "Desert": 23,
+        "Aquatic": 18,
+        "Barren": 17,
+        "Jungle": 18,
+        "Vulcanic": 8
+    },
+    "types": {        
         "Tundra": {
             "minMineral": 1,
             "maxMineral": 2,

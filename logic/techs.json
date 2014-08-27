@@ -1,7 +1,8 @@
 {
     "author": "jrie",
     "version": "v0.01",
-    "name": "Connect Techtree",
+    "dataName": "techs",
+    "description": "Connect Techtree",
     "Force fields": {
         "Advancend Magnetism": {
             "Cost": 250,
