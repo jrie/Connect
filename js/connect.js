@@ -226,13 +226,13 @@ function app() {
 
             }
         } else {
-            /*
-             if (playerEnv.activeSelection.type === "planet") {
-             scrollToLocation(playerEnv.activeSelection, false);
-             playerEnv.activeSelection = false;
-             return;
-             }
-             */
+
+            if (playerEnv.activeSelection.type === "planet" && !playerEnv.strg) {
+                scrollToLocation(playerEnv.activeSelection, false);
+                playerEnv.activeSelection = false;
+                return;
+            }
+
 
             if (!playerEnv.strg) {
                 playerEnv.activeSelection = false;
@@ -371,7 +371,9 @@ function app() {
         infoScreen += '<p>Ecological diversity.. ' + logic.ecologicalLevel[planet.ecologicalLevel][1] + '</p>';
 
         if (playerEnv.ownedPlanets.indexOf(planet.id) !== -1) {
-            infoScreen += '<br><p>Current population.. ' + planet.population[0].toString().slice(0, 4) + ' of ' + planet.population[1] + '</p>';
+            infoScreen += '<br/><p>Current population.. ' + planet.population[0].toString().slice(0, 4) + ' of ' + planet.population[1] + '</p>';
+        } else {
+            infoScreen += '<br/><p>Planet maximum population.. ' + planet.population[1] + '</p>';
         }
 
         infoScreen += '</div>';
@@ -495,7 +497,9 @@ function app() {
 
             infoScreen += '</ul></div>';
 
-            infoScreen += '<div style="float: right;"><h5>QUEUED ITEMS</h5><ul id="productionQueue">';
+            infoScreen += '<div style="float: left; width: 155px; margin-left: 10px;"><h5>DESCRIPTION</h5><div id="itemDescription" style="height: 105px; overflow:auto; font-size:10px; font-weight:normal; text-align:justify"></div></div>';
+
+            infoScreen += '<div style="float: left; margin-left: 10px; width: 155px;"><h5>QUEUED ITEMS</h5><ul id="productionQueue">';
 
             var x = planet.productionQueue.length;
             while (x--) {
@@ -593,6 +597,41 @@ function app() {
 
                 var x = constructionOptions.length;
                 while (x--) {
+                    constructionOptions[x].addEventListener('mouseover', function(evt) {
+
+                        if (evt.target.name === 'building') {
+                            var desc = document.getElementById('itemDescription');
+                            var option = playerEnv.buildings.length;
+
+                            while (option--) {
+                                if (playerEnv.buildings[option][0] === evt.target.innerHTML) {
+                                    var items = logic.buildings.length;
+                                    lg(evt.target.innerHTML);
+                                    while (items--) {
+                                        if (logic.buildings[items][0] === playerEnv.buildings[option][0]) {
+                                            desc.innerHTML = logic.buildings[items][4];
+                                            return;
+                                        }
+                                    }
+                                }
+                            }
+                        } else if (evt.target.name === 'design') {
+                            var desc = document.getElementById('itemDescription');
+                            var design = getDesign(playerEnv.player, evt.target.innerHTML);
+                            if (design) {
+                                var listing = '<ul style="text-align: left; font-size: 10px;">';
+                                listing += '<li><span>Cost</span>: ' + design.cost + '</li>';
+                                listing += '<li><span>Type</span>: ' + design.type + '</li>';
+                                listing += '<li><span>Range</span>: ' + design.range + '</li>';
+                                listing += '<li><span>Speed</span>: ' + design.speed + '</li>';
+                                listing += '<li><span>Space</span>: ' + design.space + '</li>';
+                                listing += '</ul>';
+                                desc.innerHTML = listing;
+                                return;
+                            }
+                        }
+                    });
+
                     constructionOptions[x].addEventListener('click', function(evt) {
                         evt.preventDefault();
 
@@ -893,10 +932,12 @@ function app() {
                 if (!playerEnv.strg) {
                     var item = playerEnv.fleets.length;
                     while (item--) {
-                        if (evt.target.name.split('|')[1] === playerEnv.fleets[item].id) {
-                            createSelection(playerEnv.fleets[item]);
-                            modal.style.display = 'none';
-                            return;
+                        if (evt.target.id !== ("shipListing")) {
+                            if (evt.target.name.split('|')[1] === playerEnv.fleets[item].id) {
+                                createSelection(playerEnv.fleets[item]);
+                                modal.style.display = 'none';
+                                return;
+                            }
                         }
                     }
                 } else {
@@ -1703,8 +1744,8 @@ function app() {
             playerEnv.offsetY -= stepY;
 
         }
-
-        scrollInterval = setInterval(doScroll, 24 + Math.ceil(Math.abs(stepX)));
+        unbindHandlers();
+        scrollInterval = setInterval(doScroll, 30 + Math.ceil(Math.abs(stepX)) + Math.ceil(Math.abs(stepY)));
     }
 
 
@@ -2154,7 +2195,7 @@ function app() {
                         break;
                     }
 
-                    var foreignFleet = new Object();
+                    var foreignFleet = {};
                     foreignFleet.x = targetFleet.x;
                     foreignFleet.y = targetFleet.y;
                     foreignFleet.id = targetFleet.id;
@@ -2515,7 +2556,6 @@ function app() {
         imgLoader.onreadystatechange = function() {
             if (imgLoader.readyState === 4) {
                 img["src"] = imgUrl;
-
                 animObj[imgUrl] = {
                     "src": img,
                     "x": xSize,
@@ -2529,8 +2569,6 @@ function app() {
                     "setY": setY,
                     "lastX": lastX
                 };
-
-
             }
         };
 
@@ -2624,11 +2662,11 @@ function app() {
     var scanX = 0;
     var scanY = 0;
     function mainloop() {
-        
+
         if (mainloopCalculating) {
             return;
         }
-        
+
         mainloopCalculating = true;
 
         var playerEnv = logic.environments[logic.currentPlayer];
@@ -2651,20 +2689,23 @@ function app() {
         gameScreen.closePath();
         gameScreen.fill();
 
-        if (playerEnv.activeSelection) {
-            updateSelectionInfo(env.activeSelection);
-            drawSelection();
-        }
 
         drawAnimations();
         drawPlanets();
+
 
         if (playerEnv.activeRoutes.length !== 0) {
             drawRoutes();
         }
 
+
         drawFleets();
-        
+
+        if (playerEnv.activeSelection) {
+            updateSelectionInfo(env.activeSelection);
+            drawSelection();
+        }
+
         mainloopCalculating = false;
     }
 
@@ -3039,7 +3080,7 @@ function app() {
         modal.style.display = 'none';
         modal.innerHTML = '';
 
-        fleetScreen += '<div style="width:525px; background-color: #666; padding: 10px 10px; height: 223; border-radius: 5px 5px 0px 0px;">';
+        fleetScreen += '<div style="width:525px; background-color: #666; padding: 10px 10px; height: 223px; border-radius: 5px 5px 0px 0px;">';
         fleetScreen += '<div style="background-color:#555; border-radius:5px; width: 100%; height:100%; overflow:auto;"><ul id="fleetListing"></ul></div>';
         fleetScreen += '</div>';
         fleetScreen += '<div style="width:175px; background-color: #666; padding: 5px 10px; float: left; height: 218px; border-radius: 0px 0px 0px 5px;">';
@@ -3187,11 +3228,21 @@ function app() {
     //
 
     logic.buildings = [
-        ['Factory Complex', 40, 'B', ['Construction', '*', 1.05]], //['Construction', '+', 3, false] ],
-        ['Farm Complex', 20, 'B', ['Agriculture', '%', 1.05]], //['Agriculture', '%', 1.05] ],
-        ['Research Center', 50, 'B', ['Research', '+', 4]],
-        ['Marine Barracks', 35, 'B', ['PlanetCombat', 1, 4, 5]],
-        ['Missile Base', 65, 'B', ['PlanetDefense', 1, 8, 8]]
+        ['Factory Complex', 40, 'B', ['Construction', '*', 1.05],
+            "Basic construction facility for our planets, increasing base production by 5% each active construction worker."
+        ], //['Construction', '+', 3, false] ],
+        ['Farm Complex', 20, 'B', ['Agriculture', '%', 1.05],
+            "Basic agriculture facility, increasing the base agriculture output of our planets by 5% each active farmer."
+        ], //['Agriculture', '%', 1.05] ],
+        ['Research Center', 50, 'B', ['Research', '+', 4],
+            "Assiting our researchers analyzing the ecological as well as the environmental values of our colonies.<br/>Providing 4 research points per turn."
+        ],
+        ['Marine Barracks', 35, 'B', ['PlanetCombat', 1, 4, 5],
+            "Defending the colonies is an important task, our well trained marines help to do so.<br/><br/>Training one unit each 5 turns."
+        ],
+        ['Missile Base', 65, 'B', ['PlanetDefense', 1, 8, 8],
+            "The missle base helps protecting the orbit around our planets. Providing 300 units space of our very best missiles; aiding our fleets."
+        ]
     ];
 
     //logic.research = [
@@ -3497,11 +3548,14 @@ function app() {
 
 
     function getDesign(designOwner, designName) {
-        for (var design = logic.environments[designOwner].designs.length - 1; design > -1; design--) {
-            if (designName === logic.environments[designOwner].designs[design].name) {
-                return logic.environments[designOwner].designs[design];
+        var items = logic.environments[designOwner].designs.length;
+        while (items--) {
+            if (designName === logic.environments[designOwner].designs[items].name) {
+                return logic.environments[designOwner].designs[items];
             }
         }
+
+        return false;
     }
 
 

@@ -229,13 +229,13 @@ hr {
 }
 
 #statusBar {
-    clear: both;
-    display: block;
     background-color: #4a4a4a;
-    color:#acacac;
+    clear: both;
+    color: #acacac;
+    display: block;
     font-size: 15px;
-    height: 15px;
-    padding: 0px 10px;
+    height: 17px;
+    padding: 5px 10px;
 }
 
 #resizeRight {
@@ -314,7 +314,7 @@ hr {
     width: auto;
 }
 
-#planetInfo #workForceModal button {
+#workForceModal button {
     clear: both;
     float: left;
     width: 100px;
@@ -349,14 +349,14 @@ hr {
     padding: 5px;
 }
 
-#planetinfo #productionQueue {
+s#productionQueue {
     overflow: auto;
     height: 94px;
     width: 130px;
 }
 
-#planetinfo #productionModal li a,
-#planetinfo #productionQueue li { 
+#productionModal li a,
+#productionQueue li {
     cursor: pointer;
     display: block;
     margin: 4px;
@@ -364,22 +364,22 @@ hr {
     color: #fff;
 }
 
-#planetinfo #productionModal li a:hover,
-#planetinfo #productionQueue li:hover {
+#productionModal li a:hover,
+#productionQueue li:hover {
     background-color: #cecece;
     border-radius: 5px;
     color: #000;
 }
 
-#planetinfo #productionList li:hover {
+#productionList li:hover {
     background-color: transparent;
 }
 
-#planetinfo #productionList #activeConstruction {
+#productionList #activeConstruction {
     color:#ffa300;
 }
 
-#planetinfo #productionList #activeConstruction:hover {
+#productionList #activeConstruction:hover {
     color: #000;
 }
 
@@ -480,13 +480,13 @@ a.selectedFleet  {
     width: 100%;
 }
 
-#splitFleetModal #partedFleetName {
+#partedFleetName {
     font-size: 10px;
     padding: 2px;
     width: 100%;
 }
 
-#splitFleetModal #partedFleet {
+#partedFleet {
     height: 70px;
     overflow: auto;
     width: 100%;

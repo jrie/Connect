@@ -26,7 +26,7 @@
             "is": "B",
             "factor": "+",
             "value": 4,
-            "text": "Assiting our researchers anaylizing the ecological as well as the environmental values of our colonies, providing 4 research points per turn."
+            "text": "Assiting our researchers analyzing the ecological as well as the environmental values of our colonies, providing 4 research points per turn."
         },
         "Marine Barracks": {
             "cost": 35,
@@ -43,7 +43,7 @@
             "is": "B",
             "space": 300,
             "of": "Missiles",
-            "text": "The missle base helps protecting the space around our planets. Providing 300 units space of our very best missiles; aiding our fleets."
+            "text": "The missle base helps protecting the orbit around our planets. Providing 300 units space of our very best missiles; aiding our fleets."
         }
     }
 }
