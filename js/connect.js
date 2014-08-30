@@ -2,8 +2,10 @@ var animations = {};
 var logic = {};
 var mainloopCalculating = false;
 var env = {};
+var animationsLoading = true;
 
 function app() {
+    
 
     function updateActions(type, action, data) {
         var playerEnv = logic.environments[logic.currentPlayer];
@@ -2556,23 +2558,9 @@ function app() {
 
 
 
-    function createAnimation(imgUrl, xFrameSize, yFrameSize, duration, stepX, returnLoaded, lastX, useSet, setX, setY) {
+    function createAnimation(imgUrl, xWidth, xFrameSize, yFrameSize, duration, stepX, returnLoaded, lastX, useSet, setX, setY) {
         var img = new Image();
-
-        if (!returnLoaded) {
-            returnLoaded = false;
-        }
-
-        if (!lastX) {
-            var lastX = false;
-        }
-
-        if (!useSet) {
-            var useSet = false;
-            var setX = false;
-            var setY = false;
-        }
-
+        
         img["src"] = imgUrl;
         animations[imgUrl] = {
             "src": img,
@@ -2582,7 +2570,7 @@ function app() {
             "offY": yFrameSize / 2,
             "duration": duration,
             "stepx": stepX,
-            "steps": Math.floor(img["width"] / stepX),
+            "steps": Math.floor(xWidth / stepX),
             "step": 0,
             "current": duration,
             "useSet": useSet,
@@ -2590,9 +2578,7 @@ function app() {
             "setY": setY,
             "lastX": lastX
         };
-
-
-
+              
         for (var x = 0; x < logic.environments.length; x++) {
             logic.environments[x].activeAnimations[imgUrl] = [];
         }
@@ -2600,6 +2586,7 @@ function app() {
         if (returnLoaded === true) {
             animationsLoading = false;
         }
+        
     }
 
     function drawAnimations() {
@@ -2607,20 +2594,21 @@ function app() {
         var playerEnv = logic.environments[logic.currentPlayer];
         var keys = Object.keys(playerEnv.activeAnimations);
         var keyItems = keys.length;
+        var animProps = {};
         var key = "";
         var imgSrc = new Image();
-        var animProps = new Object();
         var x = 0;
         var y = 0;
         var offsetX = 0;
+        var offX = 0;
+        var offY = 0;
         var size = 0;
         var items = 0;
         var activeAnimationItems = [];
-
+        
         while (keyItems--) {
             key = keys[keyItems];
             animProps = animations[key];
-
             imgSrc = animProps["src"];
             animProps["current"] -= 1;
 
@@ -2630,13 +2618,12 @@ function app() {
                     animProps["step"] = 0;
                 } else {
                     animProps["step"] += 1;
-                }
+                }               
             }
 
             offsetX = animProps["stepx"] * animProps["step"];
-
             if (animProps["useSet"]) {
-                if (animProps["lastX"] !== false) {
+                if (animProps["lastX"]) {
                     if (offsetX >= animProps["lastX"]) {
                         offsetX = 0;
                         animProps["step"] = 0;
@@ -3667,15 +3654,15 @@ function app() {
     }
 
 
-    //createAnimation(imgUrl, xFrameSize, yFrameSize, duration, stepX, returnLoaded, lastX, useSet, setX, setY)
+    //createAnimation(imgUrl, xWidth, xFrameSize, yFrameSize,  duration, stepX, returnLoaded, lastX, useSet, setX, setY) {
 
-    createAnimation("img/terrain0.png", 26, 25, 120, 30);
-    createAnimation("img/terrain1.png", 26, 25, 120, 30);
-    createAnimation("img/terrain2.png", 26, 25, 120, 30);
-    createAnimation("img/terrain3.png", 26, 25, 120, 30);
-    createAnimation("img/terrain4.png", 26, 25, 120, 30);
-    createAnimation("img/terrain5.png", 26, 25, 120, 30);
-    createAnimation("img/stars1.png", 800, 600, 6, 0.4, true, 3160, true, 0, 0);
+    createAnimation("img/terrain0.png", 176, 26, 25, 120, 30, false, false, false, false, false);
+    createAnimation("img/terrain1.png", 176, 26, 25, 120, 30, false, false, false, false, false);
+    createAnimation("img/terrain2.png", 176, 26, 25, 120, 30, false, false, false, false, false);
+    createAnimation("img/terrain3.png", 176, 26, 25, 120, 30, false, false, false, false, false);
+    createAnimation("img/terrain4.png", 176, 26, 25, 120, 30, false, false, false, false, false);
+    createAnimation("img/terrain5.png", 176, 26, 25, 120, 30, false, false, false, false, false);
+    createAnimation("img/stars1.png", 3860, 800, 600, 6, 0.4, true, 3160, true, 0, 0);
 
     env = logic.environments[0];
     genGalaxie(45);
