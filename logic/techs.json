@@ -3,7 +3,12 @@
     "version": "v0.01",
     "dataName": "techs",
     "description": "Connect Techtree",
+    "techTreeOrder": ["Force Fields", "Physics", "Construction"],
     "Force fields": {
+        "techOrder": [
+            "Advancend Magnetism",
+            "Gravitic Fields"
+        ],
         "Advancend Magnetism": {
             "Cost": 250,
             "Includes": {
@@ -50,7 +55,7 @@
                     "damageMin": 3,
                     "damageMax": 7,
                     "range": 15,
-                    "text": "Inflictss 3 to 7 points of structural damage.<br/>Range of 15 units."
+                    "text": "Inflicts 3 to 7 points of structural damage.<br/>Range of 15 units."
                 },
                 "Inertial Stabilizer": {
                     "type": "shipModules",
@@ -63,6 +68,9 @@
         }
     },
     "Physics": {
+        "techOrder": [
+            "Fusion Physics"
+        ],
         "Fusion Physics": {
             "Cost": 150,
             "Includes": {
@@ -84,6 +92,10 @@
         }
     },
     "Construction": {
+        "techOrder": [
+            "Construction Level 1",
+            "Construction Level 2"
+        ],
         "Construction Level 1": {
             "Cost": 350,
             "Includes": {
@@ -108,7 +120,7 @@
                 }
             }
         },
-        "Construction Level 1": {
+        "Construction Level 2": {
             "Cost": 650,
             "Includes": {
                 "Robotic Factory": {
