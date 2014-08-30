@@ -310,8 +310,9 @@ hr {
     width: 100%;
 }
 
-#planetInfo > div {
-    width: auto;
+#planetinfo h5 {
+    font-size: 12px;
+    padding: 5px;
 }
 
 #workForceModal button {
@@ -320,19 +321,15 @@ hr {
     width: 100px;
 }
 
-#productionQueue li {
-    padding: 3px 6px;
+#productionModal {
+    height: 180px;
 }
+
 
 #productionList {
     float: left;
     width: 200px;
-    height: 125px;
-    overflow: auto;
-}
-
-#productionQueue {
-    height: 105px;
+    height: 185px;
     overflow: auto;
 }
 
@@ -344,15 +341,15 @@ hr {
     width: 100%;
 }
 
-#planetinfo h5 {
-    font-size: 12px;
-    padding: 5px;
+
+#productionQueue {
+    height: 165px;
+    overflow: auto;
+    width: 165px;
 }
 
-s#productionQueue {
-    overflow: auto;
-    height: 94px;
-    width: 130px;
+#productionQueue li {
+    padding: 3px 6px;
 }
 
 #productionModal li a,

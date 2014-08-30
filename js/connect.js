@@ -1,6 +1,7 @@
 var animations = {};
 var logic = {};
 var mainloopCalculating = false;
+var env = {};
 
 function app() {
 
@@ -241,7 +242,7 @@ function app() {
         }
 
     }
-
+    
     function getFleetById(fleetObj) {
         var fleetEnv = logic.environments[ parseInt(fleetObj.id.split('_')[0]) ].fleets;
         var x = fleetEnv.length;
@@ -383,6 +384,8 @@ function app() {
             var percentOutput = getBaseOutput(planet);
             var fixedOutput = getFixedOutput(planet);
             var multiOutput = getMultiOutput(planet);
+            
+            var turns = 0;
 
             if (planet.workForce[3] !== 0) {
                 turns = Math.ceil((planet.production[2] - planet.production[1]) / ((planet.workForce[3] * (percentOutput[1] + multiOutput[1])) + fixedOutput[1]));
@@ -497,7 +500,7 @@ function app() {
 
             infoScreen += '</ul></div>';
 
-            infoScreen += '<div style="float: left; width: 155px; margin-left: 10px;"><h5>DESCRIPTION</h5><div id="itemDescription" style="height: 105px; overflow:auto; font-size:10px; font-weight:normal; text-align:justify"></div></div>';
+            infoScreen += '<div style="float: left; width: 155px; margin-left: 10px;"><h5>DESCRIPTION</h5><div id="itemDescription" style="height: 165px; overflow:auto; font-size:10px; font-weight:normal; text-align:justify"></div></div>';
 
             infoScreen += '<div style="float: left; margin-left: 10px; width: 155px;"><h5>QUEUED ITEMS</h5><ul id="productionQueue">';
 
@@ -513,7 +516,7 @@ function app() {
 
         infoScreen += '</div>';
         modal.innerHTML = infoScreen;
-
+        
         // Set the event handlers for the tabregisters
         if (playerEnv.ownedPlanets.indexOf(planet.id) !== -1) {
             var tabRegisters = document.getElementsByClassName('tabregister');
@@ -598,7 +601,6 @@ function app() {
                 var x = constructionOptions.length;
                 while (x--) {
                     constructionOptions[x].addEventListener('mouseover', function(evt) {
-
                         if (evt.target.name === 'building') {
                             var desc = document.getElementById('itemDescription');
                             var option = playerEnv.buildings.length;
@@ -606,10 +608,10 @@ function app() {
                             while (option--) {
                                 if (playerEnv.buildings[option][0] === evt.target.innerHTML) {
                                     var items = logic.buildings.length;
-                                    lg(evt.target.innerHTML);
                                     while (items--) {
                                         if (logic.buildings[items][0] === playerEnv.buildings[option][0]) {
-                                            desc.innerHTML = logic.buildings[items][4];
+                                            desc.innerHTML = '<p style="text-align:left; font-size:10px;">Construction cost: '+logic.buildings[items][1]+'</p><br/>';
+                                            desc.innerHTML += logic.buildings[items][4];
                                             return;
                                         }
                                     }
@@ -619,12 +621,12 @@ function app() {
                             var desc = document.getElementById('itemDescription');
                             var design = getDesign(playerEnv.player, evt.target.innerHTML);
                             if (design) {
-                                var listing = '<ul style="text-align: left; font-size: 10px;">';
-                                listing += '<li><span>Cost</span>: ' + design.cost + '</li>';
-                                listing += '<li><span>Type</span>: ' + design.type + '</li>';
-                                listing += '<li><span>Range</span>: ' + design.range + '</li>';
-                                listing += '<li><span>Speed</span>: ' + design.speed + '</li>';
-                                listing += '<li><span>Space</span>: ' + design.space + '</li>';
+                                var listing = '<ul style="text-align: left; font-size: 10px; text-transform: none;">';
+                                listing += '<li>Construction Cost</span>: ' + design.cost + '</li><br/>';
+                                listing += '<li>Type..   ' + design.type + '</li>';
+                                listing += '<li>Range.. ' + design.range + '</li>';
+                                listing += '<li>Speed.. ' + design.speed + '</li>';
+                                listing += '<li>Space.. ' + design.space + '</li>';
                                 listing += '</ul>';
                                 desc.innerHTML = listing;
                                 return;
@@ -634,6 +636,7 @@ function app() {
 
                     constructionOptions[x].addEventListener('click', function(evt) {
                         evt.preventDefault();
+                        env.scrollTargetToY = ["productionList", document.getElementById("productionList").children[0].scrollTop];
 
                         // Planet contruction handling
                         if (evt.target.name === 'building') {
@@ -675,7 +678,6 @@ function app() {
                                         }
 
                                         showPlanetDialog(planet, 1);
-
                                     } else {
                                         for (var queueItem = planet.productionQueue.length - 1; queueItem > -1; queueItem--) {
                                             if (planet.productionQueue[queueItem][1] === playerEnv.buildings[option][0]) {
@@ -780,12 +782,17 @@ function app() {
                             }
                         }
                     }
-
                 }
             }
         }
 
         modal.style.display = 'inline';
+        
+        if (env.scrollTargetToY[0] !== false) {
+            document.getElementById(env.scrollTargetToY[0]).children[0].scrollTop = env.scrollTargetToY[1];
+            env.scrollTargetToY = [false, 0];
+        }
+        
         gameArea.focus();
     }
 
@@ -2549,34 +2556,47 @@ function app() {
 
 
 
-    function createAnimation(animObj, imgUrl, xWidth, xSize, ySize, duration, stepX, lastX, setX, setY) {
-        var imgLoader = new XMLHttpRequest();
+    function createAnimation(imgUrl, xFrameSize, yFrameSize, duration, stepX, returnLoaded, lastX, useSet, setX, setY) {
         var img = new Image();
-
-        imgLoader.onreadystatechange = function() {
-            if (imgLoader.readyState === 4) {
-                img["src"] = imgUrl;
-                animObj[imgUrl] = {
-                    "src": img,
-                    "x": xSize,
-                    "y": ySize,
-                    "duration": duration,
-                    "stepx": stepX,
-                    "steps": Math.floor(xWidth / stepX),
-                    "step": 0,
-                    "current": duration,
-                    "setX": setX,
-                    "setY": setY,
-                    "lastX": lastX
-                };
-            }
+        
+        if (!returnLoaded) {
+            returnLoaded = false;
+        }
+        
+        if (!lastX) {
+            var lastX = false;
+        }
+        
+        if (!useSet) {
+            var useSet = false;
+            var setX = false;
+            var setY = false;
+        }
+        
+        img["src"] = imgUrl;
+        animations[imgUrl] = {
+            "src": img,
+            "x": xFrameSize,
+            "y": yFrameSize,
+            "duration": duration,
+            "stepx": stepX,
+            "steps": Math.floor(img["width"] / stepX),
+            "step": 0,
+            "current": duration,
+            "useSet": useSet,
+            "setX": setX,
+            "setY": setY,
+            "lastX": lastX
         };
-
-        imgLoader.open("GET", imgUrl);
-        imgLoader.send();
+        
+        
 
         for (var x = 0; x < logic.environments.length; x++) {
             logic.environments[x].activeAnimations[imgUrl] = [];
+        }
+        
+        if (returnLoaded) {
+            animationsLoading = false;
         }
     }
 
@@ -2593,13 +2613,9 @@ function app() {
         var size = 13;
         var items = 0;
         var activeAnimationItems = [];
-
+        
         for (var key in playerEnv.activeAnimations) {
             animProps = animations[key];
-
-            if (!animProps.hasOwnProperty("src")) {
-                return;
-            }
 
             imgSrc = animProps["src"];
             animProps["current"] -= 1;
@@ -2615,10 +2631,12 @@ function app() {
 
             offsetX = animProps["stepx"] * animProps["step"];
 
-            if (animProps["setX"] !== false && animProps["setY"] !== false) {
-                if (offsetX >= animProps["lastX"]) {
-                    offsetX = 0;
-                    animProps["step"] = 0;
+            if (animProps["useSet"]) {
+                if (animProps["lastX"] !== false) {
+                    if (offsetX >= animProps["lastX"]) {
+                        offsetX = 0;
+                        animProps["step"] = 0;
+                    }
                 }
                 gameScreen.drawImage(imgSrc, animProps["setX"] - offsetX, animProps["setY"]);
                 continue;
@@ -3126,7 +3144,7 @@ function app() {
 
     // ---------------------------------------------------------------------------------
 
-    var logic = new Object();		// var logic, var envs
+    logic = new Object();		// var logic, var envs
     envs = [];
 
     logic.planets = [];
@@ -3235,7 +3253,7 @@ function app() {
             "Basic agriculture facility, increasing the base agriculture output of our planets by 5% each active farmer."
         ], //['Agriculture', '%', 1.05] ],
         ['Research Center', 50, 'B', ['Research', '+', 4],
-            "Assiting our researchers analyzing the ecological as well as the environmental values of our colonies.<br/>Providing 4 research points per turn."
+            "Assiting our researchers analyzing the ecological as well as the environmental values of our colonies.<br/><br/>Providing 4 research points per turn."
         ],
         ['Marine Barracks', 35, 'B', ['PlanetCombat', 1, 4, 5],
             "Defending the colonies is an important task, our well trained marines help to do so.<br/><br/>Training one unit each 5 turns."
@@ -3377,11 +3395,12 @@ function app() {
             env.activeSelection = false;
             env.movement = false;
             env.stepping = 0.25;
-            env.baseStepping = 0.25;
+            env.baseStepping = 0.15;
             env.strg = false;
             env.gameIntervalRunning = true;
             env.activeRoutes = [];
             env.scrollActive = false;
+            env.scrollTargetToY = [false, 0];
 
             env.activeAnimations = {};
 
@@ -3419,8 +3438,7 @@ function app() {
             env.research.required = 0;
 
             env.techs = [];
-
-
+            
             env.availableBuildings = [
                 'Farm Complex',
                 'Factory Complex',
@@ -3559,19 +3577,29 @@ function app() {
     }
 
 
-    //function createAnimation(animObj, imgUrl, xWidth, xSize, ySize, duration, stepX, lastX, setX, setY) {
-    createAnimation(animations, "img/terrain0.png", 176, 26, 25, 120, 30, 0, false, false, false);
-    createAnimation(animations, "img/terrain1.png", 176, 26, 25, 120, 30, 0, false, false, false);
-    createAnimation(animations, "img/terrain2.png", 176, 26, 25, 120, 30, 0, false, false, false);
-    createAnimation(animations, "img/terrain3.png", 176, 26, 25, 120, 30, 0, false, false, false);
-    createAnimation(animations, "img/terrain4.png", 176, 26, 25, 120, 30, 0, false, false, false);
-    createAnimation(animations, "img/terrain5.png", 176, 26, 25, 120, 30, 0, false, false, false);
-    createAnimation(animations, "img/stars1.png", 3860, 800, 600, 6, 0.4, 3160, 0, 0);
+    //createAnimation(imgUrl, xFrameSize, yFrameSize, duration, stepX, returnLoaded, lastX, useSet, setX, setY)
+    
+    createAnimation("img/terrain0.png", 26, 25, 120, 30);
+    createAnimation("img/terrain1.png", 26, 25, 120, 30);
+    createAnimation("img/terrain2.png", 26, 25, 120, 30);
+    createAnimation("img/terrain3.png", 26, 25, 120, 30);
+    createAnimation("img/terrain4.png", 26, 25, 120, 30);
+    createAnimation("img/terrain5.png", 26, 25, 120, 30);
+    createAnimation("img/stars1.png", 800, 600, 6, 0.4, true, 3160, true, 0, 0);
 
     env = logic.environments[0];
     genGalaxie(45);
     bindHandlers();
-    gameInterval = setInterval(mainloop, 1);
+    var loaderCheck = setInterval(checkFinishedLoad, 100);
+    var gameInterval;
+    
+    function checkFinishedLoad() {
+        if (!animationsLoading) {
+            clearInterval(loaderCheck);
+            gameInterval = setInterval(mainloop, 1);
+        }
+    }
+     
 }
 
 document.addEventListener('load', app());
