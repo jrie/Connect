@@ -242,7 +242,7 @@ function app() {
         }
 
     }
-    
+
     function getFleetById(fleetObj) {
         var fleetEnv = logic.environments[ parseInt(fleetObj.id.split('_')[0]) ].fleets;
         var x = fleetEnv.length;
@@ -384,7 +384,7 @@ function app() {
             var percentOutput = getBaseOutput(planet);
             var fixedOutput = getFixedOutput(planet);
             var multiOutput = getMultiOutput(planet);
-            
+
             var turns = 0;
 
             if (planet.workForce[3] !== 0) {
@@ -413,7 +413,7 @@ function app() {
             var displayAgriculture = baseMixOutput[0].toString().slice(0, baseMixOutput[0].toString().indexOf('.') + 3);
             var displayProduction = baseMixOutput[1].toString().slice(0, baseMixOutput[1].toString().indexOf('.') + 3);
             var displayResearch = baseMixOutput[2].toString().slice(0, baseMixOutput[2].toString().indexOf('.') + 2);
-            infoScreen += '<div style="float:right; text-align:right;">';
+            infoScreen += '<div style="float:right; text-align:right; width: 240px;">';
             infoScreen += '<p>Base Agriculture.. ' + displayAgriculture + '</p>';
             infoScreen += '<p>Base Production.. ' + displayProduction + '</p>';
             infoScreen += '<p>Base research.. ' + displayResearch + '</p>';
@@ -516,7 +516,7 @@ function app() {
 
         infoScreen += '</div>';
         modal.innerHTML = infoScreen;
-        
+
         // Set the event handlers for the tabregisters
         if (playerEnv.ownedPlanets.indexOf(planet.id) !== -1) {
             var tabRegisters = document.getElementsByClassName('tabregister');
@@ -610,7 +610,7 @@ function app() {
                                     var items = logic.buildings.length;
                                     while (items--) {
                                         if (logic.buildings[items][0] === playerEnv.buildings[option][0]) {
-                                            desc.innerHTML = '<p style="text-align:left; font-size:10px;">Construction cost: '+logic.buildings[items][1]+'</p><br/>';
+                                            desc.innerHTML = '<p style="text-align:left; font-size:10px;">Construction cost: ' + logic.buildings[items][1] + '</p><br/>';
                                             desc.innerHTML += logic.buildings[items][4];
                                             return;
                                         }
@@ -787,12 +787,12 @@ function app() {
         }
 
         modal.style.display = 'inline';
-        
+
         if (env.scrollTargetToY[0] !== false) {
             document.getElementById(env.scrollTargetToY[0]).children[0].scrollTop = env.scrollTargetToY[1];
             env.scrollTargetToY = [false, 0];
         }
-        
+
         gameArea.focus();
     }
 
@@ -2558,26 +2558,28 @@ function app() {
 
     function createAnimation(imgUrl, xFrameSize, yFrameSize, duration, stepX, returnLoaded, lastX, useSet, setX, setY) {
         var img = new Image();
-        
+
         if (!returnLoaded) {
             returnLoaded = false;
         }
-        
+
         if (!lastX) {
             var lastX = false;
         }
-        
+
         if (!useSet) {
             var useSet = false;
             var setX = false;
             var setY = false;
         }
-        
+
         img["src"] = imgUrl;
         animations[imgUrl] = {
             "src": img,
             "x": xFrameSize,
             "y": yFrameSize,
+            "offX": xFrameSize / 2,
+            "offY": yFrameSize / 2,
             "duration": duration,
             "stepx": stepX,
             "steps": Math.floor(img["width"] / stepX),
@@ -2588,14 +2590,14 @@ function app() {
             "setY": setY,
             "lastX": lastX
         };
-        
-        
+
+
 
         for (var x = 0; x < logic.environments.length; x++) {
             logic.environments[x].activeAnimations[imgUrl] = [];
         }
-        
-        if (returnLoaded) {
+
+        if (returnLoaded === true) {
             animationsLoading = false;
         }
     }
@@ -2604,17 +2606,19 @@ function app() {
 
         var playerEnv = logic.environments[logic.currentPlayer];
         var keys = Object.keys(playerEnv.activeAnimations);
+        var keyItems = keys.length;
         var key = "";
         var imgSrc = new Image();
         var animProps = new Object();
         var x = 0;
         var y = 0;
         var offsetX = 0;
-        var size = 13;
+        var size = 0;
         var items = 0;
         var activeAnimationItems = [];
-        
-        for (var key in playerEnv.activeAnimations) {
+
+        while (keyItems--) {
+            key = keys[keyItems];
             animProps = animations[key];
 
             imgSrc = animProps["src"];
@@ -2644,9 +2648,11 @@ function app() {
 
             activeAnimationItems = playerEnv.activeAnimations[key];
             items = playerEnv.activeAnimations[key].length;
+            offX = animProps["offX"];
+            offY = animProps["offY"];
             while (items--) {
-                x = (activeAnimationItems[items][0] + playerEnv.offsetX) - size;
-                y = (activeAnimationItems[items][1] + playerEnv.offsetY) - size;
+                x = (activeAnimationItems[items][0] + playerEnv.offsetX) - offX;
+                y = (activeAnimationItems[items][1] + playerEnv.offsetY) - offY;
                 gameScreen.save();
                 gameScreen.beginPath();
                 gameScreen.rect(x, y, animProps["x"], animProps["y"]);
@@ -2989,6 +2995,7 @@ function app() {
 
     var turnDisplay = document.getElementById('turnDisplay');
     var fleetDisplay = document.getElementById('fleetDisplay');
+    var researchDisplay = document.getElementById('researchDisplay');
 
 
     var previousWidth = 0;
@@ -3142,6 +3149,63 @@ function app() {
         modal.style.display = 'inline';
     });
 
+    researchDisplay.addEventListener('click', function(evt) {
+        evt.preventDefault();
+
+        if (document.getElementById('researchListing') !== null) {
+            modal.style.display = 'none';
+            modal.innerHTML = '';
+            return;
+        }
+
+        //modal.style.display = 'none';
+        modal.innerHTML = '';
+        var researchScreen = '';
+        researchScreen += '<div id="researchListing" style="width: 500px; height: 100px; padding: 10px; border-radius: 5px;  background-color: #666; height: auto;">';
+        researchScreen += '<h3 style="width: 100%; color: #dedede; border-bottom:1px solid #cecece;">Research</h3>';
+        researchScreen += '<div style="margin-top: 6px; background-color: #0d0d0d; width: 96%; padding: 8px 2%; color:#dedede; border-radius: 5px 5px 0px 0px; border-bottom: 1px solid #cecece;">';
+        researchScreen += '<p style="text-transform: uppercase; font-weight: bold;">Active research: ' + env.research.project + '<p>';
+        researchScreen += '<p style="margin-top:5px;">Progress ' + env.research.progress + ' of ' + env.research.required + ' (' + Math.ceil(env.research.required / env.research.points) + ' turns)<p>';
+        researchScreen += '</div>';
+        researchScreen += '<div style="background-color:#3a3a3a; color:#cecece; width: 100%; height: auto; display:inline-block; border-radius: 0px 0px 5px 5px; margin-bottom: 0px;">';
+
+        // TODO: tech listing
+        var techs = env.listedTechs.length;
+        var subitems = 0;
+        var tech = [];
+        while (techs--) {
+            tech = env.listedTechs[techs];
+            researchScreen += '<div style="width: 44%; float: left; border-radius: 5px; background-color:#1a1a1a; border:1px solid #6a6a6a; padding: 1%; margin: 2% 2%; margin-right: 1%;">';
+            researchScreen += '<h5 style="text-transform: uppercase; color: #dedede;">' + tech[0] + ' (' + tech[1] + ')</h5>';
+
+            subitems = tech[2].length;
+            researchScreen += '<ul style="padding: 5px;">';
+            for (var option = 0; option < subitems; option++) {
+                researchScreen += '<li class="techOption" name="' + techs + '_' + option + '" style="padding: 2px 4px; border-radius:5px; margin-top:2px;">' + tech[2][option][0] + '</li>';
+            }
+            researchScreen += '</ul>';
+            researchScreen += '</div>';
+        }
+        researchScreen += '</div>';
+
+        researchScreen += '<div style="clear: both; width: 96%; height: 40px; background-color:#0d0d0d; padding: 2%; color:#dedede; border-radius: 5px; font-size:12px;" id="researchDescription"></div>';
+
+        researchScreen += '</div></div>';
+        modal.innerHTML = researchScreen;
+
+        var techElements = document.getElementsByClassName("techOption");
+        var options = techElements.length;
+        while (options--) {
+            techElements[options].addEventListener("mouseover", function(evt) {
+                var keys = evt.target.getAttribute("name").split("_", 2);
+                document.getElementById('researchDescription').innerHTML = env.listedTechs[keys[0]][2][keys[1]][1];
+            });
+        }
+
+        modal.style.display = 'inline';
+
+    });
+
     // ---------------------------------------------------------------------------------
 
     logic = new Object();		// var logic, var envs
@@ -3263,42 +3327,49 @@ function app() {
         ]
     ];
 
-    //logic.research = [
-    //		[TreeName, [Requirements**], ResearchCost,
-    //			[ Name, [Category, Type**, Options**, Effect] ],
-    //		]
-
-    logic.techtrees = [
-        ['Force fields', [
-                ['Advanced Magnetism', 250, [
-                        ['Class I Shield', ['shipShields', 5, 3, 2, 10, 1]],
-                        ['Ecm Jammer', ['shipModules', 'AntiMissile', 0.7]],
-                        ['Mass Driver', ['shipWeapons', 'Beam', 10, 7, 50, 0, 1, 6, 6]]
-                    ]],
-                ['Garvitic Fields', 650, [
-                        ['Anti-Grav Harness', ['PlanetCombat', 10]],
-                        ['Inertial Stabilizer', ['shipWeapons', 'Beam', 10, 7, 50, 0, 1, 6, 6]],
-                        ['Gyro Destabilizer', ['shipModules', 'AntiBeam', 50]]
-                    ]]
-            ]],
-        ['Construction', [
-                ['Construction Level 1', 250, [
-                        ['Extended Factory Complex', ['building', 120, ['Construction', '+', 2, 'E', 'Factory Complex']]]
-                    ]],
-                ['Construction Level 2', 450, [
-                        ['Space mining facility', ['building', 120, ['Construction', '+', 3, 'B']]]
-                    ]]
-            ]]
-    ];
-
-
+    logic.techTrees = {
+        "techTreeOrder": ["Force fields", "Physics", "Construction"],
+        "Force fields":
+                ['Advanced Magnetism', 250,
+                    [
+                        ['Class I Shields',
+                            "First established shield for our ships, inflicting up to 5 damage, regenerating 30% per combat turn."
+                        ],
+                        ['ECM Jammer',
+                            "Allows our ships to evade missile.<br/>The chance to evade missiles is increased by 70%."],
+                        ['Mass Driver',
+                            "Mass drivers shot projecticles at hyper-velocity, dealing 6 damage."
+                        ]
+                    ]
+                ],
+        "Construction":
+                ['Construction Level 1', 350,
+                    [
+                        ['Extended Factory Complex',
+                            "Extends our factory complexes with more advanced machinery. Scaling our production by addional 5% cummulative to the bonus of the Factory Complex."
+                        ],
+                        ['Space mining facility',
+                            "Space mining around our planets allow us to harvest the ressources of the galaxy, increasing our production base output by plus 7 units."
+                        ]
+                    ]
+                ],
+        "Physics":
+                ["Fusion Physics", 150,
+                    [
+                        ["Fusion Beam",
+                            "Advanced beam for ships, dealing 2 to 6 damage."
+                        ],
+                        ["Fusion Rifle",
+                            "Very standard rifle for ground troops, increasing groud combat unit damage by +10."
+                        ]
+                    ]
+                ]
+    };
 
     // --------------------------------
 
 
     function prepareGameObjects() {
-
-
 
         // Create shipClass objects
         var size = logic.shipClasses.length;
@@ -3424,21 +3495,40 @@ function app() {
             env.foreignFleets = [];
             env.knownForeignDesigns = [];
 
+            // Base efficiency
+            env.workers.agriculture = 1;
+            env.workers.production = 1;
+            env.workers.research = 1;
 
-            env.workers.agriculture = 1;	// % efficiency
-            env.workers.production = 1;         // % efficiency
-            env.workers.research = 1;		// % efficiency
-
-            env.marines.attack = 1;
-            env.marines.defense = 1;
-            env.marines.evasion = 1;
+            // Base efficiency
+            env.marines.attack = 10;
+            env.marines.defense = 10;
+            env.marines.evasion = 10;
 
             env.research.project = false;
             env.research.progress = 0;
             env.research.required = 0;
+            env.research.points = 4;
 
-            env.techs = [];
-            
+            // TODO: Env.techLevels will later be used to indicate the progress in a research field
+            env.techLevels = [];
+            env.listedTechs = [];
+
+            // Storing discovered technologies in the format
+            // "TechtreeName" : [
+            //  ["name", "description text"],
+            //  ["name2", "description text"]
+            // ]
+            env.techs = {};
+
+            for (var option = 0; option < logic.techTrees.techTreeOrder.length; option++) {
+                var tecKey = logic.techTrees.techTreeOrder[option];
+
+                env.techLevels.push(0);
+                env.techs[tecKey] = [];
+                env.listedTechs.push(logic.techTrees[tecKey]);
+            }
+
             env.availableBuildings = [
                 'Farm Complex',
                 'Factory Complex',
@@ -3578,7 +3668,7 @@ function app() {
 
 
     //createAnimation(imgUrl, xFrameSize, yFrameSize, duration, stepX, returnLoaded, lastX, useSet, setX, setY)
-    
+
     createAnimation("img/terrain0.png", 26, 25, 120, 30);
     createAnimation("img/terrain1.png", 26, 25, 120, 30);
     createAnimation("img/terrain2.png", 26, 25, 120, 30);
@@ -3590,16 +3680,16 @@ function app() {
     env = logic.environments[0];
     genGalaxie(45);
     bindHandlers();
-    var loaderCheck = setInterval(checkFinishedLoad, 100);
+    var loaderCheck = setInterval(checkFinishedLoad, 500);
     var gameInterval;
-    
+
     function checkFinishedLoad() {
         if (!animationsLoading) {
             clearInterval(loaderCheck);
-            gameInterval = setInterval(mainloop, 1);
+            gameInterval = setInterval(mainloop, 20);
         }
     }
-     
+
 }
 
 document.addEventListener('load', app());
