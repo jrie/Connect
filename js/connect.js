@@ -5,7 +5,7 @@ var env = {};
 var animationsLoading = true;
 
 function app() {
-    
+
 
     function updateActions(type, action, data) {
         var playerEnv = logic.environments[logic.currentPlayer];
@@ -351,6 +351,27 @@ function app() {
         return [planetAgriculture, planetProduction, planetResearch];
     }
 
+    function calcResearchPoints(planetObj) {
+        var playerEnv = logic.environments[planetObj.owner];
+        var percentOutput = getBaseOutput(planetObj);
+        var fixedOutput = getFixedOutput(planetObj);
+        var multiOutput = getMultiOutput(planetObj);
+
+        var researchValue = planetObj.workForce[4] * (percentOutput[2] + multiOutput[2]) + fixedOutput[2];
+
+        var index = playerEnv.ownedPlanets.indexOf(planetObj.id);
+        if (index !== -1) {
+            playerEnv.research.planets[index] = researchValue;
+
+            var items = playerEnv.ownedPlanets.length;
+            var researchValue = 0;
+            while (items--) {
+                researchValue += playerEnv.research.planets[items];
+            }
+            playerEnv.research.points = researchValue;
+        }
+    }
+
     function showPlanetDialog(planet, openTabItem) {
         var playerEnv = logic.environments[logic.currentPlayer];
         var name = '';
@@ -559,7 +580,10 @@ function app() {
             if (playerEnv.ownedPlanets.indexOf(planet.id) !== -1) {
 
                 var reset = document.getElementById('reset').addEventListener('click', function() {
+                    env.research.points -= parseInt(displayResearch);
                     planet.workForce = [planet.workForce[0], planet.workForce[0], 0, 0, 0];
+                    calcResearchPoints(planet);
+
                     showPlanetDialog(planet, 0);
                 });
 
@@ -593,7 +617,7 @@ function app() {
                         planet.workForce[1] += 1;
                         planet.workForce[4] -= 1;
                     }
-
+                    calcResearchPoints(planet);
                     showPlanetDialog(planet, 0);
                 });
 
@@ -1914,8 +1938,10 @@ function app() {
                     logic.planets[item].workForce[0] += 1;
                     logic.planets[item].workForce[1] += 1;
 
-                    var link = createLink('planet', logic.planets[item].id, logic.planets[item].name);
-                    report('Population of ' + link + ' grown to ' + parseInt(logic.planets[item].population[0]));
+                    if (logic.currentPlayer === logic.planets[item].owner) {
+                        var link = createLink('planet', logic.planets[item].id, logic.planets[item].name);
+                        report('Population of ' + link + ' grown to ' + parseInt(logic.planets[item].population[0]));
+                    }
                 }
             }
 
@@ -1938,6 +1964,7 @@ function app() {
 
                     if (planet.production[3] === 'building') {
                         planet.constructions.push(planet.production[0]);
+                        calcResearchPoints(planet);
 
                     } else if (planet.production[3] === 'design') {
                         // TODO: check if fleet is present, use autojoin or create new one
@@ -1985,8 +2012,17 @@ function app() {
             }
 
             // Planet agriculture
-            // Planet research
 
+
+        }
+
+        // Research
+        var players = logic.players;
+        while (players--) {
+            if (logic.environments[players].research.project === false) {
+                continue;
+            }
+            logic.environments[players].research.progress += logic.environments[players].research.points;
         }
 
 
@@ -2325,7 +2361,7 @@ function app() {
         }
 
         if (shipDesign) {
-            ship = new Object();
+            var ship = new Object();
             ship.name = shipDesign.name + ' ' + shipDesign.count;
             ship.speed = shipDesign.speed;
             ship.range = shipDesign.range;
@@ -2513,6 +2549,10 @@ function app() {
                 planet.owner = step;
 
                 logic.scanAreas.push([]);
+                var researchPoints = planet.workForce[4] * env.workers["research"];
+                env.research.planets.push(researchPoints);
+                env.research.points = researchPoints;
+
                 createShip(planet, 'Wayfinder', false);
                 createShip(planet, 'Colony Design', false);
                 /*
@@ -2526,6 +2566,8 @@ function app() {
                  createShip(planet, 'Retriever', false);
                  createShip(planet, 'Colony Design', false);
                  */
+
+
             }
 
         }
@@ -2560,7 +2602,7 @@ function app() {
 
     function createAnimation(imgUrl, xWidth, xFrameSize, yFrameSize, duration, stepX, returnLoaded, lastX, useSet, setX, setY) {
         var img = new Image();
-        
+
         img["src"] = imgUrl;
         animations[imgUrl] = {
             "src": img,
@@ -2578,7 +2620,7 @@ function app() {
             "setY": setY,
             "lastX": lastX
         };
-              
+
         for (var x = 0; x < logic.environments.length; x++) {
             logic.environments[x].activeAnimations[imgUrl] = [];
         }
@@ -2586,7 +2628,7 @@ function app() {
         if (returnLoaded === true) {
             animationsLoading = false;
         }
-        
+
     }
 
     function drawAnimations() {
@@ -2605,7 +2647,7 @@ function app() {
         var size = 0;
         var items = 0;
         var activeAnimationItems = [];
-        
+
         while (keyItems--) {
             key = keys[keyItems];
             animProps = animations[key];
@@ -2618,7 +2660,7 @@ function app() {
                     animProps["step"] = 0;
                 } else {
                     animProps["step"] += 1;
-                }               
+                }
             }
 
             offsetX = animProps["stepx"] * animProps["step"];
@@ -3145,47 +3187,84 @@ function app() {
             return;
         }
 
-        //modal.style.display = 'none';
+        modal.style.display = 'none';
         modal.innerHTML = '';
         var researchScreen = '';
-        researchScreen += '<div id="researchListing" style="width: 500px; height: 100px; padding: 10px; border-radius: 5px;  background-color: #666; height: auto;">';
-        researchScreen += '<h3 style="width: 100%; color: #dedede; border-bottom:1px solid #cecece;">Research</h3>';
-        researchScreen += '<div style="margin-top: 6px; background-color: #0d0d0d; width: 96%; padding: 8px 2%; color:#dedede; border-radius: 5px 5px 0px 0px; border-bottom: 1px solid #cecece;">';
-        researchScreen += '<p style="text-transform: uppercase; font-weight: bold;">Active research: ' + env.research.project + '<p>';
-        researchScreen += '<p style="margin-top:5px;">Progress ' + env.research.progress + ' of ' + env.research.required + ' (' + Math.ceil(env.research.required / env.research.points) + ' turns)<p>';
+        researchScreen += '<div id="researchListing">';
+        researchScreen += '<h3>Research</h3>';
+        researchScreen += '<div id="activeResearch">';
+        researchScreen += '<p id="researchProject">Active research: ' + env.research.project + '<p>';
+
+        turns = 0;
+        if (env.research.points != 0) {
+            turns = Math.ceil((env.research.required - env.research.progress) / env.research.points);
+        }
+
+        researchScreen += '<p id="researchProgress">Progress ' + env.research.progress + ' of ' + env.research.required + ' (' + env.research.points + ' pts each turn, ' + turns + ' turns)<p>';
         researchScreen += '</div>';
-        researchScreen += '<div style="background-color:#3a3a3a; color:#cecece; width: 100%; height: auto; display:inline-block; border-radius: 0px 0px 5px 5px; margin-bottom: 0px;">';
+        researchScreen += '<div id="techGroupContainer">';
 
         // TODO: tech listing
-        var techs = env.listedTechs.length;
+        var techSize = env.listedTechs.length;
         var subitems = 0;
         var tech = [];
-        while (techs--) {
+        for (var techs = 0; techs < techSize; techs++) {
             tech = env.listedTechs[techs];
-            researchScreen += '<div style="width: 44%; float: left; border-radius: 5px; background-color:#1a1a1a; border:1px solid #6a6a6a; padding: 1%; margin: 2% 2%; margin-right: 1%;">';
-            researchScreen += '<h5 style="text-transform: uppercase; color: #dedede;">' + tech[0] + ' (' + tech[1] + ')</h5>';
+            researchScreen += '<div class="techGroup" name="' + techs + '">';
+            if (tech[0] === env.research.project) {
+                color = '#fff;';
+            } else {
+                color = '#dedede;';
+            }
+            researchScreen += '<h5 style="text-transform: uppercase; color: ' + color + '" name="' + techs + '">' + tech[0] + ' (' + tech[1] + ')</h5>';
 
             subitems = tech[2].length;
-            researchScreen += '<ul style="padding: 5px;">';
+            researchScreen += '<ul>';
+
             for (var option = 0; option < subitems; option++) {
-                researchScreen += '<li class="techOption" name="' + techs + '_' + option + '" style="padding: 2px 4px; border-radius:5px; margin-top:2px;">' + tech[2][option][0] + '</li>';
+                researchScreen += '<li class="techOption" name="' + techs + '_' + option + '">' + tech[2][option][0] + '</li>';
             }
             researchScreen += '</ul>';
             researchScreen += '</div>';
         }
         researchScreen += '</div>';
 
-        researchScreen += '<div style="clear: both; width: 96%; height: 40px; background-color:#0d0d0d; padding: 2%; color:#dedede; border-radius: 5px; font-size:12px;" id="researchDescription"></div>';
+        researchScreen += '<div id="researchDescription"></div>';
 
         researchScreen += '</div></div>';
         modal.innerHTML = researchScreen;
 
+        // Binding tech field elements mouseover for descriptions
         var techElements = document.getElementsByClassName("techOption");
         var options = techElements.length;
         while (options--) {
             techElements[options].addEventListener("mouseover", function(evt) {
                 var keys = evt.target.getAttribute("name").split("_", 2);
                 document.getElementById('researchDescription').innerHTML = env.listedTechs[keys[0]][2][keys[1]][1];
+            });
+        }
+
+        // Binding tech groups to set active
+        var techGroups = document.getElementsByClassName("techGroup");
+        var options = techGroups.length;
+        while (options--) {
+            techGroups[options].addEventListener("click", function(evt) {
+                var targetName = evt.target.getAttribute("name");
+                if (targetName === null) {
+                    targetName = evt.target.parentNode.getAttribute("name");
+                }
+
+                if (targetName.indexOf("_") !== -1) {
+                    targetName = targetName.split("_", 1)[0];
+                }
+
+                var techItem = parseInt(targetName);
+                env.research.project = [techItem, env.listedTechs[techItem][0]];
+                env.research.required = env.listedTechs[techItem][1];
+                env.research.progress = 0;
+
+                document.getElementById('researchProject').innerHTML = 'Active research: ' + env.research.project[1];
+                document.getElementById('researchProgress').innerHTML = 'Progress ' + env.research.progress + ' of ' + env.research.required + ' (' + env.research.points + ' pts each turn, ' + Math.ceil(env.research.required / env.research.points) + ' turns)';
             });
         }
 
@@ -3207,6 +3286,7 @@ function app() {
     logic.marines = [];
     logic.techs = [];
     logic.research = [];
+    logic.planetResearch = [];
     logic.availableBuildings = [];
     logic.activeRoutes = [];
     logic.designs = [];
@@ -3336,7 +3416,7 @@ function app() {
                             "Extends our factory complexes with more advanced machinery. Scaling our production by addional 5% cummulative to the bonus of the Factory Complex."
                         ],
                         ['Space mining facility',
-                            "Space mining around our planets allow us to harvest the ressources of the galaxy, increasing our production base output by plus 7 units."
+                            "Space mining around our planets allow us to harvest the resources of the galaxy, increasing our production base output by plus 7 units."
                         ]
                     ]
                 ],
@@ -3496,6 +3576,9 @@ function app() {
             env.research.progress = 0;
             env.research.required = 0;
             env.research.points = 4;
+
+            // TODO: Array containing the research values of all user owned planets
+            env.research.planets = [];
 
             // TODO: Env.techLevels will later be used to indicate the progress in a research field
             env.techLevels = [];
@@ -3673,7 +3756,7 @@ function app() {
     function checkFinishedLoad() {
         if (!animationsLoading) {
             clearInterval(loaderCheck);
-            gameInterval = setInterval(mainloop, 20);
+            gameInterval = setInterval(mainloop, 10);
         }
     }
 
