@@ -58,16 +58,17 @@ ul li span {
 
 #gameScreen {
     margin: 0px auto;
-    width: 1060px;
+    width: 79%;
     border: 1px solid #5a5a5a;
+    position: relative;
 }
 
 #gameScreenArea {
     /*background-color:#151540;*/
-    background-color:070707;
+    background-color:#070707;
     display: inline;
     position:relative;
-    z-index:0;
+    z-index: 0;
     float: left;
 }
 
@@ -155,12 +156,11 @@ input, textarea, #logwindow {
 }
 
 #modal {
-    position:absolute;
+    position: absolute;
     display: none;
-    z-index:1;
-    min-width: 375px;
-    top: 10%;
-    left: 12%;
+    z-index: 1;
+    left: 2%;
+    top: 7%;
 }
 
 #modal a.tabregister:hover {
@@ -181,6 +181,7 @@ input, textarea, #logwindow {
 
 .tabcontent {
     background-color: #555555;
+    background-color: rgba(60,60, 60, 0.38);
     border: 1px solid #0A0A0A;
     border-radius: 0 0 5px 5px;
     color: #dedede;
@@ -300,10 +301,12 @@ hr {
 
 #planetInfo {
     background-color: #3c3c3c;
+    background-color: rgba(60, 60, 60, 0.15);
     border: 1px solid #5a5a5a;
+    border-color: rgba(255, 255, 255, 0.1);
     border-radius: 5px;
     color: #fff;
-    display:inline-block;
+    display: inline-block;
     font-family: sans-serif;
     font-weight: bold;
     padding: 10px;
@@ -355,7 +358,7 @@ hr {
 #productionModal li a,
 #productionQueue li {
     cursor: pointer;
-    display: block;
+    width: 86%;
     margin: 4px;
     text-decoration: none;
     color: #fff;
@@ -364,9 +367,13 @@ hr {
 #productionModal li a:hover,
 #productionQueue li:hover {
     background-color: #cecece;
+    background-color: rgba(206, 206, 206, 0.42);
+    border: 0px solid #efefef;
+    border-color: rgba(230, 230, 230, 0.25);
     border-radius: 5px;
     color: #000;
 }
+
 
 #productionList li:hover {
     background-color: transparent;

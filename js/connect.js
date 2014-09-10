@@ -162,9 +162,6 @@ function app() {
         var fleetObj = false;
 
         planetObj = checkPlanets(evt);
-        if (planetObj) {
-            lg(planetObj);
-        }
         fleetObj = checkFleets(evt);
 
         if (!planetObj && !fleetObj) {
@@ -402,6 +399,28 @@ function app() {
 
         infoScreen += '</div>';
 
+        if (planet.owner === -1) {
+            playerEnv.colonizeInfo = [0];
+
+            var stationedFleets = planet.stationedFleets;
+            var fleetItem = stationedFleets.length;
+            var effect = [];
+            var x = 0;
+            while (fleetItem--) {
+                x = stationedFleets[fleetItem].ships.length;
+                while (x--) {
+                    effect = getModule(stationedFleets[fleetItem].ships[x].design, 'Colonize');
+                    if (effect[0]) {
+                        playerEnv.colonizeInfo = [effect[1], fleetItem, stationedFleets[fleetItem].ships[x], planet.id];
+                    }
+                }
+            }
+
+            if (playerEnv.colonizeInfo[0] !== 0) {
+                infoScreen += '<br><button id="btnColonize">Colonize</button><br>';
+            }
+        }
+
         if (playerEnv.ownedPlanets.indexOf(planet.id) !== -1) {
 
             var percentOutput = getBaseOutput(planet);
@@ -539,6 +558,10 @@ function app() {
 
         infoScreen += '</div>';
         modal.innerHTML = infoScreen;
+
+        if (playerEnv.colonizeInfo[0]) {
+            document.getElementById('btnColonize').addEventListener('click', colonizePlanet);
+        }
 
         // Set the event handlers for the tabregisters
         if (playerEnv.ownedPlanets.indexOf(planet.id) !== -1) {
@@ -828,26 +851,28 @@ function app() {
         var colonizeInfo = [0];
         var playerEnv = logic.environments[logic.currentPlayer];
 
+
         if (planetObj.owner === -1) {
             if (playerEnv.ownedPlanets.indexOf(planetObj.id) === -1) {
                 var stationedFleets = planetObj.stationedFleets;
 
                 var fleetItem = stationedFleets.length;
+                var effect = [];
+                var x = 0;
+
+                playerEnv.colonizeInfo = [0];
+
                 while (fleetItem--) {
-                    var x = stationedFleets[fleetItem].ships.length;
+                    x = stationedFleets[fleetItem].ships.length;
                     while (x--) {
-                        var effect = getModule(stationedFleets[fleetItem].ships[x].design, 'Colonize');
+                        effect = getModule(stationedFleets[fleetItem].ships[x].design, 'Colonize');
                         if (effect[0]) {
-                            if (colonizeInfo < effect[1]) {
-                                colonizeInfo = [effect[1], fleetItem, ship];
-                            }
+                            playerEnv.colonizeInfo = [effect[1], fleetItem, stationedFleets[fleetItem].ships[x], planetObj.id];
                         }
                     }
                 }
 
-                lg(colonizeInfo);
-
-                if (colonizeInfo[0] !== 0) {
+                if (playerEnv.colonizeInfo[0] !== 0) {
                     options += '<br><button id="btnColonize">Colonize</button><br>';
                 }
 
@@ -1364,93 +1389,106 @@ function app() {
 
             }
 
-            if (colonizeInfo[0]) {
-
-                document.getElementById('btnColonize').addEventListener('click', function() {
-                    this.parentNode.removeChild(this);
-
-                    var playerEnv = logic.environments[logic.currentPlayer];
-                    playerEnv.ownedPlanets.push(planetObj.id);
-                    planetObj.population[0] = colonizeInfo[0];
-                    planetObj.workForce = [colonizeInfo[0], colonizeInfo[0], 0, 0, 0];
-
-                    // TODO: If greater then 1, place workforce in agriculture until food lvl is high enough
-                    // then place into production, no research
-                    /*
-                     if (colonizeInfo[0] > 1) {
-                     planetObj.workForce[0] = 1;
-                     } else {
-                     planetObj.workForce[0] = 1;
-                     }
-                     */
-
-
-                    if (planetObj.stationedFleets[colonizeInfo[1]].ships.length === 1) {
-                        // Remove fleet
-
-                        var isVisible = planetObj.stationedFleets[colonizeInfo[1]].hideDrawing;
-
-                        // Remove fleet from other player screens
-                        var targetFleet = planetObj.stationedFleets[colonizeInfo[1]];
-                        removeFleetFromPlayerViews(targetFleet);
-
-                        // Decrease count of design
-                        for (var design = playerEnv.designs.length - 1; design > -1; design--) {
-                            if (planetObj.stationedFleets[colonizeInfo[1]].ships[0].design === playerEnv.designs[design].name) {
-                                playerEnv.designs[design].count -= 1;
-                            }
-                        }
-
-                        playerEnv.fleets.splice(playerEnv.fleets.indexOf(planetObj.stationedFleets[colonizeInfo[1]]), 1);
-                        planetObj.stationedFleets.splice(colonizeInfo[1], 1);
-                        playerEnv.activeSelection = false;
-
-                        if (!isVisible && planetObj.stationedFleets.length !== 0) {
-                            planetObj.stationedFleets[0].hideDrawing = false;
-                        }
-
-                    } else {
-                        // Decrease count of design
-                        /*
-                         for (var design = playerEnv.designs.length - 1; design > -1; design--) {
-                         if (planetObj.stationedFleets[colonizeInfo[1]].ships[colonizeInfo[2]].design === playerEnv.designs[design].name) {
-                         playerEnv.designs[design].count -= 1;
-                         }
-                         }
-                         */
-
-                        // Remove single ship from fleet
-                        planetObj.stationedFleets[colonizeInfo[1]].ships.splice(colonizeInfo[2], 1);
-
-                    }
-
-                    modal.innerHTML = '<h2>Colony name</h2><input id="planetName" autocomplete="off" maxlength=25 width=25/>';
-                    modal.style.display = 'inline';
-
-                    var nameField = document.getElementById('planetName');
-                    nameField.focus();
-                    nameField.addEventListener('keyup', function(evt) {
-                        if (evt.keyCode === 13) {
-                            planetObj.name = nameField.value;
-                            planetObj.owner = logic.currentPlayer;
-                            modal.style.display = 'none';
-                            discoverPlanets(planetObj.x, planetObj.y, 150, planetObj);
-
-                            logic.scanAreas[logic.currentPlayer].push([150, planetObj.x, planetObj.y]);
-                            playerEnv.scanAreas.push([150, planetObj.x, planetObj.y]);
-
-                            createSelection(planetObj);
-                            scrollToLocation(planetObj, showPlanetDialog);
-                            gameArea.focus();
-                        }
-                    });
-
-                });
-
+            if (playerEnv.colonizeInfo[0]) {
+                document.getElementById('btnColonize').addEventListener('click', colonizePlanet);
             }
         }
 
     }
+
+
+    function colonizePlanet() {
+        var playerEnv = logic.environments[logic.currentPlayer];
+        var colonizeInfo = playerEnv.colonizeInfo;
+        var planets = playerEnv.planets.length;
+        var planetObj = new Object();
+
+        while (planets--) {
+            if (playerEnv.planets[planets].id === playerEnv.colonizeInfo[3]) {
+                planetObj = playerEnv.planets[ planets ];
+                break;
+            }
+        }
+
+        modal.innerHTML = '<h4 style="color: #fff; margin-bottom:5px;">Colony name</h4><input id="planetName" autocomplete="off" maxlength=25 width=25/>';
+        modal.style.display = 'inline';
+
+        var nameField = document.getElementById('planetName');
+        nameField.focus();
+        nameField.addEventListener('keyup', function(evt) {
+            if (evt.keyCode === 13) {
+
+                this.parentNode.removeChild(this);
+
+                playerEnv.ownedPlanets.push(planetObj.id);
+                planetObj.population[0] = colonizeInfo[0];
+                planetObj.workForce = [colonizeInfo[0], colonizeInfo[0], 0, 0, 0];
+
+                // TODO: If greater then 1, place workforce in agriculture until food lvl is high enough
+                // then place into production, no research
+                /*
+                 if (colonizeInfo[0] > 1) {
+                 planetObj.workForce[0] = 1;
+                 } else {
+                 planetObj.workForce[0] = 1;
+                 }
+                 */
+
+
+                if (planetObj.stationedFleets[colonizeInfo[1]].ships.length === 1) {
+                    // Remove fleet
+
+                    var isVisible = planetObj.stationedFleets[colonizeInfo[1]].hideDrawing;
+
+                    // Remove fleet from other player screens
+                    var targetFleet = planetObj.stationedFleets[colonizeInfo[1]];
+                    removeFleetFromPlayerViews(targetFleet);
+
+                    // Decrease count of design
+                    for (var design = playerEnv.designs.length - 1; design > -1; design--) {
+                        if (planetObj.stationedFleets[colonizeInfo[1]].ships[0].design === playerEnv.designs[design].name) {
+                            playerEnv.designs[design].count -= 1;
+                        }
+                    }
+
+                    playerEnv.fleets.splice(playerEnv.fleets.indexOf(planetObj.stationedFleets[colonizeInfo[1]]), 1);
+                    planetObj.stationedFleets.splice(colonizeInfo[1], 1);
+                    playerEnv.activeSelection = false;
+
+                    if (!isVisible && planetObj.stationedFleets.length !== 0) {
+                        planetObj.stationedFleets[0].hideDrawing = false;
+                    }
+
+                } else {
+                    // Decrease count of design
+                    for (var design = playerEnv.designs.length - 1; design > -1; design--) {
+                        if (planetObj.stationedFleets[colonizeInfo[1]].ships[colonizeInfo[2]].design === playerEnv.designs[design].name) {
+                            playerEnv.designs[design].count -= 1;
+                        }
+                    }
+
+                    // Remove single ship from fleet
+                    planetObj.stationedFleets[colonizeInfo[1]].ships.splice(colonizeInfo[2], 1);
+
+                }
+
+                planetObj.name = nameField.value;
+                planetObj.owner = logic.currentPlayer;
+                modal.style.display = 'none';
+                discoverPlanets(planetObj.x, planetObj.y, 150, planetObj);
+
+                logic.scanAreas[logic.currentPlayer].push([150, planetObj.x, planetObj.y]);
+                playerEnv.scanAreas.push([150, planetObj.x, planetObj.y]);
+
+                createSelection(planetObj);
+                scrollToLocation(planetObj, showPlanetDialog);
+                gameArea.focus();
+                playerEnv.colonizeInfo = [0];
+            }
+        });
+
+    }
+    ;
 
 
     function checkKeys(evt) {
@@ -1473,19 +1511,22 @@ function app() {
                     }
                     break;
                 case 9:
-                    if (!env.strg) {
-                        logic.currentPlayer++;
-                        if (logic.currentPlayer === logic.players) {
-                            logic.currentPlayer = 0;
+                    if (modal.style.display === 'none') {
+                        if (!env.strg) {
+                            logic.currentPlayer++;
+                            if (logic.currentPlayer === logic.players) {
+                                logic.currentPlayer = 0;
+                            }
+                        } else {
+                            logic.currentPlayer--;
+                            if (logic.currentPlayer === -1) {
+                                logic.currentPlayer = logic.players - 1;
+                            }
                         }
-                    } else {
-                        logic.currentPlayer--;
-                        if (logic.currentPlayer === -1) {
-                            logic.currentPlayer = logic.players - 1;
-                        }
+
+                        env = logic.environments[logic.currentPlayer];
                     }
 
-                    env = logic.environments[logic.currentPlayer];
                     break;
             }
         } else if (evt.type === 'keydown') {
@@ -1705,8 +1746,6 @@ function app() {
         if (fleet.origin.y > destination.y) {
             fleet.stepY = -fleet.stepY;
         }
-
-        lg(fleet)
 
         fleet.destination = destination;
         fleet.needsMove = true;
@@ -2070,9 +2109,6 @@ function app() {
                     targetFleet.location = 'space';
                 }
 
-                lg(targetFleet);
-
-
                 targetFleet.x += targetFleet.stepX;
                 targetFleet.y += targetFleet.stepY;
                 targetFleet.turns--;
@@ -2101,7 +2137,6 @@ function app() {
 
 
                     // TODO: Check planet for foreign fleets upon arrival and offering options for space combat..
-                    lg(targetFleet);
                     if (targetFleet.origin.stationedFleets.length !== 0) {
                         if (targetFleet.owner === targetFleet.origin.stationedFleets[0].owner) {
                             targetFleet.hideDrawing = true;
@@ -2978,17 +3013,10 @@ function app() {
 
         for (var item = playerEnv.designs.length - 1; item > -1; item--) {
             if (designName === playerEnv.designs[item].name) {
-                //lg('design');
 
                 for (var module = playerEnv.designs[item].modules.length - 1; module > -1; module--) {
-                    lg('Module');
-                    lg(env.designs[item].modules[module]);
-
                     for (var moduleItem = logic.shipModules.length - 1; moduleItem > -1; moduleItem--) {
-                        lg(logic.shipModules[moduleItem].name);
                         if (playerEnv.designs[item].modules[module] === logic.shipModules[moduleItem].name) {
-                            lg(logic.shipModules[moduleItem].effects);
-
                             for (var effect = logic.shipModules[moduleItem].effects.length - 1; effect > -1; effect--) {
                                 if (category === logic.shipModules[moduleItem].effects[effect][0]) {
                                     return [true, logic.shipModules[moduleItem].effects[effect][1]];
@@ -3193,10 +3221,15 @@ function app() {
         researchScreen += '<div id="researchListing">';
         researchScreen += '<h3>Research</h3>';
         researchScreen += '<div id="activeResearch">';
-        researchScreen += '<p id="researchProject">Active research: ' + env.research.project + '<p>';
 
-        turns = 0;
-        if (env.research.points != 0) {
+        if (env.research.project) {
+            researchScreen += '<p id="researchProject">Active research: ' + env.research.project[1] + '<p>';
+        } else {
+            researchScreen += '<p id="researchProject">Active research: No project selected<p>';
+        }
+
+        var turns = 0;
+        if (env.research.points !== 0) {
             turns = Math.ceil((env.research.required - env.research.progress) / env.research.points);
         }
 
@@ -3618,6 +3651,8 @@ function app() {
             // Player actions in turn(s) to verify with logic
             env.actions = [];
 
+            env.colonizeInfo = [0];
+
 
             // Logic mirrors of player variables
             logic.availableBuildings.push(env.availableBuildings);
@@ -3722,7 +3757,7 @@ function app() {
     calculateDesign(design);
     env.designs.push(design);
 
-    //lg(env.designs)
+    //c(env.designs)
 
 
     function getDesign(designOwner, designName) {
@@ -3739,13 +3774,13 @@ function app() {
 
     //createAnimation(imgUrl, xWidth, xFrameSize, yFrameSize,  duration, stepX, returnLoaded, lastX, useSet, setX, setY) {
 
-    createAnimation("img/terrain0.png", 176, 26, 25, 120, 30, false, false, false, false, false);
-    createAnimation("img/terrain1.png", 176, 26, 25, 120, 30, false, false, false, false, false);
-    createAnimation("img/terrain2.png", 176, 26, 25, 120, 30, false, false, false, false, false);
-    createAnimation("img/terrain3.png", 176, 26, 25, 120, 30, false, false, false, false, false);
-    createAnimation("img/terrain4.png", 176, 26, 25, 120, 30, false, false, false, false, false);
-    createAnimation("img/terrain5.png", 176, 26, 25, 120, 30, false, false, false, false, false);
-    createAnimation("img/stars1.png", 3860, 800, 600, 6, 0.4, true, 3160, true, 0, 0);
+    createAnimation("img/terrain0.png", 176, 26, 25, 50, 30, false, false, false, false, false);
+    createAnimation("img/terrain1.png", 176, 26, 25, 50, 30, false, false, false, false, false);
+    createAnimation("img/terrain2.png", 176, 26, 25, 50, 30, false, false, false, false, false);
+    createAnimation("img/terrain3.png", 176, 26, 25, 50, 30, false, false, false, false, false);
+    createAnimation("img/terrain4.png", 176, 26, 25, 50, 30, false, false, false, false, false);
+    createAnimation("img/terrain5.png", 176, 26, 25, 50, 30, false, false, false, false, false);
+    createAnimation("img/stars1.png", 3860, 800, 600, 3, 0.4, true, 3160, true, 0, 0);
 
     env = logic.environments[0];
     genGalaxie(45);
@@ -3756,7 +3791,7 @@ function app() {
     function checkFinishedLoad() {
         if (!animationsLoading) {
             clearInterval(loaderCheck);
-            gameInterval = setInterval(mainloop, 10);
+            gameInterval = setInterval(mainloop, 50);
         }
     }
 
