@@ -581,7 +581,7 @@ function app() {
                     document.getElementById(tabRegisters[x].name).style.display = 'block';
                 }
 
-                tabRegisters[x].addEventListener('click', function(evt) {
+                tabRegisters[x].addEventListener('click', function (evt) {
                     evt.preventDefault();
                     var activeTab = document.getElementsByClassName('activetab');
 
@@ -602,7 +602,7 @@ function app() {
         if (planet.population[0] !== 0) {
             if (playerEnv.ownedPlanets.indexOf(planet.id) !== -1) {
 
-                var reset = document.getElementById('reset').addEventListener('click', function() {
+                var reset = document.getElementById('reset').addEventListener('click', function () {
                     env.research.points -= parseInt(displayResearch);
                     planet.workForce = [planet.workForce[0], planet.workForce[0], 0, 0, 0];
                     calcResearchPoints(planet);
@@ -610,7 +610,7 @@ function app() {
                     showPlanetDialog(planet, 0);
                 });
 
-                var agriculture = document.getElementById('agriculture').addEventListener('click', function(evt) {
+                var agriculture = document.getElementById('agriculture').addEventListener('click', function (evt) {
                     if (planet.workForce[1] !== 0 && !playerEnv.strg) {
                         planet.workForce[1] -= 1;
                         planet.workForce[2] += 1;
@@ -621,7 +621,7 @@ function app() {
                     showPlanetDialog(planet, 0);
                 });
 
-                var production = document.getElementById('production').addEventListener('click', function() {
+                var production = document.getElementById('production').addEventListener('click', function () {
                     if (planet.workForce[1] !== 0 && !playerEnv.strg) {
                         planet.workForce[1] -= 1;
                         planet.workForce[3] += 1;
@@ -632,7 +632,7 @@ function app() {
                     showPlanetDialog(planet, 0);
                 });
 
-                var research = document.getElementById('research').addEventListener('click', function() {
+                var research = document.getElementById('research').addEventListener('click', function () {
                     if (planet.workForce[1] !== 0 && !playerEnv.strg) {
                         planet.workForce[1] -= 1;
                         planet.workForce[4] += 1;
@@ -649,7 +649,7 @@ function app() {
 
                 var x = constructionOptions.length;
                 while (x--) {
-                    constructionOptions[x].addEventListener('mouseover', function(evt) {
+                    constructionOptions[x].addEventListener('mouseover', function (evt) {
                         if (evt.target.name === 'building') {
                             var desc = document.getElementById('itemDescription');
                             var option = playerEnv.buildings.length;
@@ -683,7 +683,7 @@ function app() {
                         }
                     });
 
-                    constructionOptions[x].addEventListener('click', function(evt) {
+                    constructionOptions[x].addEventListener('click', function (evt) {
                         evt.preventDefault();
                         env.scrollTargetToY = ["productionList", document.getElementById("productionList").children[0].scrollTop];
 
@@ -1094,15 +1094,15 @@ function app() {
 
                         // Bind handles to the current displayed ships
                         for (var x = fleetSelections.length - 1; x > -1; x--) {
-                            fleetSelections[x].addEventListener('click', function(evt) {
+                            fleetSelections[x].addEventListener('click', function (evt) {
                                 evt.preventDefault();
                             });
 
-                            fleetSelections[x].addEventListener('dragstart', function(evt) {
+                            fleetSelections[x].addEventListener('dragstart', function (evt) {
                                 dropSrc = evt;
                             });
 
-                            fleetSelections[x].addEventListener('dragend', function(evt) {
+                            fleetSelections[x].addEventListener('dragend', function (evt) {
                                 if (dropTarget !== dropSrc) {
                                     var design = dropSrc.target.name;
                                     var partedShips = document.getElementsByClassName('partedShips');
@@ -1155,16 +1155,16 @@ function app() {
 
                             // Bind handles to the current displayed ships
                             for (var ship = partedShips.length - 1; ship > -1; ship--) {
-                                partedShips[ship].addEventListener('click', function(evt) {
+                                partedShips[ship].addEventListener('click', function (evt) {
                                     evt.preventDefault();
                                 });
 
-                                partedShips[ship].addEventListener('dragstart', function(evt) {
+                                partedShips[ship].addEventListener('dragstart', function (evt) {
                                     dropSrc = evt;
 
                                 });
 
-                                partedShips[ship].addEventListener('dragend', function(evt) {
+                                partedShips[ship].addEventListener('dragend', function (evt) {
                                     if (dropTarget !== dropSrc) {
                                         var design = dropSrc.target.name;
                                         partedShips = document.getElementsByClassName('partedShips');
@@ -1201,20 +1201,20 @@ function app() {
                     }
 
                     // Set the droptarget handlers
-                    document.getElementById('fleetListing').addEventListener('dragover', function(evt) {
+                    document.getElementById('fleetListing').addEventListener('dragover', function (evt) {
                         if (dropSrc) {
                             dropTarget = evt;
                         }
                     });
 
 
-                    document.getElementById('partedFleet').addEventListener('dragover', function(evt) {
+                    document.getElementById('partedFleet').addEventListener('dragover', function (evt) {
                         if (dropSrc) {
                             dropTarget = evt;
                         }
                     });
 
-                    document.getElementById('partFleet').addEventListener('click', function(evt) {
+                    document.getElementById('partFleet').addEventListener('click', function (evt) {
                         evt.preventDefault();
 
                         if (targetFleet.ships.length === 1) {
@@ -1270,7 +1270,7 @@ function app() {
 
 
                 var joinedFleet = false;
-                document.getElementById('joinFleets').addEventListener('click', function(evt) {
+                document.getElementById('joinFleets').addEventListener('click', function (evt) {
                     if (activeItem) {
                         activeItem.className = '';
                     }
@@ -1311,7 +1311,7 @@ function app() {
 
                 });
 
-                document.getElementById('nameFleet').addEventListener('click', function(evt) {
+                document.getElementById('nameFleet').addEventListener('click', function (evt) {
                     evt.preventDefault();
 
                     if (activeItem) {
@@ -1333,7 +1333,7 @@ function app() {
 
                     modal.appendChild(input);
 
-                    fleetName = input.addEventListener('keyup', function(evt) {
+                    fleetName = input.addEventListener('keyup', function (evt) {
                         evt.preventDefault();
 
                         if (evt.keyCode === 13) {
@@ -1350,7 +1350,7 @@ function app() {
                     gameArea.focus();
                 });
 
-                document.getElementById('splitFleet').addEventListener('click', function(evt) {
+                document.getElementById('splitFleet').addEventListener('click', function (evt) {
                     evt.preventDefault();
                     if (activeItem) {
                         activeItem.className = '';
@@ -1374,7 +1374,7 @@ function app() {
                 });
 
 
-                document.getElementById('shipListing').addEventListener('mouseover', function(evt) {
+                document.getElementById('shipListing').addEventListener('mouseover', function (evt) {
 
                     if (evt.target.name) {
                         if (activeItem) {
@@ -1415,7 +1415,7 @@ function app() {
 
         var nameField = document.getElementById('planetName');
         nameField.focus();
-        nameField.addEventListener('keyup', function(evt) {
+        nameField.addEventListener('keyup', function (evt) {
             if (evt.keyCode === 13) {
 
                 this.parentNode.removeChild(this);
@@ -3053,10 +3053,11 @@ function app() {
     var turnDisplay = document.getElementById('turnDisplay');
     var fleetDisplay = document.getElementById('fleetDisplay');
     var researchDisplay = document.getElementById('researchDisplay');
-
+    var planetDisplay = document.getElementById('planetDisplay');
+    var helpDisplay = document.getElementById("helpDisplay");
 
     var previousWidth = 0;
-    turnDisplay.addEventListener('click', function(evt) {
+    turnDisplay.addEventListener('click', function (evt) {
         evt.preventDefault();
 
         if (reports.style.display !== 'none') {
@@ -3071,7 +3072,7 @@ function app() {
         }
     });
 
-    fleetDisplay.addEventListener('click', function(evt) {
+    fleetDisplay.addEventListener('click', function (evt) {
         evt.preventDefault();
 
         if (document.getElementById('designListing') !== null) {
@@ -3177,7 +3178,7 @@ function app() {
         var fleetListing = document.getElementById('fleetListing');
 
         var playerEnv = logic.environments[logic.currentPlayer];
-        playerEnv.designs.forEach(function(design) {
+        playerEnv.designs.forEach(function (design) {
             designListing.innerHTML += '<li><a href="#" class="fleetDesign" name="' + design.name + '">' + design.count + ' x ' + design.name + ' (' + design.type + ')</a></li>';
         });
 
@@ -3206,7 +3207,8 @@ function app() {
         modal.style.display = 'inline';
     });
 
-    researchDisplay.addEventListener('click', function(evt) {
+
+    researchDisplay.addEventListener('click', function (evt) {
         evt.preventDefault();
 
         if (document.getElementById('researchListing') !== null) {
@@ -3271,7 +3273,7 @@ function app() {
         var techElements = document.getElementsByClassName("techOption");
         var options = techElements.length;
         while (options--) {
-            techElements[options].addEventListener("mouseover", function(evt) {
+            techElements[options].addEventListener("mouseover", function (evt) {
                 var keys = evt.target.getAttribute("name").split("_", 2);
                 document.getElementById('researchDescription').innerHTML = env.listedTechs[keys[0]][2][keys[1]][1];
             });
@@ -3281,7 +3283,7 @@ function app() {
         var techGroups = document.getElementsByClassName("techGroup");
         var options = techGroups.length;
         while (options--) {
-            techGroups[options].addEventListener("click", function(evt) {
+            techGroups[options].addEventListener("click", function (evt) {
                 var targetName = evt.target.getAttribute("name");
                 if (targetName === null) {
                     targetName = evt.target.parentNode.getAttribute("name");
@@ -3301,6 +3303,203 @@ function app() {
             });
         }
 
+        modal.style.display = 'inline';
+
+    });
+
+    planetDisplay.addEventListener("click", function (evt) {
+        var playerEnv = logic.environments[logic.currentPlayer];
+        evt.preventDefault();
+
+        if (document.getElementById('planetListing') !== null) {
+            modal.style.display = 'none';
+            modal.innerHTML = '';
+            return;
+        }
+
+        var planetScreen = '';
+        planetScreen = '<div id="planetListing">';
+        planetScreen += '<h3>Planet overview</h3>';
+        planetScreen += '<div>';
+        planetScreen += '<ul id="planetFilter">';
+        planetScreen += '<li id="filterOwned" class="filterSelected">Colonized planets</li>';
+        planetScreen += '<li id="filterKnown">Known planets</li>';
+        planetScreen += '</ul>';
+        planetScreen += '<ul id="planetList">';
+        planetScreen += '</ul>';
+        planetScreen += '<div id="planetDetails"></div>';
+        planetScreen += '</div></div>';
+        modal.innerHTML = planetScreen;
+
+        var planet = new Object();
+        var planetName = "";
+        var planetInfo = "";
+
+        var planetList = document.getElementById("planetList");
+        var planetDetails = document.getElementById("planetDetails");
+        var ownedPlanets = playerEnv.ownedPlanets.length;
+
+        var filterOwned = document.getElementById("filterOwned");
+        var filterKnown = document.getElementById("filterKnown");
+
+
+        function showPlanetDetails(planet) {
+            var planetInfo = '';
+            planetInfo += '<h3>' + planet.name + '</h3>';
+            planetInfo += '<br><h5>Description<h5>';
+            planetInfo += '<p>' + logic.terrains[planet.terrain][0] + ' planet</p><br/>';
+            planetInfo += '<p><span>Terrain</span>' + logic.terrains[planet.terrain][0] + '</p>';
+            planetInfo += '<p><span>Mineral richness</span>' + logic.mineralLevel[planet.mineralLevel][1] + '</p>';
+            planetInfo += '<p><span>Ecological diversity</span>' + logic.ecologicalLevel[planet.ecologicalLevel][1] + '</p>';
+            planetInfo += '<br/><p><span>Current population</span>' + planet.population[0].toString().slice(0, 4) + ' of ' + planet.population[1] + '</p>';
+
+            if (planet.owner === logic.currentPlayer) {
+                planetInfo += '<br/><h5>Workforce</h5>';
+                planetInfo += '<p><span>Assigned workfroce</span>' + (planet.workForce[0] - planet.workForce[1]) + ' of ' + planet.workForce[0] + '<br/>';
+                planetInfo += '<br/><span>Agriculture</span>' + planet.workForce[2];
+                planetInfo += '<br/><span>Construction</span>' + planet.workForce[3];
+                planetInfo += '<br/><span>Research</span>' + planet.workForce[4];
+                planetInfo += '</p>';
+            }
+
+            planetDetails.innerHTML = planetInfo;
+        }
+
+        modal.style.display = 'inline';
+
+        // Create list of owned planets on opening
+        createAndBindPlanetListItems(playerEnv.ownedPlanets, true);
+
+        // Bind colonizedPlanet filter and create list on click
+        filterOwned.addEventListener("click", function (evt) {
+            var selected = document.getElementsByClassName("filterSelected")[0];
+            selected.className = selected.className.replace("filterSelected", "");
+            evt.target.className += "filterSelected";
+
+            createAndBindPlanetListItems(playerEnv.ownedPlanets, true);
+        });
+
+        // Bind knownPlanets filter and create list on click
+        filterKnown.addEventListener("click", function (evt) {
+            var selected = document.getElementsByClassName("filterSelected")[0];
+            selected.className = selected.className.replace("filterSelected", "");
+            evt.target.className += "filterSelected";
+
+            createAndBindPlanetListItems(playerEnv.knownPlanets, false);
+        });
+
+
+        // Add custom scrolling feature to planetList
+        planetList.addEventListener("wheel", function (evt) {
+            evt.preventDefault();
+
+            if (evt.deltaY > 0) {
+                if ((planetList.scrollHeight - planetList.clientHeight) > 0) {
+                    planetList.scrollTop += 29;
+                }
+            } else {
+                if (planetList.scrollTop > 0) {
+                    planetList.scrollTop -= 29;
+                }
+            }
+        });
+
+
+        // TODO: Change use of logic.planet in this functions at some point
+        function createAndBindPlanetListItems(planets, showOwned) {
+            var planetCount = planets.length;
+            var planet = new Object();
+
+            planetList.innerHTML = "";
+
+            for (var x = 0; x < planetCount; x++) {
+                planet = logic.planets[ planets[x] ];
+
+                if (!showOwned) {
+                    if (planet.owner === logic.currentPlayer) {
+                        continue
+                    }
+                }
+
+                if (x === 0) {
+                    showPlanetDetails(planet);
+                }
+
+                planetList.innerHTML += '<li name="' + planets[x] + '">' + planet.name + '</li>';
+            }
+
+            var elements = planetList.children.length;
+            var items = planetList.children;
+            while (elements--) {
+                items[elements].addEventListener("mouseover", function (evt) {
+                    if (document.getElementsByClassName("active").length === 0) {
+                        showPlanetDetails(logic.planets[ evt.target.getAttribute("name") ]);
+                    }
+                });
+
+                items[elements].addEventListener("click", function (evt) {
+                    var planetObj = logic.planets[ evt.target.getAttribute("name") ];
+
+                    if (evt.target.className === "active") {
+                        evt.target.className = "";
+                        if (env.strg) {
+                            env.strg = false;
+                            scrollToLocation(planetObj, showPlanetDialog);
+                        } else {
+                            scrollToLocation(planetObj, false);
+                        }
+                        return;
+                    }
+
+                    var selected = document.getElementsByClassName("active");
+                    if (selected.length !== 0) {
+                        selected[0].className = selected[0].className.replace("active", "");
+                    }
+
+                    evt.target.className += "active";
+
+                    showPlanetDetails(planetObj);
+                    scrollToLocation(planetObj, false);
+                });
+            }
+        }
+        ;
+    });
+
+    helpDisplay.addEventListener("click", function (evt) {
+        evt.preventDefault();
+
+        if (document.getElementById('helpListing') !== null) {
+            modal.style.display = 'none';
+            modal.innerHTML = '';
+            return;
+        }
+
+        var helpScreen = '';
+
+        helpScreen += '<div style="width: 550px; height: 400px; padding: 10px; background-color: #8a8a8a">';
+        helpScreen += '<h4>Help overview - Controls</h4>';
+        helpScreen += '<h6 style="margin: 5px;">This help is from <a style="width: auto; display: inline;" target="_blank" href="http://github.com/jrie/Connect">http://github.com/jrie/Connect</a></h6>';
+        helpScreen += '<p style="height: 315px; overflow: auto; padding: 5px 15px; padding-bottom: 25px; clear: both;">';
+        helpScreen += '- Pressing "T" advances the turn<br/><br/>';
+        helpScreen += '- Pressing "Turn" in the main panel opens and closes the turn log which contains a history of discoveries, fleet arrivals, constructions and such<br/><br/>';
+        helpScreen += '- Holding down the control/Strg key and the left mouse button in the game window while moving the mouse will move the galaxy<br/><br/>';
+        helpScreen += '- Pressing control/Strg while clicking on fleet will open the fleet basic dialog - its by default hidden when there is only one fleet<br/><br/>';
+        helpScreen += '- The current player can be switched using Shift + Tab key<br/><br/>';
+        helpScreen += '- Pressing "Research" opens the research panel, for now this only has basic function and adding research results has to be implemented.<br/><br/>';
+        helpScreen += '- The fleet overview can be opened by pressing "Fleets" - selecting a design name (bottom) will show its details<br/><br/>';
+        helpScreen += '- The log window can be resized by pressing and moving on the very left, clicking "Turn" hides the logwindow<br/><br/>';
+        helpScreen += '- Clicking on bold texts elements in the log will bring you to the place of action, and possibly showing further dialogs<br/><br/>';
+        helpScreen += '- When a colony ship is brought to a uncolonized planet, a "colony" button appears on the top left of the galaxy view after the fleet is selected again<br/><br/>';
+        helpScreen += '- Selecting a fleet and another planet will create a route where this fleet will travel towards, routes also can be selected, automatically selecting the first fleet using it, ships on routes/in space cant be moved before landing<br/><br/>';
+        helpScreen += '- Selecting a colonized planet will show the planet dialog, workforce based on the population can be added or reset<br/><br/>';
+        helpScreen += '- A queue for production items can be made by holding control/strg, clicking an item on the right will remove of the queue<br/><br/>';
+        helpScreen += '- Selecting a fleet in the fleet overview with Strg/Control selects it, this allows to rename the fleet by pressing "rename", selecting multiple fleets and pressing join, joins all fleets into the first selected one. Selecting a fleet and pressing "split" will change the view to the split flit modal, allowing drag and drop of ships from the selected fleet into a new fleet<br/><br/>';
+        helpScreen += '- The planet overview can be opened clicking on "Planets" in the main panel, clicking one on a planet scrolls the planet into the view, deselecting using Strg/Control mouse click will remove the planet lock of that entry, so while hovering other planets there information will be shown<br/><br/>';
+        helpScreen += '</p>';
+        helpScreen += '</div>';
+
+        modal.innerHTML = helpScreen;
         modal.style.display = 'inline';
 
     });
