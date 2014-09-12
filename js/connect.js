@@ -3495,7 +3495,7 @@ function app() {
         helpScreen += '- Selecting a colonized planet will show the planet dialog, workforce based on the population can be added or reset<br/><br/>';
         helpScreen += '- A queue for production items can be made by holding control/strg, clicking an item on the right will remove of the queue<br/><br/>';
         helpScreen += '- Selecting a fleet in the fleet overview with Strg/Control selects it, this allows to rename the fleet by pressing "rename", selecting multiple fleets and pressing join, joins all fleets into the first selected one. Selecting a fleet and pressing "split" will change the view to the split flit modal, allowing drag and drop of ships from the selected fleet into a new fleet<br/><br/>';
-        helpScreen += '- The planet overview can be opened clicking on "Planets" in the main panel, clicking one on a planet scrolls the planet into the view, deselecting using Strg/Control mouse click will remove the planet lock of that entry, so while hovering other planets there information will be shown<br/><br/>';
+        helpScreen += '- The planet overview can be opened clicking on "Planets" in the main panel, clicking one on a planet scrolls the planet into the view and locking it, deselecting with a mouse click removes the lock of that entry, so while hovering other planets there information will be shown. When a planet is selected, pressing Strg/Control and clicking left will open the planet dialog for this particular planet<br/><br/>';
         helpScreen += '</p>';
         helpScreen += '</div>';
 
