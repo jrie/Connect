@@ -67,7 +67,7 @@ function app() {
             x = planetObj.x + playerEnv.offsetX;
             y = planetObj.y + playerEnv.offsetY;
             gameScreen.moveTo(x, y);
-            gameScreen.arc(x, y, 24, 0, 6.3);
+            gameScreen.arc(x, y, 14, 0, 6.3);
 
             if (gameScreen.isPointInPath(evt.layerX, evt.layerY)) {
                 if (playerEnv.knownPlanets.indexOf(planetObj.id) !== -1 || playerEnv.unknownPlanets.indexOf(planetObj.id) !== -1) {
@@ -3477,12 +3477,12 @@ function app() {
 
         var helpScreen = '';
 
-        helpScreen += '<div style="width: 550px; height: 400px; padding: 10px; background-color: #8a8a8a">';
+        helpScreen += '<div id="helpListing" style="width: 550px; height: 400px; padding: 10px; background-color: #8a8a8a; border-radius: 5px;">';
         helpScreen += '<h4>Help overview - Controls</h4>';
         helpScreen += '<h6 style="margin: 5px;">This help is from <a style="width: auto; display: inline;" target="_blank" href="http://github.com/jrie/Connect">http://github.com/jrie/Connect</a></h6>';
         helpScreen += '<p style="height: 315px; overflow: auto; padding: 5px 15px; padding-bottom: 25px; clear: both;">';
-        helpScreen += '- Pressing "T" advances the turn<br/><br/>';
-        helpScreen += '- Pressing "Turn" in the main panel opens and closes the turn log which contains a history of discoveries, fleet arrivals, constructions and such<br/><br/>';
+        helpScreen += '- Pressing " T " advances the turn<br/><br/>';
+        helpScreen += '- Pressing "Turn" in the main panel opens or closes the turn log which contains a history of discoveries, fleet arrivals, constructions and such<br/><br/>';
         helpScreen += '- Holding down the control/Strg key and the left mouse button in the game window while moving the mouse will move the galaxy<br/><br/>';
         helpScreen += '- Pressing control/Strg while clicking on fleet will open the fleet basic dialog - its by default hidden when there is only one fleet<br/><br/>';
         helpScreen += '- The current player can be switched using Shift + Tab key<br/><br/>';
