@@ -3,6 +3,7 @@ var logic = {};
 var mainloopCalculating = false;
 var env = {};
 var animationsLoading = true;
+var loadInProgress = true;
 
 function app() {
 
@@ -2527,7 +2528,8 @@ function app() {
     function genGalaxie(count) {
 
 
-
+        var random = 0;
+        var planetNames = logic.planetNames.length;
         for (var step = 0; step < count; step++) {
             var x = Math.random() * (gameArea.width * 0.85) + 20;
             var y = Math.random() * (gameArea.height * 0.85) + 20;
@@ -2538,8 +2540,14 @@ function app() {
             planet.y = y;
             planet.size = 12;
             planet.type = "planet";
-            planet.name = 'planet ' + Math.ceil(x) + ' | ' + Math.ceil(y);
+            // Old planet naming
+            // planet.name = 'planet ' + Math.ceil(x) + ' | ' + Math.ceil(y);
+            
+            random = Math.ceil(Math.random() * (planetNames - 1));
+            planet.name = logic.planetNames[random];
             planet.displayName = planet.name;
+            logic.planetNames.splice(random, 1);
+            
             planet.id = step;
             planet.owner = -1;
 
@@ -2578,7 +2586,6 @@ function app() {
                 env.offsetY = -(planet.y - gameArea.height / 2);
 
                 planet.population = [4, size];
-                planet.name = 'Home colony ' + step;
                 planet.constructions = ['Factory Complex', 'Farm Complex'];
                 planet.workForce = [4, 0, 1, 2, 1];
                 planet.owner = step;
@@ -2606,7 +2613,6 @@ function app() {
             }
 
         }
-
 
         for (var player = 0; player < logic.players; player++) {
             var playerEnv = logic.environments[player];
@@ -3980,17 +3986,38 @@ function app() {
     createAnimation("img/terrain4.png", 176, 26, 25, 50, 30, false, false, false, false, false);
     createAnimation("img/terrain5.png", 176, 26, 25, 50, 30, false, false, false, false, false);
     createAnimation("img/stars1.png", 3860, 800, 600, 3, 0.4, true, 3160, true, 0, 0);
-
+    
+    
+    logic.planetNames = [];
+    function loadPlanetNames() {
+        var fileLoader = new XMLHttpRequest();
+        fileLoader.onreadystatechange = function() {
+            if (fileLoader.readyState === 4) {
+                logic.planetNames = fileLoader.responseText.split('\n',2)[1].split("|");
+                loadInProgress = false;
+            }
+        }
+        fileLoader.open("GET", "logic/planetnames.txt");
+        fileLoader.send(); 
+   }
     env = logic.environments[0];
-    genGalaxie(45);
-    bindHandlers();
+    
+    // Blocking loader
+    loadPlanetNames();
+    
     var loaderCheck = setInterval(checkFinishedLoad, 500);
     var gameInterval;
 
     function checkFinishedLoad() {
-        if (!animationsLoading) {
+        if (!animationsLoading && !loadInProgress) {
             clearInterval(loaderCheck);
+            
+            genGalaxie(45);
+            bindHandlers();
             gameInterval = setInterval(mainloop, 50);
+            
+            delete animationsLoading;
+            delete loadInProgress;
         }
     }
 
