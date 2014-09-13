@@ -28,26 +28,32 @@ function app() {
         gameScreen.textAlign = 'center';
         gameScreen.lineWidth = 1;
         gameScreen.beginPath();
+        gameScreen.font = "Normal 11px sans-serif";
         while (items--) {
             planetObj = playerEnv.planets[items];
             x = planetObj.x + playerEnv.offsetX;
             y = planetObj.y + playerEnv.offsetY + 26;
 
             if (planetObj.owner === -1) {
-                gameScreen.fillStyle = "rgba(150,150,175, 1)";
-                if (playerEnv.knownPlanets.indexOf(planetObj.id) !== -1) {
-                    gameScreen.fillText(planetObj.displayName, x, y);
+                gameScreen.fillStyle = "rgba(0,185,0, 1)";
+                if (playerEnv.knownPlanets.indexOf(planetObj.id) === -1) {
+                    gameScreen.fillText(("(" + planetObj.displayName + ")"), x, y);
+                } else {
+                    gameScreen.fillText(planetObj.name, x, y);
                 }
             } else if (planetObj.owner !== playerEnv.player) {
                 gameScreen.fillStyle = "rgba(170,70,70, 1)";
                 if (playerEnv.knownPlanets.indexOf(planetObj.id) !== -1) {
+                    gameScreen.fillText( ("("+planetObj.displayName+")"), x, y);
+                } else {
                     gameScreen.fillText(planetObj.name, x, y);
                 }
             } else {
-                gameScreen.fillStyle = "rgba(150,150,175, 1)";
+                gameScreen.fillStyle = "rgba(120,120,245, 1)";
                 gameScreen.fillText(planetObj.name, x, y);
             }
-
+            
+            // Old flat rendering
             //gameScreen.fillStyle = 'rgba(255, 255, 255, 0.5)';
             //gameScreen.moveTo(x, y);
             //gameScreen.arc(x, y, 12, 0, 6.3);
@@ -2531,8 +2537,8 @@ function app() {
         var random = 0;
         var planetNames = logic.planetNames.length;
         for (var step = 0; step < count; step++) {
-            var x = Math.random() * (gameArea.width * 0.85) + 20;
-            var y = Math.random() * (gameArea.height * 0.85) + 20;
+            var x = Math.random() * (gameArea.width * 1.25) + 20;
+            var y = Math.random() * (gameArea.height * 1.25) + 20;
             var size = Math.ceil((Math.random() * 8) + 7);
 
             var planet = new Object;
@@ -2542,12 +2548,12 @@ function app() {
             planet.type = "planet";
             // Old planet naming
             // planet.name = 'planet ' + Math.ceil(x) + ' | ' + Math.ceil(y);
-            
+
             random = Math.ceil(Math.random() * (planetNames - 1));
             planet.name = logic.planetNames[random];
             planet.displayName = planet.name;
             logic.planetNames.splice(random, 1);
-            
+
             planet.id = step;
             planet.owner = -1;
 
@@ -3520,6 +3526,7 @@ function app() {
     logic.ownedPlanets = [];
     logic.knownPlanets = [];
     logic.unknownPlanets = [];
+    logic.planetNames = [];
     logic.workers = [];
     logic.marines = [];
     logic.techs = [];
@@ -3986,36 +3993,35 @@ function app() {
     createAnimation("img/terrain4.png", 176, 26, 25, 50, 30, false, false, false, false, false);
     createAnimation("img/terrain5.png", 176, 26, 25, 50, 30, false, false, false, false, false);
     createAnimation("img/stars1.png", 3860, 800, 600, 3, 0.4, true, 3160, true, 0, 0);
-    
-    
-    logic.planetNames = [];
+
+
     function loadPlanetNames() {
         var fileLoader = new XMLHttpRequest();
-        fileLoader.onreadystatechange = function() {
+        fileLoader.onreadystatechange = function () {
             if (fileLoader.readyState === 4) {
-                logic.planetNames = fileLoader.responseText.split('\n',2)[1].split("|");
+                logic.planetNames = fileLoader.responseText.split('\n', 2)[1].split("|");
                 loadInProgress = false;
             }
         }
         fileLoader.open("GET", "logic/planetnames.txt");
-        fileLoader.send(); 
-   }
+        fileLoader.send();
+    }
     env = logic.environments[0];
-    
-    // Blocking loader
+
+    // Blocking loader using loadInProgress variable
     loadPlanetNames();
-    
+
     var loaderCheck = setInterval(checkFinishedLoad, 500);
     var gameInterval;
 
     function checkFinishedLoad() {
         if (!animationsLoading && !loadInProgress) {
             clearInterval(loaderCheck);
-            
+
             genGalaxie(45);
             bindHandlers();
             gameInterval = setInterval(mainloop, 50);
-            
+
             delete animationsLoading;
             delete loadInProgress;
         }
