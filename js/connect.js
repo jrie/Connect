@@ -422,25 +422,25 @@ function app() {
             name = planet.displayName;
         }
 
-        var infoScreen = '<div id="planetInfo" name="' + name + '">';
-        infoScreen += '<div>';
-        infoScreen += '<h3>' + name + ' (' + planet.type + ')</h3>';
-        infoScreen += '<br><h5>Description<h5>';
-        infoScreen += '<p>' + name + ' is a ' + logic.terrains[planet.terrain][0] + ' ' + planet.type + '.</p>';
+        var planetDetailScreen = '<div id="planetInfo" name="' + name + '">';
+        planetDetailScreen += '<div>';
+        planetDetailScreen += '<h3>' + name + ' (' + planet.type + ')</h3>';
+        planetDetailScreen += '<br><h5>Description<h5>';
+        planetDetailScreen += '<p>' + name + ' is a ' + logic.terrains[planet.terrain][0] + ' ' + planet.type + '.</p>';
 
-        infoScreen += '<br><h4>Overview</h4>';
-        infoScreen += '<p>Location.. ' + Math.ceil(planet.x) + '/' + Math.ceil(planet.y) + '</p>';
-        infoScreen += '<p>Terrain.. ' + logic.terrains[planet.terrain][0] + '</p>';
-        infoScreen += '<p>Mineral richness.. ' + logic.mineralLevel[planet.mineralLevel][1] + '</p>';
-        infoScreen += '<p>Ecological diversity.. ' + logic.ecologicalLevel[planet.ecologicalLevel][1] + '</p>';
+        planetDetailScreen += '<br><h4>Overview</h4>';
+        planetDetailScreen += '<p>Location.. ' + Math.ceil(planet.x) + '/' + Math.ceil(planet.y) + '</p>';
+        planetDetailScreen += '<p>Terrain.. ' + logic.terrains[planet.terrain][0] + '</p>';
+        planetDetailScreen += '<p>Mineral richness.. ' + logic.mineralLevel[planet.mineralLevel][1] + '</p>';
+        planetDetailScreen += '<p>Ecological diversity.. ' + logic.ecologicalLevel[planet.ecologicalLevel][1] + '</p>';
 
         if (playerEnv.ownedPlanets.indexOf(planet.id) !== -1) {
-            infoScreen += '<br/><p>Current population.. ' + planet.population[0].toString().slice(0, 4) + ' of ' + planet.population[1] + '</p>';
+            planetDetailScreen += '<br/><p>Current population.. ' + planet.population[0].toString().slice(0, 4) + ' of ' + planet.population[1] + '</p>';
         } else {
-            infoScreen += '<br/><p>Planet maximum population.. ' + planet.population[1] + '</p>';
+            planetDetailScreen += '<br/><p>Planet maximum population.. ' + planet.population[1] + '</p>';
         }
 
-        infoScreen += '</div>';
+        planetDetailScreen += '</div>';
 
         if (planet.owner === -1) {
             clearModuleEffects();
@@ -479,7 +479,7 @@ function app() {
             }
 
             if (hasColonizeModule) {
-                infoScreen += '<br><button id="btnColonize">Colonize</button><br>';
+                planetDetailScreen += '<br><button id="btnColonize">Colonize</button><br>';
             }
         }
 
@@ -496,130 +496,115 @@ function app() {
             } else {
                 turns = '-';
             }
-
-            infoScreen += '<hr><div style="height: 20px;"><a href="#" class="tabregister" name="workForceModal">Workforce</a><a href="#" name="productionModal" class="tabregister">Production</a></div>';
-            infoScreen += '<div class="planetstats"><p>Current project: <span id="currentProject">' + planet.production[0] + ', ' + planet.production[1] + ' of ' + planet.production[2] + ' units (' + turns + ' turns )</span></p>';
-            infoScreen += '<p>Available workforce: <span id="availableWorkforce">' + planet.workForce[1] + '</span></p></div>';
-
-            // Workforce modal
-            infoScreen += '<div class="tabcontent" id="workForceModal">';
-            infoScreen += '<div style="float: left;"><button id="agriculture">Agriculture</button>';
-            infoScreen += '<button id="production">Production</button>';
-            infoScreen += '<button id="research">Research</button>';
-            infoScreen += '<button id="reset">Reset workforce</button></div>';
-
+            
+            var currentProduction = parseFloat(planet.production[1]).toPrecision(3);
+            
             var baseMixOutput = [
                 percentOutput[0] + multiOutput[0],
                 percentOutput[1] + multiOutput[1],
                 percentOutput[2] + multiOutput[2]
             ];
 
-            var displayAgriculture = baseMixOutput[0].toString().slice(0, baseMixOutput[0].toString().indexOf('.') + 3);
-            var displayProduction = baseMixOutput[1].toString().slice(0, baseMixOutput[1].toString().indexOf('.') + 3);
-            var displayResearch = baseMixOutput[2].toString().slice(0, baseMixOutput[2].toString().indexOf('.') + 2);
-            infoScreen += '<div style="float:right; text-align:right; width: 240px;">';
-            infoScreen += '<p>Base Agriculture.. ' + displayAgriculture + '</p>';
-            infoScreen += '<p>Base Production.. ' + displayProduction + '</p>';
-            infoScreen += '<p>Base research.. ' + displayResearch + '</p>';
-
+            var displayAgriculture = parseFloat((baseMixOutput[0]).toPrecision(3));
+            var displayProduction = parseFloat((baseMixOutput[1]).toPrecision(3));
+            var displayResearch = parseFloat((baseMixOutput[2]).toPrecision(3));
+            
             var agricultureValue = 0;
             var productionValue = 0;
             var researchValue = 0;
 
-            displayAgriculture = 0;
-            displayProduction = 0;
-            displayResearch = 0;
+            planetDetailScreen += '<hr><div style="height: 20px;"><a href="#" class="tabregister" name="workForceModal">Workforce</a><a href="#" name="productionModal" class="tabregister">Production</a></div>';
+            if (!planet.production[0]) {
+                planetDetailScreen += '<div class="planetstats"><p>Current project: <span id="currentProject">No project assigned</span></p>';
+            } else {
+                planetDetailScreen += '<div class="planetstats"><p>Current project: <span id="currentProject">' + planet.production[0] + ', ' + currentProduction + ' of ' + planet.production[2] + ' units (' + turns + ' turns )</span></p>';
+            }
+            planetDetailScreen += '<p>Available workforce: <span id="availableWorkforce">' + planet.workForce[1] + '</span></p></div>';
+
+            // Workforce modal
+            planetDetailScreen += '<div class="tabcontent" id="workForceModal">';
+            planetDetailScreen += '<div style="float: left;"><button id="agriculture">Agriculture</button>';
+            planetDetailScreen += '<button id="production">Production</button>';
+            planetDetailScreen += '<button id="research">Research</button>';
+            planetDetailScreen += '<button id="reset">Reset workforce</button></div>';
+
+            planetDetailScreen += '<div style="float:right; text-align:right; width: 240px;">';
+            planetDetailScreen += '<p>Base Agriculture.. ' + displayAgriculture + '</p>';
+            planetDetailScreen += '<p>Base Production.. ' + displayProduction + '</p>';
+            planetDetailScreen += '<p>Base research.. ' + displayResearch + '</p>';
 
             if (planet.workForce[2] > 0) {
-                agricultureValue = planet.workForce[2] * (percentOutput[0] + multiOutput[0]);
-
-                if (agricultureValue.toString().indexOf('.') !== -1) {
-                    displayAgriculture = agricultureValue.toString().slice(0, agricultureValue.toString().indexOf('.') + 3);
-                } else {
-                    displayAgriculture = agricultureValue;
-                }
+                agricultureValue = (planet.workForce[2] * baseMixOutput[0]).toPrecision(3);
             }
 
             if (planet.workForce[3] > 0) {
-                productionValue = planet.workForce[3] * (percentOutput[1] + multiOutput[1]);
-
-                if (productionValue.toString().indexOf('.') !== -1) {
-                    displayProduction = productionValue.toString().slice(0, productionValue.toString().indexOf('.') + 3);
-                } else {
-                    displayProduction = productionValue;
-                }
+                productionValue = (planet.workForce[3] * baseMixOutput[1]).toPrecision(3);
             }
 
             if (planet.workForce[4] > 0) {
-                researchValue = planet.workForce[4] * (percentOutput[2] + multiOutput[2]);
-
-                if (researchValue.toString().indexOf('.') !== -1) {
-                    displayResearch = researchValue.toString().slice(0, researchValue.toString().indexOf('.') + 3);
-                } else {
-                    displayResearch = researchValue;
-                }
+                researchValue = (planet.workForce[4] * baseMixOutput[2]).toPrecision(3);
             }
 
-            infoScreen += '<br>';
-            infoScreen += '<p>Agriculture value.. ' + displayAgriculture + ' + ' + fixedOutput[0] + '</p>';
-            infoScreen += '<p>Production value.. ' + displayProduction + ' + ' + fixedOutput[1] + '</p>';
-            infoScreen += '<p>Research value.. ' + displayResearch + ' + ' + fixedOutput[2] + '</p>';
-            infoScreen += '</div></div>';
+            planetDetailScreen += '<br>';
+            planetDetailScreen += '<p>Agriculture value.. ' + agricultureValue + ' + ' + fixedOutput[0] + '</p>';
+            planetDetailScreen += '<p>Production value.. ' + productionValue + ' + ' + fixedOutput[1] + '</p>';
+            planetDetailScreen += '<p>Research value.. ' + researchValue + ' + ' + fixedOutput[2] + '</p>';
+            planetDetailScreen += '</div></div>';
 
             // Production modal
-            infoScreen += '<div class="tabcontent" id="productionModal" style="display: none;">';
-            infoScreen += '<div id="productionList">';
-            infoScreen += '<ul>';
-            infoScreen += '<li style="padding: 5px;">CONSTRUCTIONS</li>';
+            planetDetailScreen += '<div class="tabcontent" id="productionModal" style="display: none;">';
+            planetDetailScreen += '<div id="productionList">';
+            planetDetailScreen += '<ul>';
+            planetDetailScreen += '<li style="padding: 5px;">CONSTRUCTIONS</li>';
 
             if (planet.constructions.length !== 0) {
                 var x = playerEnv.availableBuildings.length;
                 while (x--) {
                     if (planet.constructions.indexOf(playerEnv.availableBuildings[x]) === -1) {
                         if (planet.production[0] === playerEnv.availableBuildings[x]) {
-                            infoScreen += '<li><a href="#" id="activeConstruction" class="constructionItem" name="building">' + playerEnv.availableBuildings[x] + '</a></li>';
+                            planetDetailScreen += '<li><a href="#" id="activeConstruction" class="constructionItem" name="building">' + playerEnv.availableBuildings[x] + '</a></li>';
                         } else {
-                            infoScreen += '<li><a href="#" class="constructionItem" name="building">' + playerEnv.availableBuildings[x] + '</a></li>';
+                            planetDetailScreen += '<li><a href="#" class="constructionItem" name="building">' + playerEnv.availableBuildings[x] + '</a></li>';
                         }
                     }
                 }
             } else {
                 var x = playerEnv.availableBuildings.length;
                 while (x--) {
-                    infoScreen += '<li><a href="#" class="constructionItem" name="building">' + playerEnv.availableBuildings[x] + '</a></li>';
+                    planetDetailScreen += '<li><a href="#" class="constructionItem" name="building">' + playerEnv.availableBuildings[x] + '</a></li>';
                 }
             }
 
             // TODO: Add a check for a shipyards, distinguish by design size and option to build or not
-            infoScreen += '<li style="border-top: 1px dashed #666; padding: 5px;">SHIP DESIGNS</li>';
+            planetDetailScreen += '<li style="border-top: 1px dashed #666; padding: 5px;">SHIP DESIGNS</li>';
 
             var x = playerEnv.designs.length;
             while (x--) {
                 if (planet.production[0] === playerEnv.designs[x].name) {
-                    infoScreen += '<li><a href="#" id="activeConstruction" class="constructionItem" name="design">' + playerEnv.designs[x].name + '</a></li>';
+                    planetDetailScreen += '<li><a href="#" id="activeConstruction" class="constructionItem" name="design">' + playerEnv.designs[x].name + '</a></li>';
                 } else {
-                    infoScreen += '<li><a href="#" class="constructionItem" name="design">' + playerEnv.designs[x].name + '</a></li>';
+                    planetDetailScreen += '<li><a href="#" class="constructionItem" name="design">' + playerEnv.designs[x].name + '</a></li>';
                 }
             }
 
-            infoScreen += '</ul></div>';
+            planetDetailScreen += '</ul></div>';
 
-            infoScreen += '<div style="float: left; width: 155px; margin-left: 10px;"><h5>DESCRIPTION</h5><div id="itemDescription" style="height: 165px; overflow:auto; font-size:10px; font-weight:normal; text-align:justify"></div></div>';
+            planetDetailScreen += '<div style="float: left; width: 155px; margin-left: 10px;"><h5>DESCRIPTION</h5><div id="itemDescription" style="height: 165px; overflow:auto; font-size:10px; font-weight:normal; text-align:justify"></div></div>';
 
-            infoScreen += '<div style="float: left; margin-left: 10px; width: 155px;"><h5>QUEUED ITEMS</h5><ul id="productionQueue">';
+            planetDetailScreen += '<div style="float: left; margin-left: 10px; width: 155px;"><h5>QUEUED ITEMS</h5><ul id="productionQueue">';
 
             var x = planet.productionQueue.length;
             while (x--) {
-                infoScreen += '<li>' + planet.productionQueue[x][1] + '</li>';
+                planetDetailScreen += '<li>' + planet.productionQueue[x][1] + '</li>';
             }
-            infoScreen += '</ul></div>';
+            planetDetailScreen += '</ul></div>';
 
-            infoScreen += '</div>';
+            planetDetailScreen += '</div>';
 
         }
 
-        infoScreen += '</div>';
-        modal.innerHTML = infoScreen;
+        planetDetailScreen += '</div>';
+        modal.innerHTML = planetDetailScreen;
 
         // Check if there is any colonizatio module amongst the ships
         if (playerEnv.knownPlanets.indexOf(planet.id) !== -1) {
@@ -2010,6 +1995,13 @@ function app() {
 
         // TODO: make use of only owned planets
         var item = logic.planets.length;
+        
+        var planet = new Object();
+        var percentOutput = 0.0;
+        var fixedOutput = 0.0;
+        var multiOutput = 0.0;
+        var productionValue = 0.0;
+        var link = "";
         while (item--) {
             // Population growth
             if (logic.planets[item].population[0] !== 0 && logic.planets[item].population[0] < logic.planets[item].population[1]) {
@@ -2025,7 +2017,7 @@ function app() {
                     logic.planets[item].workForce[1] += 1;
 
                     if (logic.currentPlayer === logic.planets[item].owner) {
-                        var link = createLink('planet', logic.planets[item].id, logic.planets[item].name);
+                        link = createLink('planet', logic.planets[item].id, logic.planets[item].name);
                         report('Population of ' + link + ' grown to ' + parseInt(logic.planets[item].population[0]));
                     }
                 }
@@ -2035,13 +2027,14 @@ function app() {
             //lg('out '+logic.planets[item].production[0]);
             if (logic.planets[item].production[0]) {
 
-                var planet = logic.planets[item];
+                planet = logic.planets[item];
 
-                var percentOutput = getBaseOutput(planet);
-                var fixedOutput = getFixedOutput(planet);
-                var multiOutput = getMultiOutput(planet);
-
-                planet.production[1] += (planet.workForce[3] * (percentOutput[1] + multiOutput[1])) + fixedOutput[1];
+                percentOutput = getBaseOutput(planet);
+                fixedOutput = getFixedOutput(planet);
+                multiOutput = getMultiOutput(planet);
+                productionValue = (planet.workForce[3] * (percentOutput[1] + multiOutput[1])) + fixedOutput[1];
+                
+                planet.production[1] += parseFloat(productionValue.toPrecision(3));
 
                 if (planet.production[1] >= planet.production[2]) {
 
@@ -2429,9 +2422,9 @@ function app() {
                 item = discoveredPlanets[items];
                 link1 = '';
                 if (item[1].type === 'fleet') {
-                    link1 = createLink(item[1].type, item[1].name, item[1].type + ' ' + item[1].name);
+                    link1 = createLink("Fleet", item[1].name, item[1].type + ' ' + item[1].name);
                 } else {
-                    link1 = createLink(item[1].type, item[1].id, item[1].type + ' ' + item[1].name);
+                    link1 = createLink("Planet", item[1].id, item[1].type + ' ' + item[1].name);
                 }
                 link2 = createLink('planet', item[2], 'planet in ' + item[0] + ' units');
                 report(link1 + ' discovered a ' + link2 + ' away.');
@@ -3376,7 +3369,7 @@ function app() {
             modal.innerHTML = '';
             return;
         }
-
+        
         var planetScreen = '';
         planetScreen = '<div id="planetListing">';
         planetScreen += '<h3>Planet overview</h3>';
@@ -3389,7 +3382,8 @@ function app() {
         planetScreen += '<ul id="planetList">';
         planetScreen += '</ul>';
         planetScreen += '<div id="planetDetails"></div>';
-        planetScreen += '</div></div>';
+        // TODO: STARTHERE
+        //planetScreen += '<div id="commands" style=""><button>Sort by name</button></div></div></div>';
         modal.innerHTML = planetScreen;
 
         var planet = new Object();
@@ -3505,8 +3499,11 @@ function app() {
 
         // TODO: Change use of logic.planet in this functions at some point
         function createAndBindPlanetListItems(planets, showOwned) {
-            var planetCount = planets.length;
+            
+            var playerEnv = logic.environments[logic.currentPlayer];
+            
             var planet = new Object();
+            var planetCount = planets.length;
 
             planetList.innerHTML = "";
 
@@ -3540,7 +3537,7 @@ function app() {
 
                     if (evt.target.className === "active") {
                         evt.target.className = "";
-                        if (env.strg) {
+                        if (env.strg && playerEnv.ownedPlanets.indexOf(planetObj.id) !== -1) {
                             env.strg = false;
                             scrollToLocation(planetObj, showPlanetDialog);
                         } else {
