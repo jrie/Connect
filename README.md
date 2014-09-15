@@ -3,7 +3,7 @@ connect
 
 An approach for a space game based on HTML5 and javascript - linked to the feeling of Master of Orion 2.
 
-Note: The game was mainly tested in Firefox, Chrome workability has just been added, IE 10 failed yet to load the project properly.
+Note: The game was mainly tested in Firefox, Chrome workability has just been added, IE 10 failed yet to load the project properly. If you download onto your desktop, please start Chrome with the parameter: "--allow-file-access-from-files", because otherwise the Ajax request made to load the planet names is failing and nothing will show up.
 
 At present the game elements are pretty simple, main focus has been set on getting the logic and some ui interaction in place, in favor of working with graphic elements - which has changed to get away with the flat appeareance. Its pretty simple at its state, but can already be "played". Its not in any way a full game as the underlying structure has no agriculture implemented, but work on research is ongoing.
 Production is working as is and also basic fleet management, renaming/splitting/joining and the options to switch players on demand in an - at the moment - totally random generated galaxie without any order.
