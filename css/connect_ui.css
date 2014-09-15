@@ -27,7 +27,6 @@ ul {
 
 li {
     cursor: pointer;
-
 }
 
 li:hover {
@@ -43,6 +42,9 @@ button {
     font-size: 10px;
     color: #cecece;
     background-color: #3a3a3a;
+    border-radius: 5px;
+    padding-top: 3px;
+    padding-bottom: 2px;
 }
 
 span {
@@ -177,6 +179,7 @@ input, textarea, #logwindow {
     background-color: #0A0A0A;
     display: block;
     padding: 10px;
+    min-width: 375px;
 }
 
 .tabcontent {
@@ -322,6 +325,7 @@ hr {
     clear: both;
     float: left;
     width: 100px;
+    margin-bottom: 5px;
 }
 
 #productionModal {
@@ -591,19 +595,16 @@ a.selectedFleet  {
     background-color: rgba(60,60,60, 0.22);
     height: auto;
     border-radius: 5px;
-    padding: 10px;
+    padding: 4px;
     width: 480px;
 }
 
 #planetListing > h3 {
-    border-bottom:1px solid #cecece;
+    border-bottom: 1px solid #1a1a1a;
     color: #dedede;
-    margin-bottom: 5px;
-    width: 100%;
-}
-
-#planetListing > div {
-     display: inline;
+    margin-bottom: 2px;
+    width: 96%;
+    padding: 3px 2%;
 }
 
 #planetListing #planetFilter {
@@ -700,4 +701,28 @@ a.selectedFleet  {
     width: 165px;
     display: inline-block;
     text-transform: uppercase;
+}
+
+#planetListing #commands {
+    clear: both;
+    display: inline-block;
+    padding: 12px 1% 7px 1%;
+    width: 98%;
+}
+
+#planetListing #commands button {
+    float: left;
+    margin-top: 8px;
+    margin-right: 8px;
+    width: 112px;
+}
+
+#planetListing #commands button:disabled {
+    background-color: #0e0e0e;
+    color: #6a6a6a;
+}
+
+#planetListing #commands button.active {
+    background-color: #7a7a7a;
+    color: #000;
 }

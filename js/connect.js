@@ -435,9 +435,9 @@ function app() {
         planetDetailScreen += '<p>Ecological diversity.. ' + logic.ecologicalLevel[planet.ecologicalLevel][1] + '</p>';
 
         if (playerEnv.ownedPlanets.indexOf(planet.id) !== -1) {
-            planetDetailScreen += '<br/><p>Current population.. ' + planet.population[0].toString().slice(0, 4) + ' of ' + planet.population[1] + '</p>';
+            planetDetailScreen += '<br/><p>Current population.. ' + planet.population[0].toFixed(2) + ' of ' + planet.population[1].toFixed(2) + '</p>';
         } else {
-            planetDetailScreen += '<br/><p>Planet maximum population.. ' + planet.population[1] + '</p>';
+            planetDetailScreen += '<br/><p>Planet maximum population.. ' + planet.population[1].toFixed(2) + '</p>';
         }
 
         planetDetailScreen += '</div>';
@@ -496,19 +496,19 @@ function app() {
             } else {
                 turns = '-';
             }
-            
-            var currentProduction = parseFloat(planet.production[1]).toPrecision(3);
-            
+
+            var currentProduction = parseFloat(planet.production[1]).toFixed(2);
+
             var baseMixOutput = [
                 percentOutput[0] + multiOutput[0],
                 percentOutput[1] + multiOutput[1],
                 percentOutput[2] + multiOutput[2]
             ];
 
-            var displayAgriculture = parseFloat((baseMixOutput[0]).toPrecision(3));
-            var displayProduction = parseFloat((baseMixOutput[1]).toPrecision(3));
-            var displayResearch = parseFloat((baseMixOutput[2]).toPrecision(3));
-            
+            var displayAgriculture = parseFloat((baseMixOutput[0]).toFixed(2));
+            var displayProduction = parseFloat((baseMixOutput[1]).toFixed(2));
+            var displayResearch = parseFloat((baseMixOutput[2]).toFixed(2));
+
             var agricultureValue = 0;
             var productionValue = 0;
             var researchValue = 0;
@@ -534,15 +534,15 @@ function app() {
             planetDetailScreen += '<p>Base research.. ' + displayResearch + '</p>';
 
             if (planet.workForce[2] > 0) {
-                agricultureValue = (planet.workForce[2] * baseMixOutput[0]).toPrecision(3);
+                agricultureValue = (planet.workForce[2] * baseMixOutput[0]).toFixed(2);
             }
 
             if (planet.workForce[3] > 0) {
-                productionValue = (planet.workForce[3] * baseMixOutput[1]).toPrecision(3);
+                productionValue = (planet.workForce[3] * baseMixOutput[1]).toFixed(2);
             }
 
             if (planet.workForce[4] > 0) {
-                researchValue = (planet.workForce[4] * baseMixOutput[2]).toPrecision(3);
+                researchValue = (planet.workForce[4] * baseMixOutput[2]).toFixed(2);
             }
 
             planetDetailScreen += '<br>';
@@ -1831,7 +1831,7 @@ function app() {
         createSelection(object);
 
         function doScroll() {
-            if (Math.floor(Math.abs(playerEnv.offsetX)) === targetX && Math.floor(Math.abs(playerEnv.offsetY)) === targetY) {
+            if (Math.round(Math.abs(playerEnv.offsetX)) === targetX && Math.round(Math.abs(playerEnv.offsetY)) === targetY) {
                 clearInterval(scrollInterval);
                 bindHandlers();
 
@@ -1995,7 +1995,7 @@ function app() {
 
         // TODO: make use of only owned planets
         var item = logic.planets.length;
-        
+
         var planet = new Object();
         var percentOutput = 0.0;
         var fixedOutput = 0.0;
@@ -2033,8 +2033,8 @@ function app() {
                 fixedOutput = getFixedOutput(planet);
                 multiOutput = getMultiOutput(planet);
                 productionValue = (planet.workForce[3] * (percentOutput[1] + multiOutput[1])) + fixedOutput[1];
-                
-                planet.production[1] += parseFloat(productionValue.toPrecision(3));
+
+                planet.production[1] += parseFloat(productionValue.toFixed(2));
 
                 if (planet.production[1] >= planet.production[2]) {
 
@@ -2403,7 +2403,7 @@ function app() {
 
         }
 
-        function sortByDistance(p1, p2) {
+        function sortDistance(p1, p2) {
             if (p1[0] >= p2[0]) {
                 return true;
             }
@@ -2416,7 +2416,7 @@ function app() {
             var maxItems = discoveredPlanets.length;
             var item = [];
 
-            discoveredPlanets.sort(sortByDistance);
+            discoveredPlanets.sort(sortDistance);
 
             while (items < maxItems) {
                 item = discoveredPlanets[items];
@@ -2574,13 +2574,12 @@ function app() {
     // Create custom animation using imageMaps
 
     function genGalaxy(count) {
-
-
         var random = 0;
         var planetNames = logic.planetNames.length;
+
         for (var step = 0; step < count; step++) {
-            var x = Math.random() * (gameArea.width * 1.25) + 20;
-            var y = Math.random() * (gameArea.height * 1.25) + 20;
+            var x = Math.floor(Math.random() * (gameArea.width * 1.25) + 20);
+            var y = Math.floor(Math.random() * (gameArea.height * 1.25) + 20);
             var size = Math.ceil((Math.random() * 8) + 7);
 
             var planet = new Object;
@@ -2656,8 +2655,6 @@ function app() {
                  createShip(planet, 'Retriever', false);
                  createShip(planet, 'Colony Design', false);
                  */
-
-
             }
 
         }
@@ -3369,7 +3366,7 @@ function app() {
             modal.innerHTML = '';
             return;
         }
-        
+
         var planetScreen = '';
         planetScreen = '<div id="planetListing">';
         planetScreen += '<h3>Planet overview</h3>';
@@ -3382,8 +3379,16 @@ function app() {
         planetScreen += '<ul id="planetList">';
         planetScreen += '</ul>';
         planetScreen += '<div id="planetDetails"></div>';
-        // TODO: STARTHERE
-        //planetScreen += '<div id="commands" style=""><button>Sort by name</button></div></div></div>';
+
+        planetScreen += '<div id="commands">';
+        planetScreen += '<span style="margin-top:12px; margin-right:12px; clear: both; float: left; color:#dedede;">Sort planets by</span>';
+        planetScreen += '<button id="sortByName">Name</button>';
+        planetScreen += '<button id="sortBySize">Size</button>';
+        planetScreen += '<button id="sortByDistance">Distance</button>';
+        planetScreen += '</div>';
+
+        planetScreen += '</div></div>';
+
         modal.innerHTML = planetScreen;
 
         var planet = new Object();
@@ -3397,6 +3402,137 @@ function app() {
         var filterKnown = document.getElementById("filterKnown");
         var filterUnknown = document.getElementById("filterUnknown");
 
+        var originalList = [];
+        var sortByName = document.getElementById("sortByName");
+        var sortByDistance = document.getElementById("sortByDistance");
+        var sortBySize = document.getElementById("sortBySize");
+        sortByDistance.disabled = true;
+        
+        modal.style.display = 'inline';
+        
+        // Create list of owned planets on opening
+        createPlanetListItems(playerEnv.ownedPlanets);
+
+        // Bind colonizedPlanet filter and create list on click
+        filterOwned.addEventListener("click", function (evt) {
+            var selected = document.getElementsByClassName("filterSelected")[0];
+            selected.className = selected.className.replace("filterSelected", "");
+            evt.target.className += "filterSelected";
+            planetList.setAttribute("name", "own");
+            sortBySize.disabled = false;
+            sortByDistance.disabled = true;
+
+            createPlanetListItems(playerEnv.ownedPlanets);
+        });
+
+        // Bind knownPlanets filter and create list on click
+        filterKnown.addEventListener("click", function (evt) {
+            var selected = document.getElementsByClassName("filterSelected")[0];
+            selected.className = selected.className.replace("filterSelected", "");
+            evt.target.className += "filterSelected";
+            planetList.setAttribute("name", "known");
+            sortBySize.disabled = false;
+            sortByDistance.disabled = false;
+
+            createPlanetListItems(playerEnv.knownPlanets);
+        });
+
+        // Bind knownPlanets filter and create list on click
+        filterUnknown.addEventListener("click", function (evt) {
+            var selected = document.getElementsByClassName("filterSelected")[0];
+            selected.className = selected.className.replace("filterSelected", "");
+            evt.target.className += "filterSelected";
+            planetList.setAttribute("name", "unknown");
+            sortBySize.disabled = true;
+            sortByDistance.disabled = false;
+
+            createPlanetListItems(playerEnv.unknownPlanets);
+        });
+
+
+        // Add custom scrolling feature to planetList
+        planetList.addEventListener("wheel", function (evt) {
+            evt.preventDefault();
+
+            if (evt.deltaY > 0) {
+                if ((planetList.scrollHeight - planetList.clientHeight) > 0) {
+                    planetList.scrollTop += 29;
+                }
+            } else {
+                if (planetList.scrollTop > 0) {
+                    planetList.scrollTop -= 29;
+                }
+            }
+        });
+
+        // TODO: Change use of logic.planet in this functions at some point
+        function createPlanetListItems(planets) {
+            var playerEnv = logic.environments[logic.currentPlayer];
+
+            var planet = new Object();
+            var planetCount = planets.length;
+            planetList.innerHTML = "";
+            originalList = [];
+
+            for (var x = 0; x < planetCount; x++) {
+                planet = logic.planets[ planets[x] ];
+                originalList.push([planet.id, planet.name, planet.population[1], planet.x, planet.y]);
+
+                if (x === 0) {
+                    showPlanetDetails(planet);
+                }
+
+                planetList.innerHTML += '<li name="' + planets[x] + '">' + planet.name + '</li>';
+            }
+
+            // Remove active sorting
+            var actives = document.getElementsByClassName("active");
+            if (actives.length === 1) {
+                actives[0].className = "";
+            }
+
+            bindPlanetListItems();
+        }
+
+        function bindPlanetListItems() {
+            // Bind all items to click and mouseOver
+            var elements = planetList.children.length;
+            var items = planetList.children;
+
+            while (elements--) {
+                items[elements].addEventListener("mouseover", function (evt) {
+                    if (document.getElementsByClassName("activeFilter").length === 0) {
+                        showPlanetDetails(logic.planets[ evt.target.getAttribute("name") ]);
+                    }
+                });
+
+                items[elements].addEventListener("click", function (evt) {
+                    var planetObj = logic.planets[ evt.target.getAttribute("name") ];
+
+                    if (evt.target.className === "active") {
+                        evt.target.className = "";
+                        if (env.strg && playerEnv.ownedPlanets.indexOf(planetObj.id) !== -1) {
+                            env.strg = false;
+                            scrollToLocation(planetObj, showPlanetDialog);
+                        } else {
+                            scrollToLocation(planetObj, false);
+                        }
+                        return;
+                    }
+
+                    var selected = document.getElementsByClassName("activeFilter");
+                    if (selected.length !== 0) {
+                        selected[0].className = selected[0].className.replace("activeFilter", "");
+                    }
+
+                    evt.target.className += "activeFilter";
+
+                    showPlanetDetails(planetObj);
+                    scrollToLocation(planetObj, false);
+                });
+            }
+        }
+
         function showPlanetDetails(planet) {
             var planetInfo = '';
             planetInfo += '<h3>' + planet.name + '</h3>';
@@ -3407,7 +3543,7 @@ function app() {
                 var distanceX = 0;
                 var distanceY = 0;
                 var distance = 0;
-                var shortestDistance = 100000;
+                var shortestDistance = 10000000;
                 var planets = playerEnv.ownedPlanets.length;
                 var srcPlanet = new Object();
                 var routeFrom = "";
@@ -3433,12 +3569,16 @@ function app() {
                 planetInfo += '<p><span>Terrain</span>' + logic.terrains[planet.terrain][0] + '</p>';
                 planetInfo += '<p><span>Mineral richness</span>' + logic.mineralLevel[planet.mineralLevel][1] + '</p>';
                 planetInfo += '<p><span>Ecological diversity</span>' + logic.ecologicalLevel[planet.ecologicalLevel][1] + '</p>';
-                planetInfo += '<br/><p><span>Current population</span>' + planet.population[0].toString().slice(0, 4) + ' of ' + planet.population[1] + '</p>';
+                
+                if (planet.owner === -1) {
+                    planetInfo += '<br/><p><span>Maximum population</span>' + planet.population[1].toFixed(2)+'</p>';
+                }
             }
 
             if (planet.owner === logic.currentPlayer) {
+                planetInfo += '<br/><p><span>Current population</span>' + planet.population[0].toFixed(2) + ' of ' + planet.population[1].toFixed(2) + '</p>';
                 planetInfo += '<br/><h5>Workforce</h5>';
-                planetInfo += '<p><span>Assigned workfroce</span>' + (planet.workForce[0] - planet.workForce[1]) + ' of ' + planet.workForce[0] + '<br/>';
+                planetInfo += '<p><span>Assigned workforce</span>' + planet.workForce[1] + ' of ' + planet.workForce[0] + '<br/>';
                 planetInfo += '<br/><span>Agriculture</span>' + planet.workForce[2];
                 planetInfo += '<br/><span>Construction</span>' + planet.workForce[3];
                 planetInfo += '<br/><span>Research</span>' + planet.workForce[4];
@@ -3448,118 +3588,152 @@ function app() {
             planetDetails.innerHTML = planetInfo;
         }
 
-        modal.style.display = 'inline';
-
-        // Create list of owned planets on opening
-        createAndBindPlanetListItems(playerEnv.ownedPlanets, true);
-
-        // Bind colonizedPlanet filter and create list on click
-        filterOwned.addEventListener("click", function (evt) {
-            var selected = document.getElementsByClassName("filterSelected")[0];
-            selected.className = selected.className.replace("filterSelected", "");
-            evt.target.className += "filterSelected";
-
-            createAndBindPlanetListItems(playerEnv.ownedPlanets, true);
-        });
-
-        // Bind knownPlanets filter and create list on click
-        filterKnown.addEventListener("click", function (evt) {
-            var selected = document.getElementsByClassName("filterSelected")[0];
-            selected.className = selected.className.replace("filterSelected", "");
-            evt.target.className += "filterSelected";
-
-            createAndBindPlanetListItems(playerEnv.knownPlanets, false);
-        });
-
-        // Bind knownPlanets filter and create list on click
-        filterUnknown.addEventListener("click", function (evt) {
-            var selected = document.getElementsByClassName("filterSelected")[0];
-            selected.className = selected.className.replace("filterSelected", "");
-            evt.target.className += "filterSelected";
-
-            createAndBindPlanetListItems(playerEnv.unknownPlanets, false);
-        });
-
-
-        // Add custom scrolling feature to planetList
-        planetList.addEventListener("wheel", function (evt) {
-            evt.preventDefault();
-
-            if (evt.deltaY > 0) {
-                if ((planetList.scrollHeight - planetList.clientHeight) > 0) {
-                    planetList.scrollTop += 29;
-                }
-            } else {
-                if (planetList.scrollTop > 0) {
-                    planetList.scrollTop -= 29;
-                }
-            }
-        });
-
-
-        // TODO: Change use of logic.planet in this functions at some point
-        function createAndBindPlanetListItems(planets, showOwned) {
-            
-            var playerEnv = logic.environments[logic.currentPlayer];
-            
-            var planet = new Object();
-            var planetCount = planets.length;
-
+        // Restoring function
+        function restoreAndBindList(planetArray) {
+            var elements = planetArray.length;
             planetList.innerHTML = "";
 
-            for (var x = 0; x < planetCount; x++) {
-                planet = logic.planets[ planets[x] ];
-
-                if (!showOwned) {
-                    if (planet.owner === logic.currentPlayer) {
-                        continue
-                    }
-                }
-
-                if (x === 0) {
-                    showPlanetDetails(planet);
-                }
-
-                planetList.innerHTML += '<li name="' + planets[x] + '">' + planet.name + '</li>';
-            }
-
-            var elements = planetList.children.length;
-            var items = planetList.children;
             while (elements--) {
-                items[elements].addEventListener("mouseover", function (evt) {
-                    if (document.getElementsByClassName("active").length === 0) {
-                        showPlanetDetails(logic.planets[ evt.target.getAttribute("name") ]);
-                    }
-                });
-
-                items[elements].addEventListener("click", function (evt) {
-                    var planetObj = logic.planets[ evt.target.getAttribute("name") ];
-
-                    if (evt.target.className === "active") {
-                        evt.target.className = "";
-                        if (env.strg && playerEnv.ownedPlanets.indexOf(planetObj.id) !== -1) {
-                            env.strg = false;
-                            scrollToLocation(planetObj, showPlanetDialog);
-                        } else {
-                            scrollToLocation(planetObj, false);
-                        }
-                        return;
-                    }
-
-                    var selected = document.getElementsByClassName("active");
-                    if (selected.length !== 0) {
-                        selected[0].className = selected[0].className.replace("active", "");
-                    }
-
-                    evt.target.className += "active";
-
-                    showPlanetDetails(planetObj);
-                    scrollToLocation(planetObj, false);
-                });
+                planetList.innerHTML += '<li name="' + planetArray[elements][0] + '">' + planetArray[elements][1] + '</li>';
             }
+
+            bindPlanetListItems();
         }
-        ;
+        
+        // Shadowing
+        function createListShadow(planetArray) {
+            var elements = planetArray.length;
+            var originalShadow = [];
+            while (elements--) {
+                originalShadow.push(planetArray[elements]);
+            }
+            
+            return originalShadow;
+        }
+        
+        
+        // Sorting functions
+        function sortName(p1, p2) {
+            if (p1[1] < p2[1]) {
+                return true;
+            }
+
+            return false;
+        }
+        
+        
+        function sortSize(p1, p2) {
+            if (p1[2] < p2[2]) {
+                return true;
+            }
+
+            return false;
+        }
+        
+        
+        function sortDistance(p1, p2) {
+            if (p1[2] < p2[2]) {
+                return true;
+            }
+
+            return false;
+        }
+        
+
+        // Sorting clickhandlers
+        sortByName.addEventListener("click", function (evt) {
+            evt.preventDefault();
+
+            if (evt.target.className === "active") {
+                evt.target.className = "";
+                restoreAndBindList(originalList);
+                return;
+            }
+
+            var actives = document.getElementsByClassName("active");
+            if (actives.length === 1) {
+                actives[0].className = "";
+            }
+
+            evt.target.className = "active";
+
+            restoreAndBindList( createListShadow(originalList).sort(sortName) );
+        });
+
+
+        sortBySize.addEventListener("click", function (evt) {
+            evt.preventDefault();
+
+            if (planetList.getAttribute("name") === "unknown") {
+                return;
+            }
+
+            if (evt.target.className === "active") {
+                evt.target.className = "";
+                restoreAndBindList(originalList);
+                return;
+            }
+
+            var actives = document.getElementsByClassName("active");
+            if (actives.length === 1) {
+                actives[0].className = "";
+            }
+
+            evt.target.className = "active";
+            restoreAndBindList( createListShadow(originalList).sort(sortSize) );
+        });
+
+
+        sortByDistance.addEventListener("click", function (evt) {
+            evt.preventDefault();
+
+            if (evt.target.className === "active") {
+                evt.target.className = "";
+                restoreAndBindList(originalList);
+                return;
+            }
+
+            var actives = document.getElementsByClassName("active");
+            if (actives.length === 1) {
+                actives[0].className = "";
+            }
+
+            evt.target.className = "active";
+            var shadowList = createListShadow(originalList);
+            
+            var distanceX = 0;
+            var distanceY = 0;
+            var distance = 0;
+            var shortestDistance = 0;
+            var planets = 0;
+            var srcPlanet = new Object();
+            var resultsArray = [];
+            
+            var items = shadowList.length;
+            while (items--) {
+                shortestDistance = 10000000;
+                planets = playerEnv.ownedPlanets.length;
+                while (planets--) {
+                    srcPlanet = logic.planets[ playerEnv.ownedPlanets[planets] ];
+                    distanceX = Math.abs(srcPlanet.x - shadowList[items][3] );
+                    distanceY = Math.abs(srcPlanet.y - shadowList[items][4]);
+                    distance = Math.sqrt(Math.pow(distanceX, 2) + Math.pow(distanceY, 2));
+
+                    if (distance < shortestDistance) {
+                        shortestDistance = Math.round(distance);
+                    }
+                }
+                
+                resultsArray.push( [ shadowList[items][0], shadowList[items][1], shortestDistance ]);
+            }
+            
+            restoreAndBindList( resultsArray.sort(sortDistance) );
+        });
+
+
     });
+
+
 
     helpDisplay.addEventListener("click", function (evt) {
         evt.preventDefault();
@@ -3585,7 +3759,7 @@ function app() {
         helpScreen += '- The fleet overview can be opened by pressing "Fleets" - selecting a design name (bottom) will show its details<br/><br/>';
         helpScreen += '- The log window can be resized by pressing and moving on the very left, clicking "Turn" hides the logwindow<br/><br/>';
         helpScreen += '- Clicking on bold texts elements in the log will bring you to the place of action, and possibly showing further dialogs<br/><br/>';
-        helpScreen += '- When a colony ship is brought to a uncolonized planet, a "colony" button appears on the top left of the galaxy view after the fleet is selected again<br/><br/>';
+        helpScreen += '- When a colony ship is brought to a uncolonized planet, a "colony" button appears on the top left of the galaxy view after the planet is selected<br/><br/>';
         helpScreen += '- Selecting a fleet and another planet will create a route where this fleet will travel towards, routes also can be selected, automatically selecting the first fleet using it, ships on routes/in space cant be moved before landing<br/><br/>';
         helpScreen += '- Selecting a colonized planet will show the planet dialog, workforce based on the population can be added or reset<br/><br/>';
         helpScreen += '- A queue for production items can be made by holding control/strg, clicking an item on the right will remove of the queue<br/><br/>';
