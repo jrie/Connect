@@ -520,13 +520,13 @@ a.selectedFleet  {
     border-radius: 5px 5px 0px 0px;
     background-color: #0d0d0d;
     color: #dedede;
-    margin-top: 6px; 
+    margin-top: 6px;
     padding: 8px 2%;
     width: 96%;
 }
 
 #researchProject {
-    text-transform: uppercase; 
+    text-transform: uppercase;
     font-weight: bold;
     color: #fff;
 }
@@ -632,7 +632,7 @@ a.selectedFleet  {
 
 #planetListing #planetFilter li:hover {
     cursor: pointer;
-    color: #050505; 
+    color: #050505;
     background-color: #dedede;
 }
 
@@ -698,9 +698,9 @@ a.selectedFleet  {
 }
 
 #planetListing #planetDetails span {
-    width: 165px;
     display: inline-block;
     text-transform: uppercase;
+    width: 150px;
 }
 
 #planetListing #commands {

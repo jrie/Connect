@@ -104,9 +104,17 @@ function app() {
             if (gameScreen.isPointInPath(evt.layerX, evt.layerY)) {
                 if (fleetObj.location !== 'space') {
 
-                    if (fleetObj.origin.foreignFleets.length === 0 || fleetObj.origin.owner === playerEnv.player) {
+                    if (fleetObj.origin.foreignFleets.length === 0 && fleetObj.origin.owner === playerEnv.player) {
                         return fleetObj.origin.stationedFleets[0];
                     } else {
+                        
+                        while(items--) {
+                            if (fleetObj.origin.stationedFleets[items].owner === playerEnv.player) {
+                                gameScreen.closePath();
+                                return fleetObj.origin.stationedFleets[0];
+                            }
+                        }
+                        
                         foreignItems = fleetObj.origin.foreignFleets.length;
                         while (foreignItems--) {
                             if (playerEnv.fleets[foreignItems].origin.foreignFleets.owner === playerEnv.player) {
@@ -182,7 +190,7 @@ function app() {
         if (fleetObj) {
             // Retrieve fleet info from env.fleet for selection
             if (!fleetObj.hasOwnProperty('name')) {
-                fleetObj = getFleetById(fleetObj);
+                fleetObj = playerEnv.fleets[fleetObj.idx];
             }
 
             if (fleetObj.location !== 'space') {
@@ -249,12 +257,13 @@ function app() {
 
     }
 
+    // TODO REMOVE get fleet by id
     function getFleetById(fleetObj) {
         var fleetEnv = logic.environments[ parseInt(fleetObj.id.split('_')[0]) ].fleets;
-        var x = fleetEnv.length;
-        while (x--) {
-            if (fleetObj.id === fleetEnv[x].id) {
-                return fleetEnv[x];
+        var items = fleetEnv.length;
+        while (items--) {
+            if (fleetObj.id === fleetEnv[items].id) {
+                return fleetEnv[items];
             }
         }
     }
@@ -263,21 +272,43 @@ function app() {
     // into the env.moduleEffects variable of fleets, stationend/foreign, on planetId
     function gatherModuleEffects(planetId, listType, fleetList, moduleType) {
         var playerEnv = logic.environments[logic.currentPlayer];
+
         var effect = [];
         var ships = 0;
         var fleetItems = fleetList.length;
-
+        var fleetShadow = [];
+        
+        if (listType === "foreign") {
+            var fleetShadow = [];
+            
+            // Create a shadow list to work with
+            while (fleetItems--) {
+                fleetShadow.push( playerEnv.fleets[ fleetList[fleetItems].idx ] );
+            }
+            
+            fleetItems = fleetShadow.length;
+        } else if (listType === "stationed") {
+            fleetShadow = fleetList;
+        }
+        
+        var fleetIndex = 0;
         while (fleetItems--) {
-            ships = fleetList[fleetItems].ships.length;
+            ships = fleetShadow[fleetItems].ships.length;
 
             while (ships--) {
-                effect = getModule(fleetList[fleetItems].ships[ships].design, moduleType);
+                effect = getModule(fleetShadow[fleetItems].ships[ships].design, moduleType);
 
                 if (effect[0]) {
+                    if (listType === "foreign") {
+                        fleetIndex = fleetList[fleetItems].idx;
+                    } else {
+                        fleetIndex = fleetItems;
+                    }
+
                     var moduleEffect = {
                         "type": moduleType,
                         "value": effect[1],
-                        "fleet": fleetItems,
+                        "fleet": fleetIndex,
                         "ship": ships,
                         "planetId": planetId,
                         "moduleId": playerEnv.moduleEffects.length,
@@ -286,7 +317,6 @@ function app() {
 
                     playerEnv.moduleEffects.push(moduleEffect);
                 }
-
             }
         }
     }
@@ -429,7 +459,7 @@ function app() {
         planetDetailScreen += '<p>' + name + ' is a ' + logic.terrains[planet.terrain][0] + ' ' + planet.type + '.</p>';
 
         planetDetailScreen += '<br><h4>Overview</h4>';
-        planetDetailScreen += '<p>Location.. ' + Math.ceil(planet.x) + '/' + Math.ceil(planet.y) + '</p>';
+        planetDetailScreen += '<p>Location.. ' + planet.x + '/' + planet.y + '</p>';
         planetDetailScreen += '<p>Terrain.. ' + logic.terrains[planet.terrain][0] + '</p>';
         planetDetailScreen += '<p>Mineral richness.. ' + logic.mineralLevel[planet.mineralLevel][1] + '</p>';
         planetDetailScreen += '<p>Ecological diversity.. ' + logic.ecologicalLevel[planet.ecologicalLevel][1] + '</p>';
@@ -454,7 +484,7 @@ function app() {
             } else {
                 var fleetItems = planet.stationedFleets.length;
                 while (fleetItems--) {
-                    if (planet.stationedFleets[fleetItems].owner === playerEnv.player) {
+                    if (planet.stationedFleets[fleetItems].owner === logic.currentPlayer) {
                         activeFleetList = planet.stationedFleets;
                         listType = "stationed";
                         break;
@@ -462,11 +492,11 @@ function app() {
                 }
 
                 if (!activeFleetList) {
-                    activeFleetList = planet.foreignFleets;
                     listType = "foreign";
+                    activeFleetList = planet.foreignFleets;
                 }
             }
-
+            
             gatherModuleEffects(planet.id, listType, activeFleetList, 'Colonize');
 
             var modules = playerEnv.moduleEffects.length;
@@ -900,84 +930,70 @@ function app() {
         // TODO: Add back the colonize button to the fleet dialog, using
         // clearEffectModules and gatherEffectModules function
         // distinguish between stationed and foreign fleet
-
-        var options = '';
         var playerEnv = logic.environments[logic.currentPlayer];
 
         var shipListing = '';
-        if (planetObj.owner === logic.currentPlayer || (planetObj.owner === -1 && planetObj.foreignFleets.length === 0)) {
-            if (planetObj.stationedFleets.length > 1 || forceDisplay) {
-                shipListing = '<div id="fleetControls">';
-                shipListing += '<span id="joinFleets">Join</span>';
-                shipListing += '<span id="nameFleet">Rename</span>';
-                shipListing += '<span id="splitFleet">Split</span>';
-                shipListing += '</div>';
-
-                shipListing += '<ul id="shipListing">';
-
-                var fleetItem = {};
-                var targetLocation = '';
-
-                var items = planetObj.stationedFleets.length;
-                while (items--) {
-                    fleetItem = planetObj.stationedFleets[items];
-                    if (fleetItem.destination) {
-                        targetLocation = '';
-                        if (playerEnv.knownPlanets.indexOf(fleetItem.destination.id) === -1) {
-                            targetLocation = ' - travelling to planet at ' + Math.ceil(fleetItem.destination.x) + '-' + Math.ceil(fleetItem.destination.y) + ' (' + Math.floor(fleetItem.turns) + ' turns)';
-                        } else {
-                            targetLocation = ' - travelling to ' + fleetItem.destination.name + ' (' + Math.floor(fleetItem.turns) + ' turns)';
-                        }
-                    } else {
-                        targetLocation = '';
-                    }
-
-                    shipListing += '<li><a href="#" name="' + fleetItem.name + '|' + fleetItem.id + '" class="">' + fleetItem.name + targetLocation + '</a></li>';
-
+        var options = '';
+        
+        var fleetList = planetObj.stationedFleets;
+        
+        if (planetObj.foreignFleets.length !== 0) {
+            var hasActive = false;
+            var fleetItems = planetObj.stationedFleets.length;
+            
+            while(fleetItems--) {
+                if (fleetList[fleetItems].owner === logic.currentPlayer) {
+                    hasActive = true;
+                    fleetList = planetObj.stationedFleets;
+                    break;
                 }
-
-                shipListing += '</ul>';
-                shipListing += '<div id="fleetDetails"></div>';
-
             }
-        } else {
-            if (forceDisplay) {
-                shipListing = '<div id="fleetControls">';
-                shipListing += '<span id="joinFleets">Join</span>';
-                shipListing += '<span id="nameFleet">Rename</span>';
-                shipListing += '<span id="splitFleet">Split</span>';
-                shipListing += '</div>';
-
-                shipListing += '<ul id="shipListing">';
-
-                var fleetItem = new Object();
-                var targetLocation = '';
-
-                var item = planetObj.foreignFleets.length;
-                while (item--) {
-                    fleetItem = planetObj.foreignFleets[item];
-                    if (fleetItem.owner === logic.currentPlayer) {     // TODO: MAke a check for the fleetId
-                        targetLocation = '';
-                        fleetItem = getFleetById(fleetItem);
-
-                        if (fleetItem.destination) {
-                            if (playerEnv.knownPlanets.indexOf(fleetItem.destination.id) === -1) {
-                                targetLocation = ' - travelling to planetObj at ' + Math.ceil(fleetItem.destination.x) + '-' + Math.ceil(fleetItem.destination.y) + ' (' + Math.floor(fleetItem.turns) + ' turns)';
-                            } else {
-                                targetLocation = ' - travelling to ' + fleetItem.destination.name + ' (' + Math.floor(fleetItem.turns) + ' turns)';
-                            }
-                        } else {
-                            targetLocation = '';
-                        }
-                        shipListing += '<li><a href="#" name="' + fleetItem.name + '|' + fleetItem.id + '" class="">' + fleetItem.name + targetLocation + '</a></li>';
+            
+            if (!hasActive) {
+                fleetList = [];
+                fleetItems = planetObj.foreignFleets.length;
+                while (fleetItems--) {
+                    if (planetObj.foreignFleets[fleetItems].owner === logic.currentPlayer) {
+                        fleetList.push( playerEnv.fleets[ planetObj.foreignFleets[fleetItems].idx ] );
                     }
-
                 }
-
-                shipListing += '</ul>';
             }
         }
+        
+        if (fleetList.length > 1 || forceDisplay) {
+            shipListing = '<div id="fleetControls">';
+            shipListing += '<span id="joinFleets">Join</span>';
+            shipListing += '<span id="nameFleet">Rename</span>';
+            shipListing += '<span id="splitFleet">Split</span>';
+            shipListing += '</div>';
 
+            shipListing += '<ul id="shipListing">';
+
+            var fleetItem = {};
+            var targetLocation = '';
+
+            var items = fleetList.length;
+            while (items--) {
+                fleetItem = fleetList[items];
+                if (fleetItem.destination) {
+                    targetLocation = '';
+                    if (playerEnv.knownPlanets.indexOf(fleetItem.destination.id) === -1) {
+                        targetLocation = ' - travelling to planet at ' + fleetItem.destination.x + '-' + fleetItem.destination.y + ' (' + Math.floor(fleetItem.turns) + ' turns)';
+                    } else {
+                        targetLocation = ' - travelling to ' + fleetItem.destination.name + ' (' + Math.floor(fleetItem.turns) + ' turns)';
+                    }
+                } else {
+                    targetLocation = '';
+                }
+
+                shipListing += '<li><a href="#" name="' + fleetItem.name + '|' + fleetItem.id + '" class="">' + fleetItem.name + targetLocation + '</a></li>';
+
+            }
+
+            shipListing += '</ul>';
+            shipListing += '<div id="fleetDetails"></div>';
+        }
+        
         if (options !== '' || shipListing !== '') {
             modal.innerHTML = shipListing + options;
             modal.style.display = 'inline';
@@ -1056,7 +1072,7 @@ function app() {
                     partedFleetTypes = [];
                     partedFleetCount = [];
 
-                    if (planetObj.owner === logic.currentPlayer || planetObj.foreignFleets.length === 0) {
+                    if (planetObj.owner === logic.currentPlayer && planetObj.foreignFleets.length === 0) {
                         for (var item = planetObj.stationedFleets.length - 1; item > -1; item--) {
                             if (evt.target.name.split('|')[1] === planetObj.stationedFleets[item].id) {
                                 targetFleet = planetObj.stationedFleets[item];
@@ -1065,11 +1081,22 @@ function app() {
                             }
                         }
                     } else {
-                        for (var item = planetObj.foreignFleets.length - 1; item > -1; item--) {
-                            if (evt.target.name.split('|')[1] === planetObj.foreignFleets[item].id) {
-                                targetFleet = getFleetById(evt.target.name.split('|')[1]);
-                                createSelection(planetObj.foreignFleets[item]);
+                        var hasActive = false;
+                        for (var item = planetObj.stationedFleets.length - 1; item > -1; item--) {
+                            if (evt.target.name.split('|')[1] === planetObj.stationedFleets[item].id) {
+                                hasActive = true;
+                                targetFleet = planetObj.stationedFleets[item];
+                                createSelection(planetObj.stationedFleets[item]);
                                 break;
+                            }
+                        }
+                        if (!hasActive) {
+                            for (var item = planetObj.foreignFleets.length - 1; item > -1; item--) {
+                                if (evt.target.name === planetObj.foreignFleets[item].id) {
+                                    targetFleet = playerEnv.fleets[ planetObj.foreignFleets[item].idx ];
+                                    createSelection(planetObj.foreignFleets[item].idx);
+                                    break;
+                                }
                             }
                         }
                     }
@@ -1449,6 +1476,7 @@ function app() {
                     this.parentNode.removeChild(this);
 
                     playerEnv.ownedPlanets.push(planetObj.id);
+                    playerEnv.knownPlanets.splice( playerEnv.knownPlanets.indexOf(planetObj.id), 1);
                     planetObj.population[0] = activeModule.value;
                     planetObj.workForce = [activeModule.value, activeModule.value, 0, 0, 0];
 
@@ -1462,14 +1490,12 @@ function app() {
                      }
                      */
 
-                    //TODO:START HERE
                     if (activeModule.list === "stationed") {
                         var colonizeFleet = planetObj.stationedFleets[ activeModule.fleet ];
                     } else {
-                        var colonizeFleet = planetObj.foreignFleets[ activeModule.fleet ];
+                        var colonizeFleet = playerEnv.fleets[ activeModule.fleet ];
                     }
-
-
+                    
                     // Decrease count of design
                     for (var design = playerEnv.designs.length - 1; design > -1; design--) {
                         if (colonizeFleet.ships[ activeModule.ship ].design === playerEnv.designs[design].name) {
@@ -1491,7 +1517,8 @@ function app() {
                             planetObj.foreignFleets.splice(colonizeFleet, 1);
                         }
                         playerEnv.activeSelection = false;
-
+                        
+                        //TODO: Switch stationed into foreignFleets
                         if (activeModule.list === "stationed") {
                             if (!isVisible && planetObj.stationedFleets.length !== 0) {
                                 planetObj.stationedFleets[0].hideDrawing = false;
@@ -1509,7 +1536,12 @@ function app() {
                         }
                     }
 
-                    planetObj.name = nameField.value;
+                    if (nameField.value === "") {
+                        planetObj.name = planetObj.displayName;
+                    } else {
+                        planetObj.name = nameField.value;
+                    }
+                    
                     planetObj.owner = logic.currentPlayer;
                     modal.style.display = 'none';
                     discoverPlanets(planetObj.x, planetObj.y, 150, planetObj);
@@ -2189,6 +2221,7 @@ function app() {
                             foreignFleet.y = targetFleet.y;
                             foreignFleet.id = targetFleet.id;
                             foreignFleet.owner = targetFleet.owner;
+                            foreignFleet.idx = playerEnv.fleets.indexOf(targetFleet);
                             targetFleet.origin.foreignFleets.push(foreignFleet);
                         }
                     } else {
@@ -2329,6 +2362,7 @@ function app() {
                     foreignFleet.y = targetFleet.y;
                     foreignFleet.id = targetFleet.id;
                     foreignFleet.owner = targetFleet.owner;
+                    foreignFleet.idx = logic.environments[targetFleet.owner].fleets.indexOf(targetFleet);
                     playerEnv.foreignFleets.push(foreignFleet);
                     removeFromPlayer = false;
                     break;
@@ -2366,6 +2400,7 @@ function app() {
         var planetObj = new Object();
         var discoveredPlanets = [];
         var items = logic.planets.length;
+        var targetFleet = new Object();
         while (items--) {
             planetObj = logic.planets[items];
 
@@ -2383,12 +2418,13 @@ function app() {
                     // TODO: Logic creates foreign fleets objects, passing to player
                     if (planetObj.stationedFleets.length !== 0) {
                         for (var x = planetObj.stationedFleets.length - 1; x > -1; x--) {
-                            fleet = planetObj.stationedFleets[x];
+                            targetFleet = planetObj.stationedFleets[x];
                             foreignFleet = new Object();
-                            foreignFleet.x = fleet.x;
-                            foreignFleet.y = fleet.y;
-                            foreignFleet.id = fleet.id;
-                            foreignFleet.owner = fleet.owner;
+                            foreignFleet.x = targetFleet.x;
+                            foreignFleet.y = targetFleet.y;
+                            foreignFleet.id = targetFleet.id;
+                            foreignFleet.owner = targetFleet.owner;
+                            foreignFleet.idx = logic.environments[targetFleet.owner].fleets.indexOf(targetFleet);
                             playerEnv.foreignFleets.push(foreignFleet);
                         }
                     }
@@ -2422,9 +2458,9 @@ function app() {
                 item = discoveredPlanets[items];
                 link1 = '';
                 if (item[1].type === 'fleet') {
-                    link1 = createLink("Fleet", item[1].name, item[1].type + ' ' + item[1].name);
+                    link1 = createLink('fleet', item[1].name, 'Fleet ' + item[1].name);
                 } else {
-                    link1 = createLink("Planet", item[1].id, item[1].type + ' ' + item[1].name);
+                    link1 = createLink('planet', item[1].id, 'Planet ' + item[1].name);
                 }
                 link2 = createLink('planet', item[2], 'planet in ' + item[0] + ' units');
                 report(link1 + ' discovered a ' + link2 + ' away.');
@@ -2550,18 +2586,23 @@ function app() {
 
         if (player === planet.owner || planet.owner === -1) {
             planet.stationedFleets.push(fleet);
-        } else {
+        }
+        // TODO: Do we need this case really?
+        /*
+        else {
             var foreignFleet = new Object();
             foreignFleet.x = fleet.x + 20;
             foreignFleet.y = fleet.y - 10;
             foreignFleet.id = fleet.id;
             foreignFleet.owner = fleet.owner;
+            foreignFleet.idx = playerEnv.fleets.indexOf(fleet);
             planet.foreignFleets.push(foreignFleet);
 
             fleet.hideDrawing = true;
             fleet.x = foreignFleet.x;
             fleet.y = foreignFleet.y;
         }
+        */
 
         playerEnv.fleets.push(fleet);
         logic.fleets.push(fleet);
@@ -4279,7 +4320,7 @@ function app() {
             delete animationsLoading;
             delete loadInProgress;
 
-            genGalaxy(45);
+            genGalaxy(40);
             bindHandlers();
             gameInterval = setInterval(mainloop, 50);
         }
