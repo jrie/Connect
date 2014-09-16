@@ -3578,7 +3578,7 @@ function app() {
             if (planet.owner === logic.currentPlayer) {
                 planetInfo += '<br/><p><span>Current population</span>' + planet.population[0].toFixed(2) + ' of ' + planet.population[1].toFixed(2) + '</p>';
                 planetInfo += '<br/><h5>Workforce</h5>';
-                planetInfo += '<p><span>Assigned workforce</span>' + planet.workForce[1] + ' of ' + planet.workForce[0] + '<br/>';
+                planetInfo += '<p><span>Assigned workforce</span>' + (planet.workForce[0] - planet.workForce[1]) + ' of ' + planet.workForce[0] + '<br/>';
                 planetInfo += '<br/><span>Agriculture</span>' + planet.workForce[2];
                 planetInfo += '<br/><span>Construction</span>' + planet.workForce[3];
                 planetInfo += '<br/><span>Research</span>' + planet.workForce[4];
@@ -3623,7 +3623,7 @@ function app() {
         
         
         function sortSize(p1, p2) {
-            if (p1[2] < p2[2]) {
+            if (p1[2] > p2[2]) {
                 return true;
             }
 
