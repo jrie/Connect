@@ -10,6 +10,8 @@ Production is working as is and also basic fleet management, renaming/splitting/
 
 But the general idea was to move slightly away from Moo2 and add other details alike manageable trade routes between planets or systems, galaxie generation in formations or other cool stuff. But thats far away as other basic features are missing at the moment and also the variant to play in multiplayer mode using a server and client solution which also would require to separate the present codebase between logic and player environments.
 
+Note: This help, somehow more (updated) can also be found in the game!
+
 A very brief instruction about the controls:
 - Pressing "T" advances the turn
 - Pressing "Turn" in the main panel opens and closes the turn log which contains a history of discoveries, fleet arrivals, constructions and such
