@@ -1873,7 +1873,11 @@ function app() {
             }
 
         } else if (selection.type === 'planet') {
-            info = 'Planet ' + selection.name;
+            if (selection.hasAttribute("name")) {
+                info = 'Planet ' + selection.name;
+            } else {
+                info = 'Planet ' + selection.displayName;
+            }
         }
 
         statusBar.innerHTML = '<h5>' + info + '</h5>';
@@ -2615,8 +2619,8 @@ function app() {
         var planetNames = logic.planetNames.length;
 
         for (var step = 0; step < count; step++) {
-            var x = Math.floor(Math.random() * (gameArea.width * 0.85) + 20);
-            var y = Math.floor(Math.random() * (gameArea.height * 0.85) + 20);
+            var x = Math.floor(Math.random() * (gameArea.width * 1.25) + 20);
+            var y = Math.floor(Math.random() * (gameArea.height * 1.25) + 20);
             var size = Math.ceil((Math.random() * 8) + 7);
 
             var planet = new Object;
