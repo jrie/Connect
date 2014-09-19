@@ -2252,8 +2252,13 @@ function app() {
                 }
 
                 // Detection for fleet during movement in scanAreas
-                updateScanAreas(targetFleet);
+                //updateScanAreas(targetFleet);
             }
+            
+            // Update the fleet detection, even if this fleet is not moving, because we need to
+            // update the scanAreas if the player fleets scanArea detection is going out of this particular fleet
+            // making it hidden for the player
+            updateScanAreas(targetFleet);
         }
 
         gameArea.focus();
