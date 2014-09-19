@@ -1873,7 +1873,7 @@ function app() {
             }
 
         } else if (selection.type === 'planet') {
-            info = 'Planet ' + selection.name;
+            info = 'Planet ' + selection.displayName;
         }
 
         statusBar.innerHTML = '<h5>' + info + '</h5>';
@@ -2118,6 +2118,7 @@ function app() {
 
                         if (planetObj.stationedFleets.length !== 0) {
                             planetObj.stationedFleets[0].hideDrawing = false;
+                            updateScanAreas(planetObj.stationedFleets[0]);
                         }
                     } else {
                         var isStationed = false;
@@ -2126,6 +2127,10 @@ function app() {
                             if (targetFleet.id === planetObj.stationedFleets[stationedFleets].id) {
                                 planetObj.stationedFleets.splice(stationedFleets, 1);
                                 isStationed = true;
+                                if (planetObj.stationedFleets.length !== 0) {
+                                    planetObj.stationedFleets[0].hideDrawing = false;
+                                }
+                                updateScanAreas(planetObj.stationedFleets[0]);
                                 break;
                             }
                         }
@@ -2160,8 +2165,19 @@ function app() {
                 if (targetFleet.turns <= 0) {
                     var playerEnv = logic.environments[targetFleet.owner];
 
+                    // Remove the unknown planet from player env
+                    playerEnv.unknownPlanets.splice(playerEnv.unknownPlanets.indexOf(targetFleet.destination.id), 1);
+                    playerEnv.planets.splice(playerEnv.planets.indexOf(targetFleet.destination), 1);
+
+                    // TODO: This is the place to hook the logic request in!
+                    targetFleet.destination = logic.planets[targetFleet.destination.id];
+
+                    // Pass the detailed planet after discovery to the player
+                    playerEnv.planets.push(targetFleet.destination);
+
                     targetFleet.x = targetFleet.destination.x - (targetFleet.destination.size + 5);
                     targetFleet.y = targetFleet.destination.y - (targetFleet.destination.size + 5);
+                    lg(targetFleet.destination);
 
                     targetFleet.origin = targetFleet.destination;
                     targetFleet.destination = false;
@@ -2231,11 +2247,9 @@ function app() {
                         playerEnv.knownPlanets.push(targetFleet.origin.id);
 
                         var planets = playerEnv.unknownPlanets.length;
-                        while (planets--) {
-                            if (targetFleet.origin.id === playerEnv.unknownPlanets[planets]) {
-                                playerEnv.unknownPlanets.splice(planets, 1);
-                                break;
-                            }
+                        var planetIndex = playerEnv.unknownPlanets.indexOf(targetFleet.origin.id);
+                        if (planetIndex !== -1) {
+                            playerEnv.unknownPlanets.splice(planets, 1);
                         }
 
                         discoverPlanets(targetFleet.origin.x, targetFleet.origin.y, 150 / 1.3, targetFleet);
@@ -2337,6 +2351,8 @@ function app() {
                             removeFromPlayer = false;
                             playerEnv.foreignFleets[item].x = targetFleet.x;
                             playerEnv.foreignFleets[item].y = targetFleet.y;
+                            playerEnv.foreignFleets[item].hideDrawing = false;
+                            lg(playerEnv.foreignFleets[item]);
                             break;
                         }
                     }
@@ -2390,6 +2406,7 @@ function app() {
         var discoveredPlanets = [];
         var items = logic.planets.length;
         var targetFleet = new Object();
+        var foreignFleet = new Object();
         while (items--) {
             planetObj = logic.planets[items];
 
@@ -2399,7 +2416,16 @@ function app() {
                     distanceY = Math.abs(cordY - planetObj.y);
                     distance = Math.ceil(Math.sqrt(Math.pow(distanceX, 2) + Math.pow(distanceY, 2)));
 
-                    playerEnv.planets.push(planetObj);
+                    var unknownPlanet = new Object();
+                    unknownPlanet.displayName = planetObj.displayName;
+                    unknownPlanet.x = planetObj.x;
+                    unknownPlanet.y = planetObj.y;
+                    unknownPlanet.type = planetObj.type;
+                    unknownPlanet.id = planetObj.id;
+                    unknownPlanet.owner = planetObj.owner;
+                    unknownPlanet.size = planetObj.size;
+
+                    playerEnv.planets.push(unknownPlanet);
                     playerEnv.unknownPlanets.push(planetObj.id);
 
                     discoveredPlanets.push([distance, obj, planetObj.id]);
@@ -2615,8 +2641,8 @@ function app() {
         var planetNames = logic.planetNames.length;
 
         for (var step = 0; step < count; step++) {
-            var x = Math.floor(Math.random() * (gameArea.width * 0.85) + 20);
-            var y = Math.floor(Math.random() * (gameArea.height * 0.85) + 20);
+            var x = Math.floor(Math.random() * (gameArea.width * 1.25) + 20);
+            var y = Math.floor(Math.random() * (gameArea.height * 1.25) + 20);
             var size = Math.ceil((Math.random() * 8) + 7);
 
             var planet = new Object;
