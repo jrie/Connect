@@ -2114,7 +2114,7 @@ function app() {
             targetFleet = logic.fleets[items];
 
             if (targetFleet.needsMove) {
-
+                
                 if (targetFleet.location === 'planet') {
                     planetObj = targetFleet.origin;
                     if (planetObj.foreignFleets.length === 0) {
@@ -2250,10 +2250,13 @@ function app() {
                     var link2 = createLink('planet', targetFleet.origin.id, targetFleet.origin.name);
                     report(link1 + ' arrived at destination ' + link2);
                 }
-
+                
                 // Detection for fleet during movement in scanAreas
-                updateScanAreas(targetFleet);
+                //updateScanAreas(targetFleet);
             }
+            
+            // Detection for fleet (during movement= in scanAreas
+            updateScanAreas(targetFleet);
         }
 
         gameArea.focus();
@@ -2359,8 +2362,18 @@ function app() {
                     playerEnv.foreignFleets.push(foreignFleet);
                     removeFromPlayer = false;
                     break;
+                    
+                } else {
+                    var item = playerEnv.foreignFleets.length;
+                    while (item--) {
+                        if (targetFleet.id === playerEnv.foreignFleets[item].id) {
+                            removeFromPlayer = true;
+                            break;
+                        }
+                    }
                 }
             }
+            
 
             // if removeFromPlayer, we can safely remove the ship from the foreignfleets list
             if (removeFromPlayer) {
