@@ -2619,8 +2619,8 @@ function app() {
         var planetNames = logic.planetNames.length;
 
         for (var step = 0; step < count; step++) {
-            var x = Math.floor(Math.random() * (gameArea.width * 1.25) + 20);
-            var y = Math.floor(Math.random() * (gameArea.height * 1.25) + 20);
+            var x = Math.floor(Math.random() * (gameArea.width * 0.85) + 20);
+            var y = Math.floor(Math.random() * (gameArea.height * 0.85) + 20);
             var size = Math.ceil((Math.random() * 8) + 7);
 
             var planet = new Object;
@@ -4252,7 +4252,7 @@ function app() {
                 logic.planetNames = fileLoader.responseText.split('\n', 2)[1].split("|");
                 loadInProgress = false;
             }
-        }
+        };
         fileLoader.open("GET", "logic/planetnames.txt");
         fileLoader.send();
     }
