@@ -1491,8 +1491,15 @@ function app() {
 
                         // Remove fleet
                         playerEnv.fleets.splice(activeModule.fleet, 1);
+                        
                         if (playerEnv.moduleEffects.isForeign) {
                             planetObj.foreignFleets.splice(activeModule.foreignId, 1);
+                        } else {
+                            if (planetObj.stationedFleets.length === 1) {
+                                planetObj.stationedFleets.splice(0, 1);
+                            } else {
+                                planetObj.stationedFleets.splice( planetObj.stationedFleets.indexOf(colonizeFleet) );
+                            }
                         }
 
                         playerEnv.activeSelection = false;
@@ -2242,7 +2249,7 @@ function app() {
                             }
                         }
 
-                        discoverPlanets(targetFleet.origin.x, targetFleet.origin.y, 150 / 1.3, targetFleet);
+                        discoverPlanets(targetFleet.origin.x, targetFleet.origin.y, 110, targetFleet);
                     }
 
 
@@ -2525,8 +2532,8 @@ function app() {
                 playerEnv.fleets.push(fleet);
                 logic.fleets.push(fleet);
 
-                playerEnv.scanAreas.push([110, fleet.origin.x, fleet.origin.y]);
-                logic.scanAreas[planet.owner].push([110, fleet.origin.x, fleet.origin.y]);
+                playerEnv.scanAreas.push([120, fleet.origin.x, fleet.origin.y]);
+                logic.scanAreas[planet.owner].push([120, fleet.origin.x, fleet.origin.y]);
                 fleet.scanArea = playerEnv.scanAreas.length - 1;
             } else {
                 planet.stationedFleets[0].ships.push(ship);
@@ -2622,13 +2629,33 @@ function app() {
     function genGalaxy(count) {
         var random = 0;
         var planetNames = logic.planetNames.length;
-
+        var x = 0;
+        var y = 0;
+        var size = 0;
+        var planet = new Object();
+        
+        var type = "procedural";
+        var yOff = 0;
+        y = 0;
+        
+        var availablePlanets = [];
+        
         for (var step = 0; step < count; step++) {
-            var x = Math.floor(Math.random() * (gameArea.width * 0.85) + 20);
-            var y = Math.floor(Math.random() * (gameArea.height * 0.85) + 20);
-            var size = Math.ceil((Math.random() * 8) + 7);
+            if  (type === "random" || type === "") {
+                x = Math.floor(Math.random() * (gameArea.width * 0.85) + 20);
+                y = Math.floor(Math.random() * (gameArea.height * 0.85) + 20);
+            } else if (type === "procedural" ) {
+                if ((step % 8) === 0) {
+                    yOff += 110;
+                    x = 0;
+                }
+                x += 70 + Math.floor(Math.random() * 125);
+                y = yOff + ((Math.floor(Math.random() * 70) - Math.floor(Math.random() * 70)));
+            }
+            
+            size = Math.ceil((Math.random() * 8) + 7);
 
-            var planet = new Object;
+            planet = new Object;
             planet.x = x;
             planet.y = y;
             planet.size = 12;
@@ -2667,58 +2694,51 @@ function app() {
             planet.foreignFleets = []; // TODO: work on planet.foreignFleets when moving to fleets to any location upon arrival
 
             logic.planets.push(planet);
-
-            if (step < logic.players) {
-                var env = logic.environments[step];
-                env.ownedPlanets = [step];
-                env.knownPlanets = [];
-                env.unknownPlanets = [];
-                env.planets.push(planet);
-
-                env.offsetX = -(planet.x - gameArea.width / 2);
-                env.offsetY = -(planet.y - gameArea.height / 2);
-
-                planet.population = [4, size];
-                planet.constructions = ['Factory Complex', 'Farm Complex'];
-                planet.workForce = [4, 0, 1, 2, 1];
-                planet.owner = step;
-
-                logic.scanAreas.push([]);
-                var researchPoints = planet.workForce[4] * env.workers["research"];
-                env.research.planets.push(researchPoints);
-                env.research.points = researchPoints;
-
-                createShip(planet, 'Wayfinder', false);
-                createShip(planet, 'Colony Design', false);
-                /*
-                 createShip(planet, 'Wayfinder', false);
-                 createShip(planet, 'Wayfinder', false);
-                 createShip(planet, 'Colony Design', false);
-                 createShip(planet, 'Retriever', false);
-                 createShip(planet, 'Retriever', false);
-                 createShip(planet, 'Colony Design', false);
-                 createShip(planet, 'Retriever', false);
-                 createShip(planet, 'Retriever', false);
-                 createShip(planet, 'Colony Design', false);
-                 */
-            }
-
+            availablePlanets.push(planet.id);
         }
-
+        
+        var playerPlanet = new Object();
+        var planetIndex = 0;
+        var randomIndex = 0;
         for (var player = 0; player < logic.players; player++) {
             var playerEnv = logic.environments[player];
-            var planetObj = playerEnv.planets[0];
+            randomIndex = Math.ceil(Math.random() * (availablePlanets.length - 1));
+            
+            planetIndex = availablePlanets[ randomIndex ];
+            availablePlanets.splice(randomIndex, 1);
+            planet = logic.planets[ planetIndex ];
+            planet.owner = player;           
+            
+            playerEnv.ownedPlanets = [planetIndex];
+            playerEnv.knownPlanets = [];
+            playerEnv.unknownPlanets = [];
+            playerEnv.planets.push(planet);
 
-            playerEnv.scanAreas.push([150, planetObj.x, planetObj.y]);
+            playerEnv.offsetX = -(planet.x - gameArea.width / 2);
+            playerEnv.offsetY = -(planet.y - gameArea.height / 2);
 
-            logic.scanAreas[player].push([150, planetObj.x, planetObj.y]);
-            var key = logic.terrains[planetObj.terrain][3];
+            planet.population = [4, size];
+            planet.constructions = ['Factory Complex', 'Farm Complex'];
+            planet.workForce = [4, 0, 1, 2, 1];
+
+            logic.scanAreas.push([]);
+            var researchPoints = planet.workForce[4] * playerEnv.workers["research"];
+            playerEnv.research.planets.push(researchPoints);
+            playerEnv.research.points = researchPoints;
+            createShip(planet, 'Wayfinder', false);
+            createShip(planet, 'Colony Design', false);
+            
+            playerEnv.scanAreas.push([160, planet.x, planet.y]);
+
+            logic.scanAreas[player].push([160, planet.x, planet.y]);
+            var key = logic.terrains[planet.terrain][3];
 
             if (!playerEnv.activeAnimations.hasOwnProperty(key)) {
                 playerEnv.activeAnimations[key] = [];
             }
-            playerEnv.activeAnimations[key].push([planetObj.x, planetObj.y]);
-            discoverPlanets(planetObj.x, planetObj.y, 150, planetObj);
+            
+            playerEnv.activeAnimations[key].push([planet.x, planet.y]);
+            discoverPlanets(planet.x, planet.y, 150, planet);
         }
 
         // TODO: Remove the global usage of env variable at some stage
@@ -2863,11 +2883,12 @@ function app() {
         gameScreen.beginPath();
 
         var items = playerEnv.scanAreas.length;
+        var scanAreas = playerEnv.scanAreas;
         while (items--) {
-            scanX = playerEnv.scanAreas[items][1] + playerEnv.offsetX;
-            scanY = playerEnv.scanAreas[items][2] + playerEnv.offsetY;
+            scanX = scanAreas[items][1] + playerEnv.offsetX;
+            scanY = scanAreas[items][2] + playerEnv.offsetY;
             gameScreen.moveTo(scanX, scanY);
-            gameScreen.arc(scanX, scanY, playerEnv.scanAreas[items][0], 0, 6.3);
+            gameScreen.arc(scanX, scanY, scanAreas[items][0], 0, 6.3);
         }
 
         gameScreen.closePath();
@@ -4168,7 +4189,6 @@ function app() {
 
             // Storeage holder for ship module effects
             env.moduleEffects = {
-                "own": false,
                 "planetIdx": 0,
                 "modules": []
             };
@@ -4274,7 +4294,7 @@ function app() {
         if (!animationsLoading && !loadInProgress) {
             clearInterval(loaderCheck);
 
-            genGalaxy(28);
+            genGalaxy(56);
             bindHandlers();
             gameInterval = setInterval(mainloop, 50);
         }
