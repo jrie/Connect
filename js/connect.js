@@ -1873,7 +1873,7 @@ function app() {
             }
 
         } else if (selection.type === 'planet') {
-            if (selection.hasAttribute("name")) {
+            if (selection.hasOwnProperty("name")) {
                 info = 'Planet ' + selection.name;
             } else {
                 info = 'Planet ' + selection.displayName;
