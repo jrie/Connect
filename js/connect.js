@@ -195,7 +195,7 @@ function app() {
                     destination.name = planetObj.displayName;
                 }
                 destination.size = planetObj.size;
-                
+
                 if (playerEnv.activeSelection.origin !== destination) {
                     if (!setDestination(playerEnv.activeSelection, destination)) {
                         createSelection(playerEnv.activeSelection);
@@ -1478,7 +1478,7 @@ function app() {
                     playerEnv.knownPlanets.splice(playerEnv.knownPlanets.indexOf(planetObj.id), 1);
                     planetObj.population[0] = activeModule.value;
                     planetObj.workForce = [activeModule.value, activeModule.value, 0, 0, 0];
-                    
+
 
                     // TODO: If greater then 1, place workforce in agriculture until food lvl is high enough
                     // then place into production, no research
@@ -2169,6 +2169,55 @@ function app() {
                         }
                     }
 
+                    if (planetObj.owner !== targetFleet.owner) {
+                        var playerEnv = logic.environments[targetFleet.owner];
+                        if (playerEnv.knownPlanets.indexOf(planetObj.id) !== -1) {
+                            var planetItems = playerEnv.planets.length;
+                            var planet = new Object();
+                            while (planetItems--) {
+                                if (playerEnv.planets[planetItems].id === planetObj.id) {
+                                    planet = playerEnv.planets[planetItems];
+                                    break;
+                                }
+                            }
+
+                            var deleteData = false;
+                            var hasFleetOnPlanet = false;
+                            var fleetItems = 0;
+
+                            if (planet.foreignFleets.length === 0) {
+                                if (planet.stationedFleets.length === 0) {
+                                    deleteData = true;
+                                }
+                            } else {
+
+                                fleetItems = planet.foreignFleets.length;
+                                while (fleetItems) {
+                                    if (planet.foreignFleets[fleetItems].owner === targetFleet.owner) {
+                                        hasFleetOnPlanet = true;
+                                        break;
+                                    }
+                                }
+                                if (!hasFleetOnPlanet) {
+                                    fleetItems = planet.stationedFleets.length;
+                                    while (fleetItems) {
+                                        if (planet.stationedFleets[fleetItems].owner === targetFleet.owner) {
+                                            hasFleetOnPlanet = true;
+                                            break;
+                                        }
+                                    }
+                                }
+
+                            }
+
+                            if (!hasFleetOnPlanet || deleteData) {
+                                // TODO: Push this updated planet to the player and overwrite existing one
+                                delete planet.stationedFleets;
+                                delete planet.foreignFleets;
+                            }
+                        }
+                    }
+
                     targetFleet.hideDrawing = false;
                     targetFleet.location = 'space';
                 }
@@ -2194,7 +2243,7 @@ function app() {
                     origin.y = targetFleet.destination.y;
                     origin.name = targetFleet.destination.name;
                     origin.size = targetFleet.destination.size;
-                    
+
                     targetFleet.origin = origin;
                     targetFleet.destination = false;
                     targetFleet.needsMove = false;
@@ -2215,7 +2264,8 @@ function app() {
                                 break;
                             }
                         }
-
+                        
+                        // TODO: Push planet from logic to player and provide some more information
                         var logicPlanet = logic.planets[targetFleet.origin.id];
                         knownPlanet.name = logicPlanet.name;
                         knownPlanet.stationedFleets = logicPlanet.stationedFleets;
@@ -2223,6 +2273,7 @@ function app() {
                         knownPlanet.ecologicalLevel = logicPlanet.ecologicalLevel;
                         knownPlanet.mineralLevel = logicPlanet.mineralLevel;
                         knownPlanet.population = logicPlanet.population;
+                        knownPlanet.population[0] = 0;
 
                         playerEnv.planets.push(knownPlanet);
                         playerEnv.knownPlanets.push(knownPlanet.id);
@@ -2625,7 +2676,7 @@ function app() {
         fleet.needsMove = false;
         fleet.hideDrawing = false;
         fleet.scanArea = -1;
-        
+
         fleet.origin.x = planet.x;
         fleet.origin.y = planet.y;
         fleet.origin.id = planet.id;
@@ -3695,10 +3746,7 @@ function app() {
                 planetInfo += '<p><span>Terrain</span>' + logic.terrains[planet.terrain][0] + '</p>';
                 planetInfo += '<p><span>Mineral richness</span>' + logic.mineralLevel[planet.mineralLevel][1] + '</p>';
                 planetInfo += '<p><span>Ecological diversity</span>' + logic.ecologicalLevel[planet.ecologicalLevel][1] + '</p>';
-
-                if (planet.owner === -1) {
-                    planetInfo += '<br/><p><span>Maximum population</span>' + planet.population[1].toFixed(2) + '</p>';
-                }
+                planetInfo += '<br/><p><span>Maximum population</span>' + planet.population[1].toFixed(2) + '</p>';
             }
 
             if (planet.owner === logic.currentPlayer) {
