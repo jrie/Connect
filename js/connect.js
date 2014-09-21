@@ -91,7 +91,7 @@ function app() {
         var items = playerEnv.fleets.length;
         var x = 0;
         var y = 0;
-        var foreignItems = 0;
+        var fleetObj = new Object();
 
         gameScreen.beginPath();
 
@@ -105,22 +105,9 @@ function app() {
 
             if (gameScreen.isPointInPath(evt.layerX, evt.layerY)) {
                 if (fleetObj.location !== 'space') {
-
-                    if (fleetObj.origin.foreignFleets.length === 0) {
-                        return fleetObj.origin.stationedFleets[0];
-                    } else {
-                        foreignItems = fleetObj.origin.foreignFleets.length;
-                        while (foreignItems--) {
-                            if (fleetObj.origin.foreignFleets[foreignItems].owner === playerEnv.player) {
-                                gameScreen.closePath();
-                                return playerEnv.fleets[ fleetObj.origin.foreignFleets[foreignItems].idx ];
-                            }
-                        }
-                    }
+                    gameScreen.closePath();
+                    return fleetObj;
                 }
-
-                gameScreen.closePath();
-                return fleetObj;
             }
         }
 
@@ -198,8 +185,19 @@ function app() {
         } else if (planetObj) {
 
             if (playerEnv.activeSelection.type === 'fleet' && playerEnv.activeSelection.location !== 'space') {
-                if (playerEnv.activeSelection.origin !== planetObj) {
-                    if (!setDestination(playerEnv.activeSelection, planetObj)) {
+                var destination = new Object();
+                destination.id = planetObj.id;
+                destination.x = planetObj.x;
+                destination.y = planetObj.y;
+                if (planetObj.hasOwnProperty("name")) {
+                    destination.name = planetObj.name;
+                } else {
+                    destination.name = planetObj.displayName;
+                }
+                destination.size = planetObj.size;
+                
+                if (playerEnv.activeSelection.origin !== destination) {
+                    if (!setDestination(playerEnv.activeSelection, destination)) {
                         createSelection(playerEnv.activeSelection);
                         return;
                     }
@@ -1883,6 +1881,7 @@ function app() {
 
 
     function updateSelectionInfo(selection) {
+        var playerEnv = logic.environments[logic.currentPlayer];
         var info = '';
         if (selection.type === 'fleet') {
             info = selection.type + ' ' + selection.name;
@@ -2138,7 +2137,7 @@ function app() {
             if (targetFleet.needsMove) {
 
                 if (targetFleet.location === 'planet') {
-                    planetObj = targetFleet.origin;
+                    planetObj = logic.planets[targetFleet.origin.id];
                     if (planetObj.foreignFleets.length === 0) {
                         planetObj.stationedFleets.splice(planetObj.stationedFleets.indexOf(targetFleet), 1);
 
@@ -2157,7 +2156,7 @@ function app() {
                         }
 
                         if (!isStationed) {
-                            fleetItems = targetFleet.origin.foreignFleets.length;
+                            fleetItems = planetObj.foreignFleets.length;
                             while (fleetItems--) {
                                 if (targetFleet.id === planetObj.foreignFleets[fleetItems].id) {
                                     planetObj.foreignFleets.splice(fleetItems, 1);
@@ -2189,7 +2188,14 @@ function app() {
                     targetFleet.x = targetFleet.destination.x - (targetFleet.destination.size + 5);
                     targetFleet.y = targetFleet.destination.y - (targetFleet.destination.size + 5);
 
-                    targetFleet.origin = targetFleet.destination;
+                    var origin = new Object();
+                    origin.id = targetFleet.destination.id;
+                    origin.x = targetFleet.destination.x;
+                    origin.y = targetFleet.destination.y;
+                    origin.name = targetFleet.destination.name;
+                    origin.size = targetFleet.destination.size;
+                    
+                    targetFleet.origin = origin;
                     targetFleet.destination = false;
                     targetFleet.needsMove = false;
                     targetFleet.turns = 0;
@@ -2230,13 +2236,14 @@ function app() {
                     logic.environments[targetFleet.owner].scanAreas[targetFleet.scanArea][2] = targetFleet.origin.y;
 
                     var isStationed = false;
-                    var stationedFleets = targetFleet.origin.stationedFleets.length;
+                    var fleetItems = logic.planets[targetFleet.origin.id].stationedFleets.length;
+                    var stationedFleets = logic.planets[targetFleet.origin.id].stationedFleets;
 
-                    if (stationedFleets === 0) {
+                    if (fleetItems === 0) {
                         isStationed = true;
                     } else {
-                        while (stationedFleets--) {
-                            if (targetFleet.origin.stationedFleets[stationedFleets].owner === targetFleet.owner) {
+                        while (fleetItems--) {
+                            if (stationedFleets[fleetItems].owner === targetFleet.owner) {
                                 isStationed = true;
                                 break;
                             }
@@ -2244,12 +2251,10 @@ function app() {
                     }
 
                     if (isStationed) {
-                        if (targetFleet.origin.stationedFleets.length !== 0) {
+                        if (stationedFleets.length !== 0) {
                             targetFleet.hideDrawing = true;
                         }
-
-                        targetFleet.origin.stationedFleets.push(targetFleet);
-
+                        logic.planets[targetFleet.origin.id].stationedFleets.push(targetFleet);
                     } else {
                         targetFleet.x += 20;
                         targetFleet.y -= 10;
@@ -2270,7 +2275,8 @@ function app() {
                          */
 
                         foreignFleet.idx = playerEnv.fleets.indexOf(targetFleet);
-                        targetFleet.origin.foreignFleets.push(foreignFleet);
+                        //targetFleet.origin.foreignFleets.push(foreignFleet);
+                        logic.planets[targetFleet.origin.id].foreignFleets.push(foreignFleet);
                     }
 
                     // Remove route item
@@ -2609,7 +2615,7 @@ function app() {
         var fleet = new Object();
         fleet.ships = [];
         fleet.count = 0;
-        fleet.origin = planet;
+        fleet.origin = new Object();
         fleet.location = 'planet';
         fleet.type = 'fleet';
         fleet.owner = player;
@@ -2619,6 +2625,10 @@ function app() {
         fleet.needsMove = false;
         fleet.hideDrawing = false;
         fleet.scanArea = -1;
+        
+        fleet.origin.x = planet.x;
+        fleet.origin.y = planet.y;
+        fleet.origin.id = planet.id;
 
         // Create hopefully unique id for fleets
         fleet.id = createFleetId(player);
