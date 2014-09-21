@@ -1462,10 +1462,25 @@ function app() {
 
                     this.parentNode.removeChild(this);
 
+                    // Update the player env with the logic planets version
+                    if (planetObj.owner !== -1) {
+                        return;
+                    }
+
+                    var planets = playerEnv.planets.length;
+                    while (planets--) {
+                        if (playerEnv.planets[planets].id === planetObj.id) {
+                            playerEnv.planets.splice(planets, 1);
+                            break;
+                        }
+                    }
+                    planetObj = logic.planets[planetObj.id];
+                    playerEnv.planets.push(planetObj);
                     playerEnv.ownedPlanets.push(planetObj.id);
                     playerEnv.knownPlanets.splice(playerEnv.knownPlanets.indexOf(planetObj.id), 1);
                     planetObj.population[0] = activeModule.value;
                     planetObj.workForce = [activeModule.value, activeModule.value, 0, 0, 0];
+                    
 
                     // TODO: If greater then 1, place workforce in agriculture until food lvl is high enough
                     // then place into production, no research
@@ -2181,8 +2196,6 @@ function app() {
                     targetFleet.location = 'planet';
 
                     if (playerEnv.unknownPlanets.indexOf(targetFleet.origin.id) !== -1) {
-                        playerEnv.knownPlanets.push(targetFleet.origin.id);
-
                         playerEnv.unknownPlanets.splice(playerEnv.unknownPlanets.indexOf(targetFleet.origin.id), 1);
 
                         var knownPlanet = new Object();
@@ -2203,6 +2216,7 @@ function app() {
                         knownPlanet.foreignFleets = logicPlanet.foreignFleets;
                         knownPlanet.ecologicalLevel = logicPlanet.ecologicalLevel;
                         knownPlanet.mineralLevel = logicPlanet.mineralLevel;
+                        knownPlanet.population = logicPlanet.population;
 
                         playerEnv.planets.push(knownPlanet);
                         playerEnv.knownPlanets.push(knownPlanet.id);
