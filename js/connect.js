@@ -1557,11 +1557,9 @@ function app() {
                     env.offsetY = -(logic.planets[logic.knownPlanets[0]].y - gameArea.height / 2);
                     break;
                 case 17:
-                    if (env.strg) {
-                        env.strg = false;
-                    }
+                    env.strg = false;
                     break;
-                case 9:
+                case 80:
                     if (modal.style.display === 'none') {
                         if (!env.strg) {
                             logic.currentPlayer++;
@@ -2184,7 +2182,6 @@ function app() {
                             var deleteData = false;
                             var hasFleetOnPlanet = false;
                             var fleetItems = 0;
-
                             if (planet.foreignFleets.length === 0) {
                                 if (planet.stationedFleets.length === 0) {
                                     deleteData = true;
@@ -2264,7 +2261,7 @@ function app() {
                                 break;
                             }
                         }
-                        
+
                         // TODO: Push planet from logic to player and provide some more information
                         var logicPlanet = logic.planets[targetFleet.origin.id];
                         knownPlanet.name = logicPlanet.name;
@@ -3928,7 +3925,7 @@ function app() {
         helpScreen += '- Pressing "Turn" in the main panel opens or closes the turn log which contains a history of discoveries, fleet arrivals, constructions and such<br/><br/>';
         helpScreen += '- Holding down the control/Strg key and the left mouse button in the game window while moving the mouse will move the galaxy<br/><br/>';
         helpScreen += '- Pressing control/Strg while clicking on fleet will open the fleet basic dialog - its by default hidden when there is only one fleet<br/><br/>';
-        helpScreen += '- The current player can be switched using Shift + Tab key<br/><br/>';
+        helpScreen += '- The current player can be switched by pressing the "p" key<br/><br/>';
         helpScreen += '- Pressing "Research" opens the research panel, for now this only has basic function and adding research results has to be implemented.<br/><br/>';
         helpScreen += '- The fleet overview can be opened by pressing "Fleets" - selecting a design name (bottom) will show its details<br/><br/>';
         helpScreen += '- The log window can be resized by pressing and moving on the very left, clicking "Turn" hides the logwindow<br/><br/>';
