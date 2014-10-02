@@ -5,6 +5,8 @@ var env = {};
 var animationsLoading = true;
 var loadInProgress = true;
 
+window.requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame || window.oRequestAnimationFrame;
+
 function app() {
 
 
@@ -2902,9 +2904,10 @@ function app() {
         var offsetX = 0;
         var offX = 0;
         var offY = 0;
-        var size = 0;
         var items = 0;
         var activeAnimationItems = [];
+        var pOffsetX = playerEnv.offsetX;
+        var pOffsetY = playerEnv.offsetY;
 
         while (keyItems--) {
             key = keys[keyItems];
@@ -2938,8 +2941,8 @@ function app() {
             offX = animProps["offX"];
             offY = animProps["offY"];
             while (items--) {
-                x = (activeAnimationItems[items][0] + playerEnv.offsetX) - offX;
-                y = (activeAnimationItems[items][1] + playerEnv.offsetY) - offY;
+                x = (activeAnimationItems[items][0] + pOffsetX) - offX;
+                y = (activeAnimationItems[items][1] + pOffsetY) - offY;
                 gameScreen.save();
                 gameScreen.beginPath();
                 gameScreen.rect(x, y, animProps["x"], animProps["y"]);
@@ -3019,12 +3022,8 @@ function app() {
         }
 
         mainloopCalculating = false;
+        window.requestAnimationFrame(mainloop);
     }
-
-    function drawSingleFrame() {
-        mainloop();
-    }
-
 
 
 
@@ -4364,13 +4363,13 @@ function app() {
 
     //createAnimation(imgUrl, xWidth, xFrameSize, yFrameSize,  duration, stepX, returnLoaded, lastX, useSet, setX, setY) {
 
-    createAnimation("img/terrain0.png", 176, 26, 25, 50, 30, false, false, false, false, false);
-    createAnimation("img/terrain1.png", 176, 26, 25, 50, 30, false, false, false, false, false);
-    createAnimation("img/terrain2.png", 176, 26, 25, 50, 30, false, false, false, false, false);
-    createAnimation("img/terrain3.png", 176, 26, 25, 50, 30, false, false, false, false, false);
-    createAnimation("img/terrain4.png", 176, 26, 25, 50, 30, false, false, false, false, false);
-    createAnimation("img/terrain5.png", 176, 26, 25, 50, 30, false, false, false, false, false);
-    createAnimation("img/stars1.png", 3860, 800, 600, 3, 0.4, true, 3160, true, 0, 0);
+    createAnimation("img/terrain0.png", 176, 26, 25, 75, 30, false, false, false, false, false);
+    createAnimation("img/terrain1.png", 176, 26, 25, 75, 30, false, false, false, false, false);
+    createAnimation("img/terrain2.png", 176, 26, 25, 75, 30, false, false, false, false, false);
+    createAnimation("img/terrain3.png", 176, 26, 25, 75, 30, false, false, false, false, false);
+    createAnimation("img/terrain4.png", 176, 26, 25, 75, 30, false, false, false, false, false);
+    createAnimation("img/terrain5.png", 176, 26, 25, 75, 30, false, false, false, false, false);
+    createAnimation("img/stars1.png", 3860, 800, 600, 6, 1, true, 3160, true, 0, 0);
 
 
     function loadPlanetNames() {
@@ -4400,7 +4399,8 @@ function app() {
             genGalaxy(56);
             //genGalaxy(3);
             bindHandlers();
-            gameInterval = setInterval(mainloop, 50);
+            //gameInterval = setInterval(mainloop, 50);
+            window.requestAnimationFrame(mainloop);
         }
     }
 
