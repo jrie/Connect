@@ -2252,9 +2252,12 @@ function app() {
                     if (playerEnv.unknownPlanets.indexOf(targetFleet.origin.id) !== -1) {
                         playerEnv.unknownPlanets.splice(playerEnv.unknownPlanets.indexOf(targetFleet.origin.id), 1);
 
-                        var knownPlanet = new Object();
+
 
                         // Removal of previous planet object of player and update with a more approperiate version
+                        var knownPlanet = new Object();
+                        var logicPlanet = logic.planets[targetFleet.origin.id];
+                        
                         var planetItems = playerEnv.planets.length;
                         while (planetItems--) {
                             if (targetFleet.origin.id === playerEnv.planets[planetItems].id) {
@@ -2265,7 +2268,8 @@ function app() {
                         }
 
                         // TODO: Push planet from logic to player and provide some more information
-                        var logicPlanet = logic.planets[targetFleet.origin.id];
+                        
+                        
                         knownPlanet.name = logicPlanet.name;
                         knownPlanet.stationedFleets = logicPlanet.stationedFleets;
                         knownPlanet.foreignFleets = logicPlanet.foreignFleets;
@@ -2278,6 +2282,26 @@ function app() {
                         playerEnv.knownPlanets.push(knownPlanet.id);
 
                         discoverPlanets(targetFleet.origin.x, targetFleet.origin.y, 110, targetFleet);
+                    } else if (playerEnv.knownPlanets.indexOf(targetFleet.origin.id) !== -1) {
+                        
+                        // Recreate scouted planet information
+                        var knownPlanet = new Object();
+                        var logicPlanet = logic.planets[targetFleet.origin.id];
+                        knownPlanet.name = logicPlanet.name;
+                        knownPlanet.stationedFleets = logicPlanet.stationedFleets;
+                        knownPlanet.foreignFleets = logicPlanet.foreignFleets;
+                        knownPlanet.ecologicalLevel = logicPlanet.ecologicalLevel;
+                        knownPlanet.mineralLevel = logicPlanet.mineralLevel;
+                        knownPlanet.population = logicPlanet.population;
+                        knownPlanet.population[0] = 0;
+
+                        var items = playerEnv.planets.length;
+                        while (items--) {
+                            if (playerEnv.planets[items].id === targetFleet.origin.id) {
+                                playerEnv.planets[items] = knownPlanet;
+                                break;
+                            }
+                        }
                     }
 
                     logic.scanAreas[targetFleet.owner][targetFleet.scanArea][1] = targetFleet.origin.x;
@@ -2802,7 +2826,6 @@ function app() {
             availablePlanets.push(planet.id);
         }
 
-        var playerPlanet = new Object();
         var planetIndex = 0;
         var randomIndex = 0;
         for (var player = 0; player < logic.players; player++) {
@@ -3946,7 +3969,7 @@ function app() {
     // ---------------------------------------------------------------------------------
 
     logic = new Object();		// var logic, var envs
-    envs = [];
+    var envs = [];
 
     logic.planets = [];
     logic.fleets = [];
