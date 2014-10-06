@@ -2281,6 +2281,7 @@ function app() {
                                 var planetItems = playerEnv.planets.length;
                                 while (planetItems--) {
                                     if (targetFleet.origin.id === playerEnv.planets[planetItems].id) {
+                                        playerEnv.unknownPlanets.splice(playerEnv.unknownPlanets.indexOf(targetFleet.origin.id), 1);
                                         playerEnv.planets.splice(planetItems, 1);
                                         break;
                                     }
