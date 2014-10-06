@@ -2135,6 +2135,7 @@ function app() {
         var fleetItems = 0;
         var planetObj = new Object();
         var items = 0;
+        var playerFleets = [];
         for (var player = 0; player < logic.players; player++) {
             var playerEnv = logic.environments[player];
             items = playerEnv.fleets.length;
@@ -2257,15 +2258,6 @@ function app() {
                             var knownPlanet = new Object();
                             var logicPlanet = logic.planets[targetFleet.origin.id];
 
-                            var planetItems = playerEnv.planets.length;
-                            while (planetItems--) {
-                                if (targetFleet.origin.id === playerEnv.planets[planetItems].id) {
-                                    knownPlanet = playerEnv.planets[planetItems];
-                                    playerEnv.planets.splice(planetItems, 1);
-                                    break;
-                                }
-                            }
-
                             // TODO: Push planet from logic to player and provide some more information
                             knownPlanet.displayName = logicPlanet.displayName;
                             knownPlanet.name = logicPlanet.name;
@@ -2283,6 +2275,14 @@ function app() {
                             knownPlanet.size = logicPlanet.size;
 
                             if (playerEnv.unknownPlanets.indexOf(targetFleet.origin.id) !== -1) {
+                                var planetItems = playerEnv.planets.length;
+                                while (planetItems--) {
+                                    if (targetFleet.origin.id === playerEnv.planets[planetItems].id) {
+                                        playerEnv.planets.splice(planetItems, 1);
+                                        break;
+                                    }
+                                }
+
                                 playerEnv.planets.push(knownPlanet);
                                 playerEnv.knownPlanets.push(knownPlanet.id);
                                 discoverPlanets(targetFleet.origin.x, targetFleet.origin.y, 110, targetFleet);
@@ -2730,7 +2730,7 @@ function app() {
          foreignFleet.owner = fleet.owner;
          foreignFleet.idx = playerEnv.fleets.indexOf(fleet);
          planet.foreignFleets.push(foreignFleet);
-
+         
          fleet.hideDrawing = true;
          fleet.x = foreignFleet.x;
          fleet.y = foreignFleet.y;
@@ -4320,14 +4320,14 @@ function app() {
              logic.ownedPlanets.push(env.ownedPlanets);
              logic.knownPlanets.push(env.knownPlanets);
              logic.unknownPlanets.push(env.unknownPlanets);
-
+             
              logic.workers.push(env.workers);
              logic.marines.push(env.marines);
              logic.research.push(env.research);
-
+             
              logic.techs.push(env.techs);
              logic.designs.push(env.designs);
-
+             
              logic.actions.push(env.actions);
              */
 
