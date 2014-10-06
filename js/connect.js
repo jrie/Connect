@@ -2770,11 +2770,11 @@ function app() {
                 y = Math.floor(Math.random() * (gameArea.height * 0.85) + 20);
             } else if (type === "procedural") {
                 if ((step % 8) === 0) {
-                    yOff += 110;
+                    yOff += 105;
                     x = 0;
                 }
-                x += 70 + Math.floor(Math.random() * 125);
-                y = yOff + ((Math.floor(Math.random() * 70) - Math.floor(Math.random() * 70)));
+                x += 75 + Math.floor(Math.random() * 125);
+                y = yOff + ((Math.floor(Math.random() * 65) - Math.floor(Math.random() * 65)));
             }
 
             size = Math.ceil((Math.random() * 8) + 7);
