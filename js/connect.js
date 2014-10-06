@@ -466,13 +466,13 @@ function app() {
         planetDetailScreen += '<div>';
         planetDetailScreen += '<h3>' + name + ' (' + planet.type + ')</h3>';
         planetDetailScreen += '<br><h5>Description<h5>';
-        planetDetailScreen += '<p>' + name + ' is a ' + logic.terrains[planet.terrain][0] + ' ' + planet.type + '.</p>';
+        planetDetailScreen += '<p>' + name + ' is a ' + env.terrains[planet.terrain][0] + ' ' + planet.type + '.</p>';
 
         planetDetailScreen += '<br><h4>Overview</h4>';
         planetDetailScreen += '<p>Location.. ' + planet.x + '/' + planet.y + '</p>';
-        planetDetailScreen += '<p>Terrain.. ' + logic.terrains[planet.terrain][0] + '</p>';
-        planetDetailScreen += '<p>Mineral richness.. ' + logic.mineralLevel[planet.mineralLevel][1] + '</p>';
-        planetDetailScreen += '<p>Ecological diversity.. ' + logic.ecologicalLevel[planet.ecologicalLevel][1] + '</p>';
+        planetDetailScreen += '<p>Terrain.. ' + env.terrains[planet.terrain][0] + '</p>';
+        planetDetailScreen += '<p>Mineral richness.. ' + env.mineralLevel[planet.mineralLevel][1] + '</p>';
+        planetDetailScreen += '<p>Ecological diversity.. ' + env.ecologicalLevel[planet.ecologicalLevel][1] + '</p>';
 
         if (playerEnv.ownedPlanets.indexOf(planet.id) !== -1) {
             planetDetailScreen += '<br/><p>Current population.. ' + planet.population[0].toFixed(2) + ' of ' + planet.population[1].toFixed(2) + '</p>';
@@ -723,11 +723,11 @@ function app() {
 
                             while (option--) {
                                 if (playerEnv.buildings[option][0] === evt.target.innerHTML) {
-                                    var items = logic.buildings.length;
+                                    var items = env.buildings.length;
                                     while (items--) {
-                                        if (logic.buildings[items][0] === playerEnv.buildings[option][0]) {
-                                            desc.innerHTML = '<p style="text-align:left; font-size:10px;">Construction cost: ' + logic.buildings[items][1] + '</p><br/>';
-                                            desc.innerHTML += logic.buildings[items][4];
+                                        if (env.buildings[items][0] === playerEnv.buildings[option][0]) {
+                                            desc.innerHTML = '<p style="text-align:left; font-size:10px;">Construction cost: ' + env.buildings[items][1] + '</p><br/>';
+                                            desc.innerHTML += env.buildings[items][4];
                                             return;
                                         }
                                     }
@@ -935,7 +935,7 @@ function app() {
             var fleetItems = planetObj.stationedFleets.length;
 
             while (fleetItems--) {
-                if (fleetList[fleetItems].owner === logic.currentPlayer) {
+                if (fleetList[fleetItems].owner === env.player) {
                     hasActive = true;
                     fleetList = planetObj.stationedFleets;
                     break;
@@ -946,7 +946,7 @@ function app() {
                 fleetList = [];
                 fleetItems = planetObj.foreignFleets.length;
                 while (fleetItems--) {
-                    if (planetObj.foreignFleets[fleetItems].owner === logic.currentPlayer) {
+                    if (planetObj.foreignFleets[fleetItems].owner === env.currentPlayer) {
                         fleetList.push(playerEnv.fleets[ planetObj.foreignFleets[fleetItems].idx ]);
                     }
                 }
@@ -1065,7 +1065,7 @@ function app() {
                     partedFleetTypes = [];
                     partedFleetCount = [];
 
-                    if (planetObj.owner === logic.currentPlayer && planetObj.foreignFleets.length === 0) {
+                    if (planetObj.owner === env.player && planetObj.foreignFleets.length === 0) {
                         for (var item = planetObj.stationedFleets.length - 1; item > -1; item--) {
                             if (evt.target.name.split('|')[1] === planetObj.stationedFleets[item].id) {
                                 targetFleet = planetObj.stationedFleets[item];
@@ -1300,7 +1300,7 @@ function app() {
 
                         var fleetName = document.getElementById('partedFleetName').value;
 
-                        createFleet(logic.currentPlayer, planetObj, newFleetList, fleetName);
+                        createFleet(env.player, planetObj, newFleetList, fleetName);
 
                         for (var x = 0; x < removeIndexes.length; x++) {
                             targetFleet.ships.splice(removeIndexes[x] - x, 1);
@@ -1480,6 +1480,8 @@ function app() {
                             break;
                         }
                     }
+
+                    // TODO: On colonize, logic pushes planet information to player, conflicts?
                     planetObj = logic.planets[planetObj.id];
                     playerEnv.planets.push(planetObj);
                     playerEnv.ownedPlanets.push(planetObj.id);
@@ -2273,6 +2275,7 @@ function app() {
                             knownPlanet.x = logicPlanet.x;
                             knownPlanet.y = logicPlanet.y;
                             knownPlanet.size = logicPlanet.size;
+                            knownPlanet.terrain = logicPlanet.terrain;
 
                             if (playerEnv.unknownPlanets.indexOf(targetFleet.origin.id) !== -1) {
                                 var planetItems = playerEnv.planets.length;
@@ -2730,7 +2733,7 @@ function app() {
          foreignFleet.owner = fleet.owner;
          foreignFleet.idx = playerEnv.fleets.indexOf(fleet);
          planet.foreignFleets.push(foreignFleet);
-         
+
          fleet.hideDrawing = true;
          fleet.x = foreignFleet.x;
          fleet.y = foreignFleet.y;
@@ -4244,6 +4247,10 @@ function app() {
             env.knownPlanets = [];
             env.unknownPlanets = [];
 
+            env.mineralLevel = logic.mineralLevel;
+            env.ecologicalLevel = logic.ecologicalLevel;
+            env.terrains = logic.terrains;
+
             env.fleets = [];
             env.designs = [];
             env.scanAreas = [];
@@ -4320,14 +4327,14 @@ function app() {
              logic.ownedPlanets.push(env.ownedPlanets);
              logic.knownPlanets.push(env.knownPlanets);
              logic.unknownPlanets.push(env.unknownPlanets);
-             
+
              logic.workers.push(env.workers);
              logic.marines.push(env.marines);
              logic.research.push(env.research);
-             
+
              logic.techs.push(env.techs);
              logic.designs.push(env.designs);
-             
+
              logic.actions.push(env.actions);
              */
 
