@@ -197,8 +197,7 @@ function app() {
                     destination.name = planetObj.displayName;
                 }
                 destination.size = planetObj.size;
-
-                if (playerEnv.activeSelection.origin !== destination) {
+                if (playerEnv.activeSelection.origin.id !== destination.id) {
                     if (!setDestination(playerEnv.activeSelection, destination)) {
                         createSelection(playerEnv.activeSelection);
                         return;
