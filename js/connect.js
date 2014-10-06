@@ -1867,6 +1867,7 @@ function app() {
 
             playerEnv.offsetX -= stepX;
             playerEnv.offsetY -= stepY;
+            
 
         }
         unbindHandlers();
@@ -3694,7 +3695,7 @@ function app() {
 
             while (elements--) {
                 items[elements].addEventListener("mouseover", function (evt) {
-                    if (document.getElementsByClassName("activeFilter").length === 0) {
+                    if (document.getElementsByClassName("active").length === 0) {
                         showPlanetDetails(logic.planets[ evt.target.getAttribute("name") ]);
                     }
                 });
@@ -3713,12 +3714,12 @@ function app() {
                         return;
                     }
 
-                    var selected = document.getElementsByClassName("activeFilter");
+                    var selected = document.getElementsByClassName("active");
                     if (selected.length !== 0) {
-                        selected[0].className = selected[0].className.replace("activeFilter", "");
+                        selected[0].className = selected[0].className.replace("active", "");
                     }
 
-                    evt.target.className += "activeFilter";
+                    evt.target.className += "active";
 
                     showPlanetDetails(planetObj);
                     scrollToLocation(planetObj, false);
