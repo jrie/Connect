@@ -277,6 +277,10 @@ function app() {
         var fleetIndexes = [];
         var foreignIndexes = [];
         var isForeignFleet = false;
+        
+        if(!planetObj.hasOwnProperty("foreignFleets")) {
+            return;
+        }
 
 
         if (planetObj.foreignFleets.length !== 0) {
@@ -2138,6 +2142,8 @@ function app() {
         var planetObj = new Object();
         var items = 0;
         var playerFleets = [];
+        var isStationed = false;
+        var stationedFleets = 0;
         for (var player = 0; player < logic.players; player++) {
             var playerEnv = logic.environments[player];
             items = playerEnv.fleets.length;
@@ -2155,8 +2161,8 @@ function app() {
                                 planetObj.stationedFleets[0].hideDrawing = false;
                             }
                         } else {
-                            var isStationed = false;
-                            var stationedFleets = planetObj.stationedFleets.length;
+                            isStationed = false;
+                            stationedFleets = planetObj.stationedFleets.length;
                             while (stationedFleets--) {
                                 if (targetFleet.id === planetObj.stationedFleets[stationedFleets].id) {
                                     planetObj.stationedFleets.splice(stationedFleets, 1);
@@ -2304,9 +2310,9 @@ function app() {
                         playerEnv.scanAreas[targetFleet.scanArea][1] = targetFleet.origin.x;
                         playerEnv.scanAreas[targetFleet.scanArea][2] = targetFleet.origin.y;
 
-                        var isStationed = false;
-                        var fleetItems = logic.planets[targetFleet.origin.id].stationedFleets.length;
-                        var stationedFleets = logic.planets[targetFleet.origin.id].stationedFleets;
+                        isStationed = false;
+                        fleetItems = logic.planets[targetFleet.origin.id].stationedFleets.length;
+                        stationedFleets = logic.planets[targetFleet.origin.id].stationedFleets;
 
                         if (fleetItems === 0) {
                             isStationed = true;
@@ -2440,30 +2446,28 @@ function app() {
             var scanArea = [0.0, 0.0, 0.0];
             var scanX = 0;
             var scanY = 0;
-
+            var items = 0;
             var area = playerEnv.scanAreas.length;
+            
             while (area--) {
                 scanArea = playerEnv.scanAreas[area];
-                scanX = scanArea[1];
-                scanY = scanArea[2];
-
                 gameScreen.beginPath();
-                gameScreen.arc(scanX, scanY, scanArea[0], 0, 6.3);
+                gameScreen.arc(scanArea[1], scanArea[2], scanArea[0], 0, 6.3);
                 gameScreen.closePath();
 
                 if (gameScreen.isPointInPath(targetX, targetY)) {
-                    var item = playerEnv.foreignFleets.length;
-                    while (item--) {
-                        if (targetFleet.id === playerEnv.foreignFleets[item].id) {
+                    items = playerEnv.foreignFleets.length;
+                    while (items--) {
+                        if (targetFleet.id === playerEnv.foreignFleets[items].id) {
                             isFleetIncluded = true;
                             removeFromPlayer = false;
 
                             if (targetFleet.location === 'space') {
-                                playerEnv.foreignFleets[item].hideDrawing = false;
+                                playerEnv.foreignFleets[items].hideDrawing = false;
                             }
 
-                            playerEnv.foreignFleets[item].x = targetFleet.x;
-                            playerEnv.foreignFleets[item].y = targetFleet.y;
+                            playerEnv.foreignFleets[items].x = targetFleet.x;
+                            playerEnv.foreignFleets[items].y = targetFleet.y;
                             break;
                         }
                     }
@@ -2487,10 +2491,10 @@ function app() {
 
             // if removeFromPlayer, we can safely remove the ship from the foreignfleets list
             if (removeFromPlayer) {
-                var item = playerEnv.foreignFleets.length;
-                while (item--) {
-                    if (targetFleet.id === playerEnv.foreignFleets[item].id) {
-                        playerEnv.foreignFleets.splice(item, 1);
+                items = playerEnv.foreignFleets.length;
+                while (items--) {
+                    if (targetFleet.id === playerEnv.foreignFleets[items].id) {
+                        playerEnv.foreignFleets.splice(items, 1);
                         break;
                     }
                 }
@@ -2767,18 +2771,18 @@ function app() {
 
         for (var step = 0; step < count; step++) {
             if (type === "random" || type === "") {
-                x = Math.floor(Math.random() * (gameArea.width * 0.85) + 20);
-                y = Math.floor(Math.random() * (gameArea.height * 0.85) + 20);
+                x = Math.ceil(Math.random() * (gameArea.width * 0.85) + 20);
+                y = Math.ceil(Math.random() * (gameArea.height * 0.85) + 20);
             } else if (type === "procedural") {
                 if ((step % 8) === 0) {
-                    yOff += 105;
+                    yOff += 120;
                     x = 0;
                 }
-                x += 75 + Math.floor(Math.random() * 125);
-                y = yOff + ((Math.floor(Math.random() * 65) - Math.floor(Math.random() * 65)));
+                x += 90 + Math.ceil(Math.random() * 135);
+                y = yOff + ((Math.ceil(Math.random() * 60) - Math.ceil(Math.random() * 60)));
             }
 
-            size = Math.ceil((Math.random() * 8) + 7);
+            size = Math.round((Math.random() * 8) + 7);
 
             planet = new Object;
             planet.x = x;
@@ -2788,7 +2792,7 @@ function app() {
             // Old planet naming
             // planet.name = 'planet ' + Math.ceil(x) + ' | ' + Math.ceil(y);
 
-            random = Math.ceil(Math.random() * (planetNames - 1));
+            random = Math.round(Math.random() * (planetNames - 1));
             planet.name = logic.planetNames[random];
             planet.displayName = planet.name;
             logic.planetNames.splice(random, 1);
@@ -2796,9 +2800,9 @@ function app() {
             planet.id = step;
             planet.owner = -1;
 
-            planet.terrain = Math.ceil(Math.random() * (logic.terrains.length - 1));
-            planet.mineralLevel = Math.ceil(Math.random() * logic.terrains[planet.terrain][1][1]);
-            planet.ecologicalLevel = Math.ceil(Math.random() * logic.terrains[planet.terrain][2][1]);
+            planet.terrain = Math.round(Math.random() * (logic.terrains.length-1));
+            planet.mineralLevel = Math.round(Math.random() * logic.terrains[planet.terrain][1][1]);
+            planet.ecologicalLevel = Math.round(Math.random() * logic.terrains[planet.terrain][2][1]);
 
             if (planet.mineralLevel < logic.terrains[planet.terrain][1][0]) {
                 planet.mineralLevel = logic.terrains[planet.terrain][1][0];
@@ -2828,7 +2832,7 @@ function app() {
         var randomIndex = 0;
         for (var player = 0; player < logic.players; player++) {
             var playerEnv = logic.environments[player];
-            randomIndex = Math.ceil(Math.random() * (availablePlanets.length - 1));
+            randomIndex = Math.round(Math.random() * (availablePlanets.length - 1));
 
             planetIndex = availablePlanets[ randomIndex ];
             availablePlanets.splice(randomIndex, 1);
@@ -2868,7 +2872,7 @@ function app() {
 
         for (var player = 0; player < logic.players; player++) {
             var playerEnv = logic.environments[player];
-            discoverPlanets(playerEnv.planets[0].x, playerEnv.planets[0].y, 150, playerEnv.planets[0]);
+            discoverPlanets(playerEnv.planets[0].x, playerEnv.planets[0].y, 160, playerEnv.planets[0]);
         }
 
         // TODO: Remove the global usage of env variable at some stage
@@ -4002,21 +4006,22 @@ function app() {
         ['Aquatic', [1, 2], [3, 3], "img/terrain2.png"],
         ['Barren', [2, 3], [1, 2], "img/terrain3.png"],
         ['Jungle', [2, 3], [2, 3], "img/terrain4.png"],
-        ['Vulcanic', [3, 3], [0, 1], "img/terrain5.png"]
+        ['Vulcanic', [3, 3], [0, 1], "img/terrain5.png"],
+        ['Artic', [1, 2], [0, 2], "img/terrain6.png"]
     ];
 
     logic.mineralLevel = [
-        [0, 'Very poor'],
-        [1, 'Poor'],
-        [2, 'Average'],
-        [3, 'Rich']
+        [0.25, 'Very poor'],
+        [0.75, 'Poor'],
+        [1.5, 'Average'],
+        [2.5, 'Rich']
     ];
 
     logic.ecologicalLevel = [
-        [0, 'Very poor'],
-        [1, 'Poor'],
-        [2, 'Average'],
-        [3, 'Rich']
+        [0.25, 'Very poor'],
+        [0.75, 'Poor'],
+        [1.5, 'Average'],
+        [2.5, 'Rich']
     ];
 
     // logic.shipClasses = [ [Type, Space, BaseCost, BaseStructure, BaseArmor, BaseMovement ] ]
@@ -4396,6 +4401,7 @@ function app() {
     createAnimation("img/terrain3.png", 176, 26, 25, 75, 30, false, false, false, false, false);
     createAnimation("img/terrain4.png", 176, 26, 25, 75, 30, false, false, false, false, false);
     createAnimation("img/terrain5.png", 176, 26, 25, 75, 30, false, false, false, false, false);
+    createAnimation("img/terrain6.png", 176, 26, 25, 75, 30, false, false, false, false, false);
     createAnimation("img/stars1.png", 3860, 800, 600, 6, 1, true, 3160, true, 0, 0);
 
 
