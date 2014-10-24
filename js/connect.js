@@ -277,8 +277,8 @@ function app() {
         var fleetIndexes = [];
         var foreignIndexes = [];
         var isForeignFleet = false;
-        
-        if(!planetObj.hasOwnProperty("foreignFleets")) {
+
+        if (!planetObj.hasOwnProperty("foreignFleets")) {
             return;
         }
 
@@ -1871,7 +1871,7 @@ function app() {
 
             playerEnv.offsetX -= stepX;
             playerEnv.offsetY -= stepY;
-            
+
 
         }
         unbindHandlers();
@@ -2448,7 +2448,7 @@ function app() {
             var scanY = 0;
             var items = 0;
             var area = playerEnv.scanAreas.length;
-            
+
             while (area--) {
                 scanArea = playerEnv.scanAreas[area];
                 gameScreen.beginPath();
@@ -2792,7 +2792,7 @@ function app() {
             // Old planet naming
             // planet.name = 'planet ' + Math.ceil(x) + ' | ' + Math.ceil(y);
 
-            random = Math.round(Math.random() * (planetNames - 1));
+            random = Math.floor(Math.random() * (planetNames - 1));
             planet.name = logic.planetNames[random];
             planet.displayName = planet.name;
             logic.planetNames.splice(random, 1);
@@ -2800,7 +2800,7 @@ function app() {
             planet.id = step;
             planet.owner = -1;
 
-            planet.terrain = Math.round(Math.random() * (logic.terrains.length-1));
+            planet.terrain = Math.round(Math.random() * (logic.terrains.length - 1));
             planet.mineralLevel = Math.round(Math.random() * logic.terrains[planet.terrain][1][1]);
             planet.ecologicalLevel = Math.round(Math.random() * logic.terrains[planet.terrain][2][1]);
 
@@ -3606,10 +3606,12 @@ function app() {
         var sortBySize = document.getElementById("sortBySize");
         sortByDistance.disabled = true;
 
+        planetList.setAttribute("name", "own");
+
         modal.style.display = 'inline';
 
         // Create list of owned planets on opening
-        createPlanetListItems(playerEnv.ownedPlanets);
+        createPlanetListItems("own");
 
         // Bind colonizedPlanet filter and create list on click
         filterOwned.addEventListener("click", function (evt) {
@@ -3620,7 +3622,7 @@ function app() {
             sortBySize.disabled = false;
             sortByDistance.disabled = true;
 
-            createPlanetListItems(playerEnv.ownedPlanets);
+            createPlanetListItems("own");
         });
 
         // Bind knownPlanets filter and create list on click
@@ -3632,10 +3634,10 @@ function app() {
             sortBySize.disabled = false;
             sortByDistance.disabled = false;
 
-            createPlanetListItems(playerEnv.knownPlanets);
+            createPlanetListItems("known");
         });
 
-        // Bind knownPlanets filter and create list on click
+        // Bind unknownPlanets filter and create list on click
         filterUnknown.addEventListener("click", function (evt) {
             var selected = document.getElementsByClassName("filterSelected")[0];
             selected.className = selected.className.replace("filterSelected", "");
@@ -3644,7 +3646,7 @@ function app() {
             sortBySize.disabled = true;
             sortByDistance.disabled = false;
 
-            createPlanetListItems(playerEnv.unknownPlanets);
+            createPlanetListItems("unknown");
         });
 
 
@@ -3664,31 +3666,74 @@ function app() {
         });
 
         // TODO: Change use of logic.planet in this functions at some point
-        function createPlanetListItems(planets) {
-            var playerEnv = logic.environments[logic.currentPlayer];
+        function createPlanetListItems(planetStoreKey) {
+            var planetStore = [];
+
+            switch (planetStoreKey) {
+                case "own":
+                    planetStore = env.ownedPlanets;
+                    break;
+                case "known":
+                    planetStore = env.knownPlanets;
+                    break;
+                case "unknown":
+                    planetStore = env.unknownPlanets;
+                    break;
+            }
 
             var planet = new Object();
-            var planetCount = planets.length;
+            var storeCount = planetStore.length;
+            var playerPlanets = env.planets;
+            var playerPlanetCount = env.planets.length;
+            var items = 0;
+            var planetId = 0;
+
             planetList.innerHTML = "";
             originalList = [];
 
-            for (var x = 0; x < planetCount; x++) {
-                planet = logic.planets[ planets[x] ];
-                originalList.push([planet.id, planet.name, planet.population[1], planet.x, planet.y]);
+            var planetName = "";
+            var planetPopulation = 0;
+
+            for (var x = 0; x < storeCount; x++) {
+                items = playerPlanetCount;
+                planetId = planetStore[x];
+
+                while (items--) {
+                    if (planetId === playerPlanets[items].id) {
+                        planet = playerPlanets[items];
+                        break;
+                    }
+                }
+
+                if (planet.hasOwnProperty("name")) {
+                    planetName = planet.name;
+                } else {
+                    planetName = planet.displayName;
+                }
+
+                if (planet.hasOwnProperty("population")) {
+                    planetPopulation = planet.population[1];
+                } else {
+                    planetPopulation = 0;
+                }
+
+                originalList.push([planet.id, planetName, planetPopulation, planet.x, planet.y]);
 
                 if (x === 0) {
                     showPlanetDetails(planet);
                 }
 
-                planetList.innerHTML += '<li name="' + planets[x] + '">' + planet.name + '</li>';
+                planetList.innerHTML += '<li name="' + planetStore[x] + '">' + planetName + '</li>';
             }
 
             // Remove active sorting
+            lg("actives");
             var actives = document.getElementsByClassName("active");
             if (actives.length === 1) {
                 actives[0].className = "";
             }
 
+            lg("binding here");
             bindPlanetListItems();
         }
 
@@ -3700,7 +3745,16 @@ function app() {
             while (elements--) {
                 items[elements].addEventListener("mouseover", function (evt) {
                     if (document.getElementsByClassName("active").length === 0) {
-                        showPlanetDetails(logic.planets[ evt.target.getAttribute("name") ]);
+                        lg("inside");
+                        var targetPlanetId = parseInt(evt.target.getAttribute("name"));
+                        var items = env.planets.length;
+                        while (items--) {
+                            if (env.planets[items].id === targetPlanetId) {
+                                showPlanetDetails(env.planets[items]);
+                                return;
+                            }
+                        }
+
                     }
                 });
 
@@ -3732,8 +3786,17 @@ function app() {
         }
 
         function showPlanetDetails(planet) {
+
+            var planetName = "";
+
+            if (planet.hasOwnProperty("name")) {
+                planetName = planet.name;
+            } else {
+                planetName = planet.displayName;
+            }
+
             var planetInfo = '';
-            planetInfo += '<h3>' + planet.name + '</h3>';
+            planetInfo += '<h3>' + planetName + '</h3>';
             planetInfo += '<br><h5>Description<h5>';
             planetInfo += '<p>' + logic.terrains[planet.terrain][0] + ' planet</p><br/>';
 
@@ -3839,18 +3902,18 @@ function app() {
         sortByName.addEventListener("click", function (evt) {
             evt.preventDefault();
 
-            if (evt.target.className === "active") {
+            if (evt.target.className === "activeFilter") {
                 evt.target.className = "";
                 restoreAndBindList(originalList);
                 return;
             }
 
-            var actives = document.getElementsByClassName("active");
+            var actives = document.getElementsByClassName("activeFilter");
             if (actives.length === 1) {
                 actives[0].className = "";
             }
 
-            evt.target.className = "active";
+            evt.target.className = "activeFilter";
 
             restoreAndBindList(createListShadow(originalList).sort(sortName));
         });
@@ -3863,18 +3926,18 @@ function app() {
                 return;
             }
 
-            if (evt.target.className === "active") {
+            if (evt.target.className === "activeFilter") {
                 evt.target.className = "";
                 restoreAndBindList(originalList);
                 return;
             }
 
-            var actives = document.getElementsByClassName("active");
+            var actives = document.getElementsByClassName("activeFilter");
             if (actives.length === 1) {
                 actives[0].className = "";
             }
 
-            evt.target.className = "active";
+            evt.target.className = "activeFilter";
             restoreAndBindList(createListShadow(originalList).sort(sortSize));
         });
 
@@ -3882,18 +3945,18 @@ function app() {
         sortByDistance.addEventListener("click", function (evt) {
             evt.preventDefault();
 
-            if (evt.target.className === "active") {
+            if (evt.target.className === "activeFilter") {
                 evt.target.className = "";
                 restoreAndBindList(originalList);
                 return;
             }
 
-            var actives = document.getElementsByClassName("active");
+            var actives = document.getElementsByClassName("activeFilter");
             if (actives.length === 1) {
                 actives[0].className = "";
             }
 
-            evt.target.className = "active";
+            evt.target.className = "activeFilter";
             var shadowList = createListShadow(originalList);
 
             var distanceX = 0;
