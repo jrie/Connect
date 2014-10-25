@@ -615,8 +615,10 @@ function app() {
 
             var x = planet.productionQueue.length;
             while (x--) {
-                planetDetailScreen += '<li>' + planet.productionQueue[x][1] + '</li>';
+                planetDetailScreen += '<li class="queueItem">' + planet.productionQueue[x][1] + '</li>';
             }
+
+
             planetDetailScreen += '</ul></div>';
 
             planetDetailScreen += '</div>';
@@ -898,6 +900,15 @@ function app() {
                                 planet.productionQueue.splice(x, 1);
                                 evt.target.parentNode.removeChild(evt.target);
                                 break;
+                            }
+                        }
+                    }
+
+                    if (playerEnv.ownedPlanets.indexOf(planet.id) !== -1) {
+                        var queueItems = document.getElementById('productionQueue').getElementsByTagName('LI');
+                        if (queueItems !== null) {
+                            for (var queueItem = queueItems.length - 1; queueItem > -1; queueItem--) {
+                                queueItems[queueItem].addEventListener('click', removeQueueItem);
                             }
                         }
                     }
@@ -3746,7 +3757,6 @@ function app() {
             while (elements--) {
                 items[elements].addEventListener("mouseover", function (evt) {
                     if (document.getElementsByClassName("active").length === 0) {
-                        lg("inside");
                         var targetPlanetId = parseInt(evt.target.getAttribute("name"));
                         var items = env.planets.length;
                         while (items--) {
