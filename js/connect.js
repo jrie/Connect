@@ -903,16 +903,15 @@ function app() {
                             }
                         }
                     }
-
-                    if (playerEnv.ownedPlanets.indexOf(planet.id) !== -1) {
-                        var queueItems = document.getElementById('productionQueue').getElementsByTagName('LI');
-                        if (queueItems !== null) {
-                            for (var queueItem = queueItems.length - 1; queueItem > -1; queueItem--) {
-                                queueItems[queueItem].addEventListener('click', removeQueueItem);
-                            }
-                        }
+                }
+                
+                var queueItems = document.getElementById('productionQueue').getElementsByTagName('LI');
+                if (queueItems !== null) {
+                    for (var queueItem = queueItems.length - 1; queueItem > -1; queueItem--) {
+                        queueItems[queueItem].addEventListener('click', removeQueueItem);
                     }
                 }
+                
             }
         }
 
