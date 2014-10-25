@@ -916,6 +916,7 @@ function app() {
     }
 
     function showFleetDialog(planetObj, forceDisplay) {
+        var playerEnv = logic.environments[logic.currentPlayer];
 
         // TODO: Add back the colonize button to the fleet dialog, using
         // clearEffectModules and gatherEffectModules function
@@ -1565,8 +1566,8 @@ function app() {
                     }
                     break;
                 case 72:
-                    env.offsetX = -(logic.planets[logic.knownPlanets[0]].x - gameArea.width / 2);
-                    env.offsetY = -(logic.planets[logic.knownPlanets[0]].y - gameArea.height / 2);
+                    env.offsetX = -(env.startX - gameArea.width / 2);
+                    env.offsetY = -(env.startY - gameArea.height / 2);
                     break;
                 case 17:
                     env.strg = false;
@@ -2207,7 +2208,7 @@ function app() {
                                 } else {
 
                                     fleetItems = planet.foreignFleets.length;
-                                    while (fleetItems) {
+                                    while (fleetItems--) {
                                         if (planet.foreignFleets[fleetItems].owner === targetFleet.owner) {
                                             hasFleetOnPlanet = true;
                                             break;
@@ -2846,6 +2847,8 @@ function app() {
 
             playerEnv.offsetX = -(planet.x - gameArea.width / 2);
             playerEnv.offsetY = -(planet.y - gameArea.height / 2);
+            playerEnv.startX = planet.x;
+            playerEnv.startY = planet.y;
 
             planet.population = [4, size];
             planet.constructions = ['Factory Complex', 'Farm Complex'];
@@ -3727,13 +3730,11 @@ function app() {
             }
 
             // Remove active sorting
-            lg("actives");
             var actives = document.getElementsByClassName("active");
             if (actives.length === 1) {
                 actives[0].className = "";
             }
 
-            lg("binding here");
             bindPlanetListItems();
         }
 
@@ -4290,6 +4291,8 @@ function app() {
 
             env.offsetX = 0;
             env.offsetY = 0;
+            env.startX = 0;
+            env.starY = 0;
             env.rotation = 0;
             env.activeSelection = false;
             env.movement = false;
