@@ -4292,7 +4292,7 @@ function app() {
             env.offsetX = 0;
             env.offsetY = 0;
             env.startX = 0;
-            env.starY = 0;
+            env.startY = 0;
             env.rotation = 0;
             env.activeSelection = false;
             env.movement = false;
