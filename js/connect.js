@@ -2757,10 +2757,8 @@ function app() {
          */
 
         playerEnv.fleets.push(fleet);
-        logic.fleets.push(fleet);
 
         playerEnv.scanAreas.push([110, fleet.x, fleet.y]);
-        logic.scanAreas[player].push([110, fleet.x, fleet.y]);
         fleet.scanArea = playerEnv.scanAreas.length - 1;
     }
 
@@ -3025,7 +3023,7 @@ function app() {
 
         gameArea.width = gameArea.width;
         gameScreen.lineWidth = 1;
-        gameScreen.fillStyle = 'rgba(255,255,255, 0.025)';
+        gameScreen.fillStyle = 'rgba(255,255,255, 0.036)';
 
         // drawScanAreas
         gameScreen.beginPath();
