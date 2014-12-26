@@ -4477,7 +4477,12 @@ function app() {
 
 
     function loadPlanetNames() {
-        var fileLoader = new XMLHttpRequest();
+        if (typeof (ActiveXObject) !== "undefined") {
+            var fileLoader = new ActiveXObject("MSXML2.XMLHTTP.6.0");
+        } else {
+            var fileLoader = new XMLHttpRequest();
+        }
+
         fileLoader.onreadystatechange = function () {
             if (fileLoader.readyState === 4) {
                 logic.planetNames = fileLoader.responseText.split('\n', 2)[1].split("|");
