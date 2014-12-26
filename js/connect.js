@@ -2157,6 +2157,7 @@ function app() {
         var stationedFleets = 0;
         for (var player = 0; player < logic.players; player++) {
             var playerEnv = logic.environments[player];
+
             items = playerEnv.fleets.length;
             playerFleets = playerEnv.fleets;
             while (items--) {
@@ -2389,6 +2390,35 @@ function app() {
                 // making it hidden for the player
                 updateScanAreas(targetFleet);
             }
+
+            // Keep the planets updated, if they are in scanRange
+
+            planetItems = playerEnv.planets.length;
+            playerFleets = playerEnv.fleets;
+            var planet = {};
+            while (planetItems--) {
+                planet = playerEnv.planets[planetItems];
+                if (player !== planet.owner) {
+                    var scanArea = [0.0, 0.0, 0.0];
+                    var items = 0;
+                    var area = playerEnv.scanAreas.length;
+                    var pX = planet.x;
+                    var pY = planet.y;
+
+                    while (area--) {
+                        scanArea = playerEnv.scanAreas[area];
+                        gameScreen.beginPath();
+                        gameScreen.arc(scanArea[1], scanArea[2], scanArea[0], 0, 6.3);
+                        gameScreen.closePath();
+
+                        if (gameScreen.isPointInPath(pX, pY)) {
+                            playerEnv.planets[planetItems].owner = logic.planets[planet.id].owner;
+                            break;
+                        }
+                    }
+                }
+            }
+
         }
 
         gameArea.focus();
@@ -2449,16 +2479,13 @@ function app() {
                 targetY = targetFleet.origin.y;
             }
 
+            var playerEnv = logic.environments[player];
+            var scanArea = [0.0, 0.0, 0.0];
+            var area = playerEnv.scanAreas.length;
+
             var removeFromPlayer = true;
             var isFleetIncluded = false;
-
-            var playerEnv = logic.environments[player];
-
-            var scanArea = [0.0, 0.0, 0.0];
-            var scanX = 0;
-            var scanY = 0;
             var items = 0;
-            var area = playerEnv.scanAreas.length;
 
             while (area--) {
                 scanArea = playerEnv.scanAreas[area];
@@ -2669,7 +2696,7 @@ function app() {
                 //logic.fleets.push(fleet);
 
                 playerEnv.scanAreas.push([120, fleet.origin.x, fleet.origin.y]);
-                //logic.scanAreas[planet.owner].push([120, fleet.origin.x, fleet.origin.y]);
+                logic.scanAreas[planet.owner].push([120, fleet.origin.x, fleet.origin.y, fleet.id]);
                 fleet.scanArea = playerEnv.scanAreas.length - 1;
             } else {
                 planet.stationedFleets[0].ships.push(ship);
@@ -2784,11 +2811,11 @@ function app() {
                 y = Math.ceil(Math.random() * (gameArea.height * 0.85) + 20);
             } else if (type === "procedural") {
                 if ((step % rows) === 0) {
-                    yOff += 120;
+                    yOff += 110;
                     x = 0;
                 }
-                x += 90 + Math.ceil(Math.random() * 135);
-                y = yOff + ((Math.ceil(Math.random() * 60) - Math.ceil(Math.random() * 60)));
+                x += 80 + Math.ceil(Math.random() * 115);
+                y = yOff + ((Math.ceil(Math.random() * 55) - Math.ceil(Math.random() * 55)));
             }
 
             size = Math.round((Math.random() * 8) + 7);
@@ -2847,6 +2874,7 @@ function app() {
             availablePlanets.splice(randomIndex, 1);
             planet = logic.planets[ planetIndex ];
             planet.owner = player;
+            logic.planets[ planetIndex ].owner = player;
 
             playerEnv.ownedPlanets = [planetIndex];
             playerEnv.knownPlanets = [];
@@ -2863,7 +2891,7 @@ function app() {
             planet.constructions = ['Factory Complex', 'Farm Complex'];
             planet.workForce = [4, 0, 1, 2, 1];
 
-            //logic.scanAreas.push([]);
+            logic.scanAreas.push([]);
             var researchPoints = planet.workForce[4] * playerEnv.workers["research"];
             playerEnv.research.planets.push(researchPoints);
             playerEnv.research.points = researchPoints;
@@ -2872,7 +2900,7 @@ function app() {
 
             playerEnv.scanAreas.push([160, planet.x, planet.y]);
 
-            //logic.scanAreas[player].push([160, planet.x, planet.y]);
+            logic.scanAreas[player].push([160, planet.x, planet.y, planet.id]);
             var key = logic.terrains[planet.terrain][3];
 
             if (!playerEnv.activeAnimations.hasOwnProperty(key)) {
@@ -3840,7 +3868,7 @@ function app() {
             }
 
             if (planet.owner === logic.currentPlayer) {
-                planetInfo += '<br/><p><span>Current population</span>' + planet.population[0].toFixed(2) + ' of ' + planet.population[1].toFixed(2) + '</p>';
+                planetInfo += '<br/><p><span>Current population</span>' + planet.population[0].toFixed(3) + ' of ' + planet.population[1] + '</p>';
                 planetInfo += '<br/><h5>Workforce</h5>';
                 planetInfo += '<p><span>Assigned workforce</span>' + (planet.workForce[0] - planet.workForce[1]) + ' of ' + planet.workForce[0] + '<br/>';
                 planetInfo += '<br/><span>Agriculture</span>' + planet.workForce[2];
@@ -4061,10 +4089,10 @@ function app() {
     //logic.knownForeignDesigns = [];
 
     logic.turn = 0;
-    logic.players = 3;
+    logic.players = 4;
     logic.currentPlayer = 0;
     logic.actions = [];
-    //logic.scanAreas = [];
+    logic.scanAreas = [];
 
 
     //logic.spies = [];
