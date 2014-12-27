@@ -3049,9 +3049,9 @@ function app() {
 
         var playerEnv = logic.environments[logic.currentPlayer];
 
-        gameArea.width = gameArea.width;
+        gameScreen.clearRect(0, 0, gameArea.width, gameArea.height);
         gameScreen.lineWidth = 1;
-        gameScreen.fillStyle = 'rgba(255,255,255, 0.036)';
+        gameScreen.fillStyle = 'rgba(255,255,255, 0.015)';
 
         // drawScanAreas
         gameScreen.beginPath();
