@@ -14,20 +14,20 @@ function scaleCombatScreen() {
 
 
 // UI element handlers
-document.getElementById('resizeRight').addEventListener('mousedown', function(evt) {
+document.getElementById('resizeRight').addEventListener('mousedown', function (evt) {
     window.addEventListener('mousemove', checkMouseResize);
 });
 
-window.addEventListener('mouseup', function() {
+window.addEventListener('mouseup', function () {
     window.removeEventListener('mousemove', checkMouseResize);
 });
 
 
-window.addEventListener('resize', function() {
+window.addEventListener('resize', function () {
     scaleCombatScreen();
 });
 
 
-window.addEventListener('load', function() {
+window.addEventListener('load', function () {
     scaleCombatScreen();
 });
