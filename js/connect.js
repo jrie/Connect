@@ -4383,7 +4383,6 @@ function app() {
     logic.scanAreas = [];
     logic.playerTypes = ["human", "ai", "ai", "ai"];
 
-
     //logic.spies = [];
     // Type, MineralLevel, EcoLevel
     logic.terrains = [
@@ -4602,14 +4601,46 @@ function app() {
     }
 
     // Set initial players and preparePlayerObjects
-
     // These items are player specific for quicker interaction from handlers and ui, but need additional controls from logic upon extension
-
 
     function preparePlayerObjects() {
 
         for (var player = 0; player < logic.players; player++) {
             var env = {};
+
+            // Prepare extra data for ai players
+            if (logic.playerTypes[player] !== "human") {
+                env.playerPlanetsNearOwn = {};
+                env.playerPlanetsNearKnown = {};
+                env.playerFleetsNearBy = {};
+                env.playerFleetPoints = [];
+                env.playerPlanetPoints = [];
+
+                // Is any other player visible to us?
+                // Do we need to do extra calculations (in turn) ?
+                env.playersVisible = false;
+
+                var playerSlots = 0;
+                while (playerSlots < logic.players) {
+                    if (playerSlots !== player) {
+                        // Contains the total point strength of fleet of other players
+                        env.playerFleetPoints.push(0);
+
+                        // Contains the total point strength of planets of other players
+                        env.playerPlanetPoints.push(0);
+
+                        // Containing ownIndex, playerPlanetIndex in logic
+                        // ideally from scanArea contents
+                        env.playerPlanetsNearOwn[playerSlots.toString()] = [];
+                        env.playerPlanetsNearKnown[playerSlots.toString()] = [];
+
+                        // Containing ownPlanetIndex, fleetPoints - ideally fleets in
+                        // scanArea from env.foreignFleets (only? / to weak move of ai?)
+                        env.playerFleetsNearBy[playerSlots.toString()] = [];
+                    }
+                    playerSlots++;
+                }
+            }
 
             env.offsetX = 0;
             env.offsetY = 0;
