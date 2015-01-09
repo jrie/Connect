@@ -1635,11 +1635,11 @@ function app() {
         gameScreen.stroke();
         gameScreen.closePath();
 
-        playerEnv.selectionIteration += env.stepping;
-        if (env.selectionIteration >= 7) {
-            playerEnv.stepping = -env.baseStepping;
-        } else if (env.selectionIteration <= 0) {
-            playerEnv.stepping = +env.baseStepping;
+        playerEnv.selectionIteration += playerEnv.stepping;
+        if (playerEnv.selectionIteration >= 7) {
+            playerEnv.stepping = -playerEnv.baseStepping;
+        } else if (playerEnv.selectionIteration <= 0) {
+            playerEnv.stepping = +playerEnv.baseStepping;
         }
     }
 
