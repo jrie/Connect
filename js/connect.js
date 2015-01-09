@@ -3159,7 +3159,7 @@ function app() {
         var randomIndex = 0;
         for (var player = 0; player < logic.players; player++) {
             var playerEnv = logic.environments[player];
-            randomIndex = Math.round(Math.random() * (availablePlanets.length - 1));
+            randomIndex = Math.floor(Math.random() * (availablePlanets.length - 1));
 
             planetIndex = availablePlanets[ randomIndex ];
             availablePlanets.splice(randomIndex, 1);
