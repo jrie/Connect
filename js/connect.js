@@ -608,8 +608,10 @@ function app() {
             planetDetailScreen += '<div style="float: left; margin-left: 10px; width: 155px;"><h5>QUEUED ITEMS</h5><ul id="productionQueue">';
 
             var x = planet.productionQueue.length;
-            while (x--) {
-                planetDetailScreen += '<li class="queueItem">' + planet.productionQueue[x][1] + '</li>';
+            var y = 0;
+            while (y < x) {
+                planetDetailScreen += '<li class="queueItem">' + planet.productionQueue[y][1] + '</li>';
+                y++;
             }
 
 
