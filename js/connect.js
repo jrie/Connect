@@ -2159,15 +2159,60 @@ function app() {
         var checkedDesigns = [];
 
         var canColonize = false;
+        var colonizeScores = [];
         var colonizePlanets = [];
 
+        function sortByScore(p1, p2) {
+            if (p1[0] >= p2[0]) {
+                return true;
+            }
 
-        // Search for planets to colonize based on in range and terrain
+            return false;
+        }
+
+        // TODO: Search for planets to colonize based on range and terrain
         items = playerEnv.knownPlanets.length;
-        while (items--) {
-            if (logic.planets[playerEnv.knownPlanets[items]].owner === -1) {
-                canColonize = true;
-                colonizePlanets.push(playerEnv.knownPlanets[items]);
+        var planetScore = 0;
+        if (playerEnv.knownPlanets.length >= 3 || playerEnv.unknownPlanets.length === 0) {
+            while (items--) {
+                if (logic.planets[playerEnv.knownPlanets[items]].owner === -1) {
+                    canColonize = true;
+                    //colonizePlanets.push(playerEnv.knownPlanets[items]);
+
+                    var planetData = logic.planets[playerEnv.knownPlanets[items]];
+                    //logic.aiTypes = [false, "equal", "res", "eco", "pop"];
+                    planetScore = 0;
+                    switch (logic.aiTypes[player]) {
+                        case "res":
+                            planetScore = planetData.mineralLevel + (planetData.ecologicalLevel * 0.5) + (planetData.size * 0.6);
+                            break;
+                        case "eco":
+                            planetScore = (planetData.mineralLevel * 0.5) + planetData.ecologicalLevel + (planetData.size * 0.6);
+                            break;
+                        case "pop":
+                            planetScore = (planetData.mineralLevel * 0.25) + (planetData.ecologicalLevel * 0.75) + planetData.size;
+                            break;
+                        case "equal":
+                        default:
+                            planetScore = planetData.mineralLevel + planetData.ecologicalLevel + planetData.size;
+                            break;
+
+                    }
+
+                    colonizeScores.push([planetScore, playerEnv.knownPlanets[items]]);
+
+
+                }
+            }
+
+            if (colonizeScores.length > 1) {
+                colonizeScores.sort(sortByScore);
+            }
+
+            colonizePlanets = [];
+            var scores = colonizeScores.length;
+            while (scores--) {
+                colonizePlanets.push(colonizeScores[scores][1]);
             }
         }
 
@@ -4382,11 +4427,12 @@ function app() {
     //logic.knownForeignDesigns = [];
 
     logic.turn = 0;
-    logic.players = 4;
+    logic.players = 5;
     logic.currentPlayer = 0;
     logic.actions = [];
     logic.scanAreas = [];
-    logic.playerTypes = ["human", "ai", "ai", "ai"];
+    logic.playerTypes = ["human", "ai", "ai", "ai", "ai"];
+    logic.aiTypes = [false, "equal", "res", "eco", "pop"];
 
     //logic.spies = [];
     // Type, MineralLevel, EcoLevel
