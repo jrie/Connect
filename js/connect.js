@@ -47,8 +47,10 @@ function app() {
                 gameScreen.fillStyle = "rgba(170,70,70, 1)";
                 if (playerEnv.knownPlanets.indexOf(planetObj.id) === -1) {
                     gameScreen.fillText(("(" + planetObj.displayName + ")"), x, y);
+                    gameScreen.fillText(("[Player " + planetObj.owner + "]"), x, y + 16);
                 } else {
                     gameScreen.fillText(planetObj.name, x, y);
+                    gameScreen.fillText(("[Player " + planetObj.owner + "]"), x, y + 16);
                 }
             } else {
                 gameScreen.fillStyle = "rgba(120,120,245, 1)";
@@ -2463,6 +2465,7 @@ function app() {
 
                             if (planetObj.stationedFleets.length !== 0) {
                                 planetObj.stationedFleets[0].hideDrawing = false;
+                                updateScanAreas(planetObj.stationedFleets[0]);
                             }
                         } else {
                             isStationed = false;
@@ -3147,7 +3150,7 @@ function app() {
             planet.prevProduction = [false, 0, 0];
             planet.productionQueue = [];
             planet.stationedFleets = [];
-            planet.foreignFleets = []; // TODO: work on planet.foreignFleets when moving to fleets to any location upon arrival
+            planet.foreignFleets = [];
 
             logic.planets.push(planet);
             availablePlanets.push(planet.id);
