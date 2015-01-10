@@ -47,10 +47,10 @@ function app() {
                 gameScreen.fillStyle = "rgba(170,70,70, 1)";
                 if (playerEnv.knownPlanets.indexOf(planetObj.id) === -1) {
                     gameScreen.fillText(("(" + planetObj.displayName + ")"), x, y);
-                    gameScreen.fillText(("[Player " + planetObj.owner + "]"), x, y + 16);
+                    gameScreen.fillText(("[Player " + (planetObj.owner + 1) + "]"), x, y + 16);
                 } else {
                     gameScreen.fillText(planetObj.name, x, y);
-                    gameScreen.fillText(("[Player " + planetObj.owner + "]"), x, y + 16);
+                    gameScreen.fillText(("[Player " + (planetObj.owner + 1) + "]"), x, y + 16);
                 }
             } else {
                 gameScreen.fillStyle = "rgba(120,120,245, 1)";
@@ -146,13 +146,14 @@ function app() {
     }
 
     function checkClick(evt) {
+        playerEnv = logic.environments[logic.currentPlayer];
         //lg(evt);
 
         if (document.getElementById("planetName") !== null) {
             return;
         }
 
-        if (evt.target.id !== 'modal' && !env.strg) {
+        if (evt.target.id !== 'modal' && !playerEnv.strg) {
             modal.style.display = 'none';
             modal.innerHTML = '';
         }
@@ -181,7 +182,7 @@ function app() {
 
             if (fleetObj.location !== 'space') {
                 createSelection(fleetObj);
-                showFleetDialog(fleetObj.origin, env.strg);
+                showFleetDialog(fleetObj.origin, playerEnv.strg);
             } else {
                 createSelection(fleetObj);
             }
@@ -339,25 +340,25 @@ function app() {
     function getBaseOutput(planet) {
         var baseAgriculture = logic.ecologicalLevel[planet.ecologicalLevel][0];
         var baseProduction = logic.mineralLevel[planet.mineralLevel][0];
-        var baseResearch = env.workers.research;
+        var baseResearch = playerEnv.workers.research;
 
         // Increasing basic planet output by percentage based buildings
         var x = planet.constructions.length;
         var y = 0;
         while (x--) {
-            y = env.buildings.length;
+            y = playerEnv.buildings.length;
             while (y--) {
-                if (planet.constructions[x] === env.buildings[y][0]) {
-                    if (env.buildings[y][3][1] === '%') {
-                        switch (env.buildings[y][3][0]) {
+                if (planet.constructions[x] === playerEnv.buildings[y][0]) {
+                    if (playerEnv.buildings[y][3][1] === '%') {
+                        switch (playerEnv.buildings[y][3][0]) {
                             case "Agriculture":
-                                baseAgriculture *= env.buildings[y][3][2];
+                                baseAgriculture *= playerEnv.buildings[y][3][2];
                                 break;
                             case "Construction":
-                                baseProduction *= env.buildings[y][3][2];
+                                baseProduction *= playerEnv.buildings[y][3][2];
                                 break;
                             case "Research":
-                                baseResearch *= env.buildings[y][3][2];
+                                baseResearch *= playerEnv.buildings[y][3][2];
                                 break;
                         }
                     }
@@ -376,19 +377,19 @@ function app() {
         var x = planet.constructions.length;
         var y = 0;
         while (x--) {
-            y = env.buildings.length;
+            y = playerEnv.buildings.length;
             while (y--) {
-                if (planet.constructions[x] === env.buildings[y][0]) {
-                    if (env.buildings[y][3][1] === '+') {
-                        switch (env.buildings[y][3][0]) {
+                if (planet.constructions[x] === playerEnv.buildings[y][0]) {
+                    if (playerEnv.buildings[y][3][1] === '+') {
+                        switch (playerEnv.buildings[y][3][0]) {
                             case "Agriculture":
-                                planetAgriculture += env.buildings[y][3][2];
+                                planetAgriculture += playerEnv.buildings[y][3][2];
                                 break;
                             case "Construction":
-                                planetProduction += env.buildings[y][3][2];
+                                planetProduction += playerEnv.buildings[y][3][2];
                                 break;
                             case "Research":
-                                planetResearch += env.buildings[y][3][2];
+                                planetResearch += playerEnv.buildings[y][3][2];
                                 break;
                         }
                     }
@@ -407,19 +408,19 @@ function app() {
         var x = planet.constructions.length;
         var y = 0;
         while (x--) {
-            y = env.buildings.length;
+            y = playerEnv.buildings.length;
             while (y--) {
-                if (planet.constructions[x] === env.buildings[y][0]) {
-                    if (env.buildings[y][3][1] === '*') {
+                if (planet.constructions[x] === playerEnv.buildings[y][0]) {
+                    if (playerEnv.buildings[y][3][1] === '*') {
                         switch (logic.buildings[y][3][0]) {
                             case "Agriculture":
-                                planetAgriculture += env.buildings[y][3][2];
+                                planetAgriculture += playerEnv.buildings[y][3][2];
                                 break;
                             case "Construction":
-                                planetProduction += env.buildings[y][3][2];
+                                planetProduction += playerEnv.buildings[y][3][2];
                                 break;
                             case "Research":
-                                planetResearch += env.buildings[y][3][2];
+                                planetResearch += playerEnv.buildings[y][3][2];
                                 break;
                         }
                     }
@@ -465,13 +466,13 @@ function app() {
         planetDetailScreen += '<div>';
         planetDetailScreen += '<h3>' + name + ' (' + planet.type + ')</h3>';
         planetDetailScreen += '<br><h5>Description<h5>';
-        planetDetailScreen += '<p>' + name + ' is a ' + env.terrains[planet.terrain][0] + ' ' + planet.type + '.</p>';
+        planetDetailScreen += '<p>' + name + ' is a ' + playerEnv.terrains[planet.terrain][0] + ' ' + planet.type + '.</p>';
 
         planetDetailScreen += '<br><h4>Overview</h4>';
         planetDetailScreen += '<p>Location.. ' + planet.x + '/' + planet.y + '</p>';
-        planetDetailScreen += '<p>Terrain.. ' + env.terrains[planet.terrain][0] + '</p>';
-        planetDetailScreen += '<p>Mineral richness.. ' + env.mineralLevel[planet.mineralLevel][1] + '</p>';
-        planetDetailScreen += '<p>Ecological diversity.. ' + env.ecologicalLevel[planet.ecologicalLevel][1] + '</p>';
+        planetDetailScreen += '<p>Terrain.. ' + playerEnv.terrains[planet.terrain][0] + '</p>';
+        planetDetailScreen += '<p>Mineral richness.. ' + playerEnv.mineralLevel[planet.mineralLevel][1] + '</p>';
+        planetDetailScreen += '<p>Ecological diversity.. ' + playerEnv.ecologicalLevel[planet.ecologicalLevel][1] + '</p>';
 
         if (playerEnv.ownedPlanets.indexOf(planet.id) !== -1) {
             planetDetailScreen += '<br/><p>Current population.. ' + planet.population[0].toFixed(2) + ' of ' + planet.population[1].toFixed(2) + '</p>';
@@ -673,7 +674,7 @@ function app() {
             if (playerEnv.ownedPlanets.indexOf(planet.id) !== -1) {
 
                 var reset = document.getElementById('reset').addEventListener('click', function () {
-                    env.research.points -= parseInt(displayResearch);
+                    playerEnv.research.points -= parseInt(displayResearch);
                     planet.workForce = [planet.workForce[0], planet.workForce[0], 0, 0, 0];
                     calcResearchPoints(planet);
 
@@ -726,11 +727,11 @@ function app() {
 
                             while (option--) {
                                 if (playerEnv.buildings[option][0] === evt.target.innerHTML) {
-                                    var items = env.buildings.length;
+                                    var items = playerEnv.buildings.length;
                                     while (items--) {
-                                        if (env.buildings[items][0] === playerEnv.buildings[option][0]) {
-                                            desc.innerHTML = '<p style="text-align:left; font-size:10px;">Construction cost: ' + env.buildings[items][1] + '</p><br/>';
-                                            desc.innerHTML += env.buildings[items][4];
+                                        if (playerEnv.buildings[items][0] === playerEnv.buildings[option][0]) {
+                                            desc.innerHTML = '<p style="text-align:left; font-size:10px;">Construction cost: ' + playerEnv.buildings[items][1] + '</p><br/>';
+                                            desc.innerHTML += playerEnv.buildings[items][4];
                                             return;
                                         }
                                     }
@@ -755,7 +756,7 @@ function app() {
 
                     constructionOptions[x].addEventListener('click', function (evt) {
                         evt.preventDefault();
-                        env.scrollTargetToY = ["productionList", document.getElementById("productionList").children[0].scrollTop];
+                        playerEnv.scrollTargetToY = ["productionList", document.getElementById("productionList").children[0].scrollTop];
 
                         // Planet contruction handling
                         if (evt.target.name === 'building') {
@@ -1077,7 +1078,7 @@ function app() {
                     partedFleetTypes = [];
                     partedFleetCount = [];
 
-                    if (planetObj.owner === env.player && planetObj.foreignFleets.length === 0) {
+                    if (planetObj.owner === playerEnv.player && planetObj.foreignFleets.length === 0) {
                         for (var item = planetObj.stationedFleets.length - 1; item > -1; item--) {
                             if (evt.target.name.split('|')[1] === planetObj.stationedFleets[item].id) {
                                 targetFleet = planetObj.stationedFleets[item];
@@ -1554,6 +1555,7 @@ function app() {
 
 
     function checkKeys(evt) {
+        var playerEnv = logic.environments[logic.currentPlayer];
         var key = evt.keyCode;
         //lg(key);
         if (evt.type === 'keyup') {
@@ -1564,15 +1566,15 @@ function app() {
                     }
                     break;
                 case 72:
-                    env.offsetX = -(env.startX - gameArea.width / 2);
-                    env.offsetY = -(env.startY - gameArea.height / 2);
+                    playerEnv.offsetX = -(playerEnv.startX - gameArea.width / 2);
+                    playerEnv.offsetY = -(playerEnv.startY - gameArea.height / 2);
                     break;
                 case 17:
-                    env.strg = false;
+                    playerEnv.strg = false;
                     break;
                 case 80:
                     if (modal.style.display === 'none') {
-                        if (!env.strg) {
+                        if (!playerEnv.strg) {
                             logic.currentPlayer++;
                             if (logic.currentPlayer === logic.players) {
                                 logic.currentPlayer = 0;
@@ -1583,8 +1585,6 @@ function app() {
                                 logic.currentPlayer = logic.players - 1;
                             }
                         }
-
-                        env = logic.environments[logic.currentPlayer];
                     }
 
                     break;
@@ -1592,7 +1592,7 @@ function app() {
         } else if (evt.type === 'keydown') {
             switch (key) {
                 case 17:
-                    env.strg = true;
+                    playerEnv.strg = true;
                     break;
             }
         }
@@ -1600,16 +1600,17 @@ function app() {
     }
 
     function checkMovement(evt) {
+        var playerEnv = logic.environments[logic.currentPlayer];
         if (evt.button !== 0) {
             return;
         } else {
             evt.preventDefault();
-            if (evt.type === "mousedown" && env.strg) {
-                if (!env.movement) {
-                    env.movement = [evt.pageX - env.offsetX, evt.pageY - env.offsetY];
+            if (evt.type === "mousedown" && playerEnv.strg) {
+                if (!playerEnv.movement) {
+                    playerEnv.movement = [evt.pageX - playerEnv.offsetX, evt.pageY - playerEnv.offsetY];
                 }
             } else if (evt.type === "mouseup") {
-                env.movement = false;
+                playerEnv.movement = false;
             }
 
             return;
@@ -1618,9 +1619,9 @@ function app() {
 
     function realiseMovement(evt) {
         var playerEnv = logic.environments[logic.currentPlayer];
-        if (env.movement) {
-            env.offsetX = evt.pageX - env.movement[0];
-            env.offsetY = evt.pageY - env.movement[1];
+        if (playerEnv.movement) {
+            playerEnv.offsetX = evt.pageX - playerEnv.movement[0];
+            playerEnv.offsetY = evt.pageY - playerEnv.movement[1];
         }
     }
 
@@ -2184,13 +2185,13 @@ function app() {
                     planetScore = 0;
                     switch (logic.aiTypes[player]) {
                         case "res":
-                            planetScore = planetData.mineralLevel + (planetData.ecologicalLevel * 0.5) + (planetData.size * 0.6);
+                            planetScore = planetData.mineralLevel + (planetData.ecologicalLevel * 0.5) + (planetData.population[1] * 0.6);
                             break;
                         case "eco":
-                            planetScore = (planetData.mineralLevel * 0.5) + planetData.ecologicalLevel + (planetData.size * 0.6);
+                            planetScore = (planetData.mineralLevel * 0.5) + planetData.ecologicalLevel + (planetData.population[1] * 0.6);
                             break;
                         case "pop":
-                            planetScore = (planetData.mineralLevel * 0.25) + (planetData.ecologicalLevel * 0.75) + planetData.size;
+                            planetScore = (planetData.mineralLevel * 0.3) + (planetData.ecologicalLevel * 0.7) + planetData.population[1];
                             break;
                         case "equal":
                         default:
@@ -2396,10 +2397,9 @@ function app() {
                     logic.planets[item].workForce[0] += 1;
                     logic.planets[item].workForce[1] += 1;
 
-                    if (logic.currentPlayer === logic.planets[item].owner) {
-                        link = createLink('planet', logic.planets[item].id, logic.planets[item].name);
-                        report('Population of ' + link + ' grown to ' + parseInt(logic.planets[item].population[0]));
-                    }
+                    // Create info link
+                    link = createLink('planet', logic.planets[item].id, logic.planets[item].name);
+                    report('Population of ' + link + ' grown to ' + parseInt(logic.planets[item].population[0]));
                 }
             }
 
@@ -2408,6 +2408,7 @@ function app() {
             if (logic.planets[item].production[0]) {
 
                 planet = logic.planets[item];
+                var playerEnv = logic.environments[planet.owner];
 
                 percentOutput = getBaseOutput(planet);
                 fixedOutput = getFixedOutput(planet);
@@ -2418,6 +2419,7 @@ function app() {
 
                 if (planet.production[1] >= planet.production[2]) {
 
+                    // Create info link
                     link = createLink('planet', item, logic.planets[item].name);
                     report('Planet ' + link + ' finished the production of ' + planet.production[0]);
 
@@ -2442,14 +2444,15 @@ function app() {
                             }
                         } else if (planet.productionQueue[0][0] === 'design') {
                             for (var design = logic.environments[planet.owner].designs.length - 1; design > -1; design--) {
-                                if (planet.productionQueue[0][1] === env.designs[design].name) {
-                                    planet.production = [env.designs[design].name, 0, env.designs[design].cost, 'design'];
+                                if (planet.productionQueue[0][1] === playerEnv.designs[design].name) {
+                                    planet.production = [playerEnv.designs[design].name, 0, playerEnv.designs[design].cost, 'design'];
                                     break;
                                 }
                             }
                         }
 
 
+                        // Create info link
                         if (planet.production[0]) {
                             report('Continuing construction of queued item ' + planet.production[0]);
                         } else {
@@ -2968,6 +2971,7 @@ function app() {
 
             discoveredPlanets.sort(sortDistance);
 
+            // Create info links
             while (items < maxItems) {
                 item = discoveredPlanets[items];
                 link1 = '';
@@ -3088,9 +3092,9 @@ function app() {
         //			separating logic.fleets to logic.fleets player/owner
 
         if (fleetName) {
-            fleet.name = fleetName + ' ' + env.fleets.length;
+            fleet.name = fleetName + ' ' + playerEnv.fleets.length;
         } else {
-            fleet.name = 'Joined fleet ' + env.fleets.length;
+            fleet.name = 'Joined fleet ' + playerEnv.fleets.length;
         }
 
         for (var x = shipList.length - 1; x > -1; x--) {
@@ -3417,7 +3421,7 @@ function app() {
         drawFleets();
 
         if (playerEnv.activeSelection) {
-            updateSelectionInfo(env.activeSelection);
+            updateSelectionInfo(playerEnv.activeSelection);
             drawSelection();
         }
 
@@ -3774,7 +3778,7 @@ function app() {
                 target = evt.target.parentNode.parentNode;
             }
 
-            target = env.fleets[ parseInt(target.attributes.name.value) ];
+            target = playerEnv.fleets[ parseInt(target.attributes.name.value) ];
             modal.style.display = 'none';
             modal.innerHTML = '';
             createSelection(target);
@@ -3847,29 +3851,29 @@ function app() {
         researchScreen += '<h3>Research</h3>';
         researchScreen += '<div id="activeResearch">';
 
-        if (env.research.project) {
-            researchScreen += '<p id="researchProject">Active research: ' + env.research.project[1] + '<p>';
+        if (playerEnv.research.project) {
+            researchScreen += '<p id="researchProject">Active research: ' + playerEnv.research.project[1] + '<p>';
         } else {
             researchScreen += '<p id="researchProject">Active research: No project selected<p>';
         }
 
         var turns = 0;
-        if (env.research.points !== 0) {
-            turns = Math.ceil((env.research.required - env.research.progress) / env.research.points);
+        if (playerEnv.research.points !== 0) {
+            turns = Math.ceil((playerEnv.research.required - playerEnv.research.progress) / playerEnv.research.points);
         }
 
-        researchScreen += '<p id="researchProgress">Progress ' + env.research.progress + ' of ' + env.research.required + ' (' + env.research.points + ' pts each turn, ' + turns + ' turns)<p>';
+        researchScreen += '<p id="researchProgress">Progress ' + playerEnv.research.progress + ' of ' + playerEnv.research.required + ' (' + playerEnv.research.points + ' pts each turn, ' + turns + ' turns)<p>';
         researchScreen += '</div>';
         researchScreen += '<div id="techGroupContainer">';
 
         // TODO: tech listing
-        var techSize = env.listedTechs.length;
+        var techSize = playerEnv.listedTechs.length;
         var subitems = 0;
         var tech = [];
         for (var techs = 0; techs < techSize; techs++) {
-            tech = env.listedTechs[techs];
+            tech = playerEnv.listedTechs[techs];
             researchScreen += '<div class="techGroup" name="' + techs + '">';
-            if (tech[0] === env.research.project) {
+            if (tech[0] === playerEnv.research.project) {
                 color = '#fff;';
             } else {
                 color = '#dedede;';
@@ -3898,7 +3902,7 @@ function app() {
         while (options--) {
             techElements[options].addEventListener("mouseover", function (evt) {
                 var keys = evt.target.getAttribute("name").split("_", 2);
-                document.getElementById('researchDescription').innerHTML = env.listedTechs[keys[0]][2][keys[1]][1];
+                document.getElementById('researchDescription').innerHTML = playerEnv.listedTechs[keys[0]][2][keys[1]][1];
             });
         }
 
@@ -3917,12 +3921,12 @@ function app() {
                 }
 
                 var techItem = parseInt(targetName);
-                env.research.project = [techItem, env.listedTechs[techItem][0]];
-                env.research.required = env.listedTechs[techItem][1];
-                env.research.progress = 0;
+                playerEnv.research.project = [techItem, env.listedTechs[techItem][0]];
+                playerEnv.research.required = env.listedTechs[techItem][1];
+                playerEnv.research.progress = 0;
 
-                document.getElementById('researchProject').innerHTML = 'Active research: ' + env.research.project[1];
-                document.getElementById('researchProgress').innerHTML = 'Progress ' + env.research.progress + ' of ' + env.research.required + ' (' + env.research.points + ' pts each turn, ' + Math.ceil(env.research.required / env.research.points) + ' turns)';
+                document.getElementById('researchProject').innerHTML = 'Active research: ' + playerEnv.research.project[1];
+                document.getElementById('researchProgress').innerHTML = 'Progress ' + playerEnv.research.progress + ' of ' + playerEnv.research.required + ' (' + playerEnv.research.points + ' pts each turn, ' + Math.ceil(playerEnv.research.required / playerEnv.research.points) + ' turns)';
             });
         }
 
@@ -3964,10 +3968,6 @@ function app() {
 
         modal.innerHTML = planetScreen;
 
-        var planet = {};
-        var planetName = "";
-        var planetInfo = "";
-
         var planetList = document.getElementById("planetList");
         var planetDetails = document.getElementById("planetDetails");
 
@@ -3979,8 +3979,7 @@ function app() {
         var sortByName = document.getElementById("sortByName");
         var sortByDistance = document.getElementById("sortByDistance");
         var sortBySize = document.getElementById("sortBySize");
-        sortByDistance.disabled = true;
-
+        sortByDistance.setAttribute("disabled", "disabled");
         planetList.setAttribute("name", "own");
 
         modal.style.display = 'inline';
@@ -3990,36 +3989,43 @@ function app() {
 
         // Bind colonizedPlanet filter and create list on click
         filterOwned.addEventListener("click", function (evt) {
-            var selected = document.getElementsByClassName("filterSelected")[0];
-            selected.className = selected.className.replace("filterSelected", "");
+            var selected = document.getElementsByClassName("filterSelected");
+            if (selected.length !== 0) {
+                selected[0].className = selected[0].className.replace("filterSelected", "");
+            }
             evt.target.className += "filterSelected";
             planetList.setAttribute("name", "own");
-            sortBySize.disabled = false;
-            sortByDistance.disabled = true;
+            sortBySize.removeAttribute("disabled");
+            sortByDistance.setAttribute("disabled", "disabled");
 
             createPlanetListItems("own");
         });
 
         // Bind knownPlanets filter and create list on click
         filterKnown.addEventListener("click", function (evt) {
-            var selected = document.getElementsByClassName("filterSelected")[0];
-            selected.className = selected.className.replace("filterSelected", "");
+            var selected = document.getElementsByClassName("filterSelected");
+            if (selected.length !== 0) {
+                selected[0].className = selected[0].className.replace("filterSelected", "");
+            }
             evt.target.className += "filterSelected";
             planetList.setAttribute("name", "known");
-            sortBySize.disabled = false;
-            sortByDistance.disabled = false;
+            sortBySize.removeAttribute("disabled");
+            sortByDistance.removeAttribute("disabled");
 
             createPlanetListItems("known");
         });
 
         // Bind unknownPlanets filter and create list on click
         filterUnknown.addEventListener("click", function (evt) {
-            var selected = document.getElementsByClassName("filterSelected")[0];
-            selected.className = selected.className.replace("filterSelected", "");
+            var selected = document.getElementsByClassName("filterSelected");
+            lg(selected)
+            if (selected.length !== 0) {
+                selected[0].className = selected[0].className.replace("filterSelected", "");
+            }
             evt.target.className += "filterSelected";
             planetList.setAttribute("name", "unknown");
-            sortBySize.disabled = true;
-            sortByDistance.disabled = false;
+            sortBySize.setAttribute("disabled", "disabled");
+            sortByDistance.removeAttribute("disabled");
 
             createPlanetListItems("unknown");
         });
@@ -4046,20 +4052,20 @@ function app() {
 
             switch (planetStoreKey) {
                 case "own":
-                    planetStore = env.ownedPlanets;
+                    planetStore = playerEnv.ownedPlanets;
                     break;
                 case "known":
-                    planetStore = env.knownPlanets;
+                    planetStore = playerEnv.knownPlanets;
                     break;
                 case "unknown":
-                    planetStore = env.unknownPlanets;
+                    planetStore = playerEnv.unknownPlanets;
                     break;
             }
 
             var planet = {};
             var storeCount = planetStore.length;
-            var playerPlanets = env.planets;
-            var playerPlanetCount = env.planets.length;
+            var playerPlanets = playerEnv.planets;
+            var playerPlanetCount = playerEnv.planets.length;
             var items = 0;
             var planetId = 0;
 
@@ -4102,7 +4108,7 @@ function app() {
             }
 
             // Remove active sorting
-            var actives = document.getElementsByClassName("active");
+            var actives = document.getElementsByClassName("activeFilter");
             if (actives.length === 1) {
                 actives[0].className = "";
             }
@@ -4119,10 +4125,10 @@ function app() {
                 items[elements].addEventListener("mouseover", function (evt) {
                     if (document.getElementsByClassName("active").length === 0) {
                         var targetPlanetId = parseInt(evt.target.getAttribute("name"));
-                        var items = env.planets.length;
+                        var items = playerEnv.planets.length;
                         while (items--) {
-                            if (env.planets[items].id === targetPlanetId) {
-                                showPlanetDetails(env.planets[items]);
+                            if (playerEnv.planets[items].id === targetPlanetId) {
+                                showPlanetDetails(playerEnv.planets[items]);
                                 return;
                             }
                         }
@@ -4135,8 +4141,8 @@ function app() {
 
                     if (evt.target.className === "active") {
                         evt.target.className = "";
-                        if (env.strg && playerEnv.ownedPlanets.indexOf(planetObj.id) !== -1) {
-                            env.strg = false;
+                        if (playerEnv.strg && playerEnv.ownedPlanets.indexOf(planetObj.id) !== -1) {
+                            playerEnv.strg = false;
                             scrollToLocation(planetObj, showPlanetDialog);
                         } else {
                             scrollToLocation(planetObj, false);
@@ -4176,7 +4182,7 @@ function app() {
                 var distanceX = 0;
                 var distanceY = 0;
                 var distance = 0;
-                var shortestDistance = 10000000;
+                var shortestDistance = -1;
                 var planets = playerEnv.ownedPlanets.length;
                 var srcPlanet = {};
                 var routeFrom = "";
@@ -4187,7 +4193,7 @@ function app() {
                     distanceY = Math.abs(srcPlanet.y - planet.y);
                     distance = Math.sqrt(Math.pow(distanceX, 2) + Math.pow(distanceY, 2));
 
-                    if (distance < shortestDistance) {
+                    if (distance < shortestDistance || shortestDistance === -1) {
                         shortestDistance = Math.round(distance);
                         routeFrom = srcPlanet.name;
                     }
