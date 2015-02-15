@@ -3,7 +3,7 @@ connect
 
 An approach for a space game based on HTML5 and javascript - linked to the feeling of Master of Orion 2.
 
-As of February, 2015 - the development has been halted as I have no ideas on what to work on next or how to improve the game concept to make it not just another Master of Orion 2 clone like game. Also there has been no decision made on what server side software to use in order to make the game really a multiplayer one. Some fundaments on how the data could be structure to archive server calculation has been done in vague using json files. If you are interested in anything of the above, please drop me an email here using the github address and I will reply to you promptly.
+As of February, 2015 - the development has been halted as I have no ideas on what to work on next - besides the AI which was what I was doing lately or how to improve the game concept to make it not just another Master of Orion 2 clone like game. Also there has been no decision made on what server side software to use in order to make the game really a multiplayer one. Some fundaments on how the data could be structure to archive server calculation has been done in vague using json files. If you are interested in anything of the above, please drop me an email here using the github address and I will reply to you promptly.
 
 Note: The game was mainly tested in Firefox, Chrome workability has just been added, IE 10 is supported. If you download onto your desktop, please start Chrome with the parameter: "--allow-file-access-from-files", because otherwise the Ajax request made to load the planet names is failing and nothing will show up.
 
